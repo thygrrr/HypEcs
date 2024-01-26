@@ -8,21 +8,12 @@ public interface ISystem
     void Run(World world);
 }
 
-public sealed class SystemGroup
+public sealed class SystemGroup : List<ISystem>
 {
-    readonly List<ISystem> _systems = new();
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public SystemGroup Add(ISystem aSystem)
-    {
-        _systems.Add(aSystem);
-        return this;
-    }
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Run(World world)
     {
-        foreach (var system in _systems)
+        foreach (var system in this)
         {
             system.Run(world);
         }

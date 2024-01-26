@@ -5,12 +5,12 @@ namespace HypEcs;
 
 public static class ListPool<T>
 {
-    static readonly Stack<List<T>> Stack = new();
+    private static readonly Stack<List<T>> Stack = new();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static List<T> Get()
     {
-        return Stack.Count > 0 ? Stack.Pop() : new List<T>();
+        return Stack.TryPop(out var list) ? list : new List<T>();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

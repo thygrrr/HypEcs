@@ -233,13 +233,13 @@ public class Query<C1, C2, C3, C4> : Query
     public void Run(Action<int, C1[], C2[], C3[], C4[]> action)
     {
         Archetypes.Lock();
-        
+
         for (var t = 0; t < Tables.Count; t++)
         {
             var table = Tables[t];
 
             if (table.IsEmpty) continue;
-            
+
             var s1 = table.GetStorage<C1>(Identity.None);
             var s2 = table.GetStorage<C2>(Identity.None);
             var s3 = table.GetStorage<C3>(Identity.None);
@@ -247,10 +247,10 @@ public class Query<C1, C2, C3, C4> : Query
 
             action(table.Count, s1, s2, s3, s4);
         }
-        
+
         Archetypes.Unlock();
     }
-    
+
     public void RunParallel(Action<int, C1[], C2[], C3[], C4[]> action)
     {
         Archetypes.Lock();

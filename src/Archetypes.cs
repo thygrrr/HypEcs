@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
+// ReSharper disable ReturnTypeCanBeEnumerable.Global
+
 namespace HypEcs;
 
 public sealed class Archetypes
@@ -17,14 +19,14 @@ public sealed class Archetypes
 
     internal int EntityCount;
 
-    readonly List<TableOperation> _tableOperations = new();
-    readonly Dictionary<Type, Entity> _typeEntities = new();
+    private readonly List<TableOperation> _tableOperations = new();
+    private readonly Dictionary<Type, Entity> _typeEntities = new();
     internal readonly Dictionary<StorageType, List<Table>> TablesByType = new();
-    readonly Dictionary<Identity, HashSet<StorageType>> _typesByRelationTarget = new();
-    readonly Dictionary<int, HashSet<StorageType>> _relationsByTypes = new();
+    private readonly Dictionary<Identity, HashSet<StorageType>> _typesByRelationTarget = new();
+    private readonly Dictionary<int, HashSet<StorageType>> _relationsByTypes = new();
 
-    int _lockCount;
-    bool _isLocked;
+    private int _lockCount;
+    private bool _isLocked;
 
     public Archetypes()
     {
@@ -72,7 +74,7 @@ public sealed class Archetypes
         meta.Row = 0;
         meta.Identity = Identity.None;
 
-        UnusedIds.Enqueue(identity);
+        UnusedIds.Enqueue(new Identity(identity.Id, (ushort) (identity.Generation + 1)));
 
         if (!_typesByRelationTarget.TryGetValue(identity, out var list))
         {
@@ -96,6 +98,8 @@ public sealed class Archetypes
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AddComponent(StorageType type, Identity identity, object data)
     {
+        AssertAlive(identity);
+        
         ref var meta = ref Meta[identity.Id];
         var oldTable = Tables[meta.TableId];
 
@@ -137,18 +141,24 @@ public sealed class Archetypes
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public ref T GetComponent<T>(Identity identity, Identity target)
     {
+        AssertAlive(identity);
+
         var type = StorageType.Create<T>(target);
         var meta = Meta[identity.Id];
+        AssertEqual(meta.Identity, identity);
         var table = Tables[meta.TableId];
         var storage = (T[])table.GetStorage(type);
         return ref storage[meta.Row];
     }
 
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool HasComponent(StorageType type, Identity identity)
     {
         var meta = Meta[identity.Id];
-        return meta.Identity != Identity.None && Tables[meta.TableId].Types.Contains(type);
+        return meta.Identity != Identity.None 
+               && meta.Identity == identity 
+               && Tables[meta.TableId].Types.Contains(type);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -182,7 +192,7 @@ public sealed class Archetypes
             var newEdge = newTable.GetTableEdge(type);
             newEdge.Add = oldTable;
 
-            Tables.Add(newTable);
+            //Tables.Add(newTable); <-- already added in AddTable
         }
 
         var newRow = Table.MoveEntry(identity, meta.Row, oldTable, newTable);
@@ -283,7 +293,7 @@ public sealed class Archetypes
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal bool IsAlive(Identity identity)
     {
-        return Meta[identity.Id].Identity != Identity.None;
+        return identity != Identity.None && Meta[identity.Id].Identity == identity;        
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -316,17 +326,19 @@ public sealed class Archetypes
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal Entity[] GetTargets(StorageType type, Identity identity)
     {
+        AssertAlive(identity);
+        
+        var list = ListPool<Entity>.Get();
+
         var meta = Meta[identity.Id];
         var table = Tables[meta.TableId];
-
-        var list = ListPool<Entity>.Get();
 
         foreach (var storageType in table.Types)
         {
             if (!storageType.IsRelation || storageType.TypeId != type.TypeId) continue;
             list.Add(new Entity(storageType.Identity));
         }
-
+        
         var targetEntities = list.ToArray();
         ListPool<Entity>.Add(list);
 
@@ -336,10 +348,13 @@ public sealed class Archetypes
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal (StorageType, object)[] GetComponents(Identity identity)
     {
+        AssertAlive(identity);
+
+        var list = ListPool<(StorageType, object)>.Get();
+
         var meta = Meta[identity.Id];
         var table = Tables[meta.TableId];
 
-        var list = ListPool<(StorageType, object)>.Get();
 
         foreach (var type in table.Types)
         {
@@ -353,7 +368,7 @@ public sealed class Archetypes
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    Table AddTable(SortedSet<StorageType> types)
+    private Table AddTable(SortedSet<StorageType> types)
     {
         var table = new Table(Tables.Count, this, types);
         Tables.Add(table);
@@ -404,13 +419,11 @@ public sealed class Archetypes
             _typeEntities.Add(type, entity);
         }
 
-        ;
-
         return entity;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    void ApplyTableOperations()
+    private void ApplyTableOperations()
     {
         foreach (var op in _tableOperations)
         {
@@ -441,7 +454,7 @@ public sealed class Archetypes
         ApplyTableOperations();
     }
 
-    struct TableOperation
+    private struct TableOperation
     {
         public bool Despawn;
         public bool Add;
@@ -449,4 +462,26 @@ public sealed class Archetypes
         public Identity Identity;
         public object Data;
     }
+    
+    
+    #region Assert Helpers
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void AssertAlive(Identity identity)
+    {
+        if (!IsAlive(identity))
+        {
+            throw new Exception($"Entity {identity} is not alive.");
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void AssertEqual(Identity metaIdentity, Identity identity)
+    {
+        if (metaIdentity != identity)
+        {
+            throw new Exception($"Entity {identity} meta/generation mismatch.");
+        }
+    }
+    #endregion
 }

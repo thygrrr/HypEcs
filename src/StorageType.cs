@@ -1,14 +1,13 @@
 using System;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace HypEcs;
 
-public struct StorageType : IComparable<StorageType>
+public readonly struct StorageType : IComparable<StorageType>, IEquatable<StorageType>
 {
-    public Type Type { get; private set; }
-    public ulong Value { get; private set; }
-    public bool IsRelation { get; private set; }
+    public required Type Type { get; init; }
+    public required ulong Value { get; init; }
+    public required bool IsRelation { get; init; }
 
     public ushort TypeId
     {
@@ -93,7 +92,7 @@ public static class TypeIdConverter
     }
 
     // ReSharper disable once ClassNeverInstantiated.Local
-    class TypeIdAssigner<T> : TypeIdAssigner
+    private class TypeIdAssigner<T> : TypeIdAssigner
     {
         // ReSharper disable once StaticMemberInGenericType
         public static readonly ushort Id;
