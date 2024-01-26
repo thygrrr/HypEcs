@@ -1,8 +1,11 @@
-# ThyECS
+# TigerECS
 
-A fork of [HypEcs](https://github.com/Byteron/HypEcs)
+*The lightweight and easy to use entity component system with an effective feature set for making games.*
 
-### A lightweight and easy to use entity component system with an effective feature set for making games.
+*TigerECS is a modernized fork of [HypEcs](https://github.com/Byteron/HypEcs) that builds upon its core strengths and enables cleaner system code.*
+
+
+# Legacy Documentation
 
 ## Components
 

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-namespace HypEcs;
+namespace ECS;
 
 public interface ISystem
 {
@@ -10,7 +10,7 @@ public interface ISystem
 
 public sealed class SystemGroup : List<ISystem>
 {
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public void Run(World world)
     {
         foreach (var system in this)

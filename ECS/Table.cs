@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-namespace HypEcs;
+namespace ECS;
 
 public sealed class TableEdge
 {
@@ -32,7 +32,7 @@ public sealed class Table
     readonly Dictionary<StorageType, TableEdge> _edges = new();
     readonly Dictionary<StorageType, int> _indices = new();
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public Table(int id, Archetypes archetypes, SortedSet<StorageType> types)
     {
         _archetypes = archetypes;
@@ -56,7 +56,7 @@ public sealed class Table
         }
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public int Add(Identity identity)
     {
         EnsureCapacity(Count + 1);
@@ -64,7 +64,7 @@ public sealed class Table
         return Count++;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public void Remove(int row)
     {
         if (row >= Count)
@@ -92,7 +92,7 @@ public sealed class Table
         }
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public TableEdge GetTableEdge(StorageType type)
     {
         if (_edges.TryGetValue(type, out var edge)) return edge;
@@ -103,20 +103,20 @@ public sealed class Table
         return edge;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public T[] GetStorage<T>(Identity target)
     {
         var type = StorageType.Create<T>(target);
         return (T[])GetStorage(type);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public Array GetStorage(StorageType type)
     {
         return _storages[_indices[type]];
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     void EnsureCapacity(int capacity)
     {
         if (capacity <= 0) throw new ArgumentOutOfRangeException(nameof(capacity), "minCapacity must be positive");
@@ -125,7 +125,7 @@ public sealed class Table
         Resize(Math.Max(capacity, StartCapacity) << 1);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     void Resize(int length)
     {
         if (length < 0) throw new ArgumentOutOfRangeException(nameof(length), "length cannot be negative");
@@ -143,7 +143,7 @@ public sealed class Table
         }
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public static int MoveEntry(Identity identity, int oldRow, Table oldTable, Table newTable)
     {
         var newRow = newTable.Add(identity);

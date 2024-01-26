@@ -1,6 +1,4 @@
-using System.Runtime.CompilerServices;
-
-namespace HypEcs;
+namespace ECS;
 
 public struct EntityMeta
 {
@@ -20,24 +18,24 @@ public readonly struct Identity
 {
     public static Identity None = default;
     public static Identity Any = new(int.MaxValue, 0);
-
+    
     public readonly int Id;
     public readonly ushort Generation;
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public Identity(int id, ushort generation = 1)
     {
         Id = id;
         Generation = generation;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public override bool Equals(object? obj)
     {
         return (obj is Identity other) && Id == other.Id && Generation == other.Generation;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public override int GetHashCode()
     {
         unchecked // Allow arithmetic overflow, numbers will just "wrap around"
@@ -49,15 +47,14 @@ public readonly struct Identity
         }
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public override string ToString()
     {
         return Id.ToString();
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator ==(Identity left, Identity right) => left.Equals(right);
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator Entity(Identity id) => new(id);
+    public static bool operator ==(Identity left, Identity right) => left.Equals(right);
     public static bool operator !=(Identity left, Identity right) => !left.Equals(right);
 }

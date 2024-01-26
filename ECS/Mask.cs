@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-namespace HypEcs;
+namespace ECS;
 
 public sealed class Mask
 {
@@ -9,19 +9,19 @@ public sealed class Mask
     internal readonly List<StorageType> NotTypes = new();
     internal readonly List<StorageType> AnyTypes = new();
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public void Has(StorageType type)
     {
         HasTypes.Add(type);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public void Not(StorageType type)
     {
         NotTypes.Add(type);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public void Any(StorageType type)
     {
         AnyTypes.Add(type);
@@ -34,7 +34,7 @@ public sealed class Mask
         AnyTypes.Clear();
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public override int GetHashCode()
     {
         var hash = HasTypes.Count + AnyTypes.Count + NotTypes.Count;

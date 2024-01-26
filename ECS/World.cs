@@ -1,18 +1,15 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
-namespace HypEcs;
+namespace ECS;
 
 public struct Element<T>
 {
     public T Value;
 }
     
-public sealed class World
+public sealed class World : IDisposable
 {
-    static int worldCount;
-
     readonly Entity _world;
     readonly WorldInfo _worldInfo;
 
@@ -20,33 +17,33 @@ public sealed class World
 
     public WorldInfo Info => _worldInfo;
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public World()
     {
         _world = _archetypes.Spawn();
-        _worldInfo = new WorldInfo(++worldCount);
+        _worldInfo = new WorldInfo();
         _archetypes.AddComponent(StorageType.Create<WorldInfo>(Identity.None), _world.Identity, _worldInfo);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public EntityBuilder Spawn()
     {
         return new EntityBuilder(this, _archetypes.Spawn());
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public EntityBuilder On(Entity entity)
     {
         return new EntityBuilder(this, entity);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public void Despawn(Entity entity)
     {
         _archetypes.Despawn(entity.Identity);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public void DespawnAllWith<T>() where T : struct
     {
         var query = Query<Entity>().Has<T>().Build();
@@ -60,59 +57,59 @@ public sealed class World
         });
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public bool IsAlive(Entity entity)
     {
         return _archetypes.IsAlive(entity.Identity);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public ref T GetComponent<T>(Entity entity) where T : struct
     {
         return ref _archetypes.GetComponent<T>(entity.Identity, Identity.None);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public bool HasComponent<T>(Entity entity) where T : struct
     {
         var type = StorageType.Create<T>(Identity.None);
         return _archetypes.HasComponent(type, entity.Identity);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public void AddComponent<T>(Entity entity) where T : struct
     {
         var type = StorageType.Create<T>(Identity.None);
         _archetypes.AddComponent(type, entity.Identity, new T());
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public void AddComponent<T>(Entity entity, T component) where T : struct
     {
         var type = StorageType.Create<T>(Identity.None);
         _archetypes.AddComponent(type, entity.Identity, component);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public void RemoveComponent<T>(Entity entity) where T : struct
     {
         var type = StorageType.Create<T>(Identity.None);
         _archetypes.RemoveComponent(type, entity.Identity);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public IEnumerable<(StorageType, object)> GetComponents(Entity entity)
     {
         return _archetypes.GetComponents(entity.Identity);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public Ref<T> GetComponent<T>(Entity entity, Entity target) where T : struct
     {
         return new Ref<T>(ref _archetypes.GetComponent<T>(entity.Identity, target.Identity));
     }
         
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public bool TryGetComponent<T>(Entity entity, out Ref<T> component) where T : struct
     {
         if (!HasComponent<T>(entity))
@@ -125,14 +122,14 @@ public sealed class World
         return true;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public bool HasComponent<T>(Entity entity, Entity target) where T : struct
     {
         var type = StorageType.Create<T>(target.Identity);
         return _archetypes.HasComponent(type, entity.Identity);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public bool HasComponent<T>(Entity entity, Type target) where T : struct
     {
         var targetEntity = GetTypeEntity(target);
@@ -141,48 +138,48 @@ public sealed class World
         return _archetypes.HasComponent(type, entity.Identity);
     }    
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public void AddComponent<T>(Entity entity, Entity target) where T : struct
     {
         var type = StorageType.Create<T>(target.Identity);
-        _archetypes.AddComponent(type, entity.Identity, new T());
+        _archetypes.AddComponent(type, entity.Identity, new T(), target);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public void AddComponent<T>(Entity entity, T component, Entity target) where T : struct
     {
         var type = StorageType.Create<T>(target.Identity);
-        _archetypes.AddComponent(type, entity.Identity, component);
+        _archetypes.AddComponent(type, entity.Identity, component, target);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public void RemoveComponent<T>(Entity entity, Entity target) where T : struct
     {
         var type = StorageType.Create<T>(target.Identity);
         _archetypes.RemoveComponent(type, entity.Identity);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public Entity GetTarget<T>(Entity entity) where T : struct
     {
         var type = StorageType.Create<T>(Identity.None);
         return _archetypes.GetTarget(type, entity.Identity);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public IEnumerable<Entity> GetTargets<T>(Entity entity) where T : struct
     {
         var type = StorageType.Create<T>(Identity.None);
         return _archetypes.GetTargets(type, entity.Identity);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public T GetElement<T>() where T : class
     {
         return _archetypes.GetComponent<Element<T>>(_world.Identity, Identity.None).Value;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public bool TryGetElement<T>(out T? element) where T : class
     {
         if (!HasElement<T>())
@@ -195,28 +192,28 @@ public sealed class World
         return true;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public bool HasElement<T>() where T : class
     {
         var type = StorageType.Create<Element<T>>(Identity.None);
         return _archetypes.HasComponent(type, _world.Identity);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public void AddElement<T>(T element) where T : class
     {
         var type = StorageType.Create<Element<T>>(Identity.None);
         _archetypes.AddComponent(type, _world.Identity, new Element<T> { Value = element });
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public void ReplaceElement<T>(T element) where T : class
     {
         RemoveElement<T>();
         AddElement(element);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public void AddOrReplaceElement<T>(T element) where T : class
     {
         if (HasElement<T>())
@@ -227,7 +224,7 @@ public sealed class World
         AddElement(element);
     }
         
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public void RemoveElement<T>() where T : class
     {
         var type = StorageType.Create<Element<T>>(Identity.None);
@@ -305,7 +302,7 @@ public sealed class World
         return new QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8>(_archetypes);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public void Tick()
     {
         _worldInfo.EntityCount = _archetypes.EntityCount;
@@ -317,16 +314,21 @@ public sealed class World
         _worldInfo.QueryCount = _archetypes.Queries.Count;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     internal Entity GetTypeEntity(Type type)
     {
         return _archetypes.GetTypeEntity(type);
+    }
+
+    public void Dispose()
+    {
+        
     }
 }
 
 public sealed class WorldInfo
 {
-    public readonly int WorldId;
+    public readonly Guid WorldId = Guid.NewGuid();
     public int EntityCount;
     public int UnusedEntityCount;
     public int AllocatedEntityCount;
@@ -336,9 +338,4 @@ public sealed class WorldInfo
     // public int RelationCount;
     public int ElementCount;
     public int QueryCount;
-
-    public WorldInfo(int id)
-    {
-        WorldId = id;
-    }
 }

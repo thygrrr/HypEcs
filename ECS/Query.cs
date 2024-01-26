@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
-namespace HypEcs;
+namespace ECS;
 
 public class Query
 {
@@ -12,7 +12,7 @@ public class Query
     internal readonly Archetypes Archetypes;
     internal readonly Mask Mask;
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public Query(Archetypes archetypes, Mask mask, List<Table> tables)
     {
         Tables = tables;
@@ -20,7 +20,7 @@ public class Query
         Mask = mask;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public bool Has(Entity entity)
     {
         var meta = Archetypes.GetEntityMeta(entity.Identity);
@@ -28,7 +28,7 @@ public class Query
         return Tables.Contains(table);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     internal void AddTable(Table table)
     {
         Tables.Add(table);
@@ -42,7 +42,7 @@ public class Query<C> : Query
     {
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public ref C Get(Entity entity)
     {
         var meta = Archetypes.GetEntityMeta(entity.Identity);
@@ -96,7 +96,7 @@ public class Query<C1, C2> : Query
     {
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public RefValueTuple<C1, C2> Get(Entity entity)
     {
         var meta = Archetypes.GetEntityMeta(entity.Identity);
@@ -154,7 +154,7 @@ public class Query<C1, C2, C3> : Query
     {
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public RefValueTuple<C1, C2, C3> Get(Entity entity)
     {
         var meta = Archetypes.GetEntityMeta(entity.Identity);
@@ -217,7 +217,7 @@ public class Query<C1, C2, C3, C4> : Query
     {
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public RefValueTuple<C1, C2, C3, C4> Get(Entity entity)
     {
         var meta = Archetypes.GetEntityMeta(entity.Identity);
@@ -284,7 +284,7 @@ public class Query<C1, C2, C3, C4, C5> : Query
     {
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public RefValueTuple<C1, C2, C3, C4, C5> Get(Entity entity)
     {
         var meta = Archetypes.GetEntityMeta(entity.Identity);
@@ -355,7 +355,7 @@ public class Query<C1, C2, C3, C4, C5, C6> : Query
     {
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public RefValueTuple<C1, C2, C3, C4, C5, C6> Get(Entity entity)
     {
         var meta = Archetypes.GetEntityMeta(entity.Identity);
@@ -431,7 +431,7 @@ public class Query<C1, C2, C3, C4, C5, C6, C7> : Query
     {
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public RefValueTuple<C1, C2, C3, C4, C5, C6, C7> Get(Entity entity)
     {
         var meta = Archetypes.GetEntityMeta(entity.Identity);
@@ -511,7 +511,7 @@ public class Query<C1, C2, C3, C4, C5, C6, C7, C8> : Query
     {
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public RefValueTuple<C1, C2, C3, C4, C5, C6, C7, C8> Get(Entity entity)
     {
         var meta = Archetypes.GetEntityMeta(entity.Identity);
@@ -595,7 +595,7 @@ public class Query<C1, C2, C3, C4, C5, C6, C7, C8, C9> : Query
     {
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    
     public RefValueTuple<C1, C2, C3, C4, C5, C6, C7, C8, C9> Get(Entity entity)
     {
         var meta = Archetypes.GetEntityMeta(entity.Identity);
