@@ -4,6 +4,19 @@
 
 *TigerECS is a modernized fork of [HypEcs](https://github.com/Byteron/HypEcs) that builds upon its core strengths and enables cleaner system code.*
 
+# Highlights / Design Goals
+
+- Entity-Target-Relations with O(1) lookup time complexity.
+- Entity-Component Queries with O(1) lookup time complexity.
+- Entity Spawning and Despawning with O(1) time complexity.
+- Entity Structural Changes with O(1) time complexity (per individual change).
+
+- Parallelizable workloads across Archetypes (old) and within Archetypes (new).
+
+- Unit Test coverage.
+- Benchmarking suite.
+- Clean C# 12 codebase, targeting .NET 7 and .NET 8.
+- Godot 4.x Sample Integrations.
 
 # Legacy Documentation
 
