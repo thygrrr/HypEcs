@@ -1,6 +1,6 @@
 ## ... the tiny, tiny, high-energy Entity Component System!
 ![GitHub issues](https://img.shields.io/github/issues-raw/thygrrr/fennECS)
-![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/thygrrr/fennECS/xUnit.yml) 
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/thygrrr/fennECS/:workflow?style=for-the-badge&link=https%3A%2F%2Fgithub.com%2Fthygrrr%2FfennECS%2Factions%2Fworkflows%2FxUnit.yml)
 ![GitHub commits since latest release (branch)](https://img.shields.io/github/commits-since/thygrrr/fennECS/latest/main)
 
 
