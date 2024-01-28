@@ -8,9 +8,9 @@ public sealed class Archetypes
 {
 	internal EntityMeta[] Meta = new EntityMeta[512];
 
-	internal readonly Queue<Identity> UnusedIds = new();
+	internal readonly ConcurrentBag<Identity> UnusedIds = [];
 
-	internal readonly List<Table> Tables = new();
+	internal readonly List<Table> Tables = [];
 
 	internal readonly Dictionary<int, Query> Queries = new();
 
@@ -18,7 +18,7 @@ public sealed class Archetypes
 
 	private readonly ConcurrentQueue<DeferredOperation> _tableOperations = new();
 	private readonly Dictionary<Type, Entity> _typeEntities = new();
-	internal readonly Dictionary<TypeExpression, List<Table>> TablesByType = new();
+	private readonly Dictionary<TypeExpression, List<Table>> _tablesByType = new();
 	private readonly Dictionary<Identity, HashSet<TypeExpression>> _typesByRelationTarget = new();
 	private readonly Dictionary<TypeFamily, HashSet<Entity>> _targetsByRelationType = new();
 	private readonly Dictionary<int, HashSet<TypeExpression>> _relationsByTypes = new();
@@ -28,19 +28,22 @@ public sealed class Archetypes
 
 	public Archetypes()
 	{
-		AddTable(new SortedSet<TypeExpression> { TypeExpression.Create<Entity>(Identity.None) });
+		AddTable([TypeExpression.Create<Entity>(Identity.None)]);
 	}
 
 	
 	public Entity Spawn()
 	{
-		var identity = UnusedIds.Count > 0 ? UnusedIds.Dequeue() : new Identity(++EntityCount);
+		if (!UnusedIds.TryTake(out var identity))
+		{
+			identity = new Identity(++EntityCount);
+		}
 
 		var table = Tables[0];
 
 		var row = table.Add(identity);
 
-		if (Meta.Length == EntityCount) Array.Resize(ref Meta, EntityCount << 1);
+		if (Meta.Length == EntityCount) Array.Resize(ref Meta, EntityCount * 2);
 
 		Meta[identity.Id] = new EntityMeta(identity, table.Id, row);
 
@@ -72,7 +75,7 @@ public sealed class Archetypes
 		meta.Row = 0;
 		meta.Identity = Identity.None;
 
-		UnusedIds.Enqueue(new Identity(identity.Id, (ushort) (identity.Generation + 1)));
+		UnusedIds.Add(new Identity(identity.Id, (ushort) (identity.Generation + 1)));
 
 		//Remove components from all entities that had a relation pointing to the despawned entity
 		if (!_typesByRelationTarget.TryGetValue(identity, out var list))
@@ -84,7 +87,7 @@ public sealed class Archetypes
 		{
 			_targetsByRelationType[type].Remove(identity);
 			
-			var tablesWithType = TablesByType[type];
+			var tablesWithType = _tablesByType[type];
 
 			foreach (var tableWithType in tablesWithType)
 			{
@@ -97,43 +100,43 @@ public sealed class Archetypes
 	}
 
 	
-	public void AddComponent<T>(TypeExpression type_expression, Identity identity, T data, Entity target = default)
+	public void AddComponent<T>(TypeExpression typeExpression, Identity identity, T data, Entity target = default)
 	{
 		AssertAlive(identity);
 
 		ref var meta = ref Meta[identity.Id];
 		var oldTable = Tables[meta.TableId];
 
-		if (oldTable.Types.Contains(type_expression))
+		if (oldTable.Types.Contains(typeExpression))
 		{
-			throw new ArgumentException($"Entity {identity} already has component of type {type_expression}");
+			throw new ArgumentException($"Entity {identity} already has component of type {typeExpression}");
 		}
 
 		if (_isLocked)
 		{
-			_tableOperations.Enqueue(new DeferredOperation { Operation = TableOp.Add, Identity = identity, TypeExpression = type_expression, Data = data! });
+			_tableOperations.Enqueue(new DeferredOperation { Operation = TableOp.Add, Identity = identity, TypeExpression = typeExpression, Data = data! });
 			return;
 		}
 
-		if (!_targetsByRelationType.ContainsKey(type_expression))
+		if (!_targetsByRelationType.ContainsKey(typeExpression))
 		{
-			_targetsByRelationType[type_expression] = new ();
+			_targetsByRelationType[typeExpression] = [];
 		}
-		_targetsByRelationType[type_expression].Add(identity);
+		_targetsByRelationType[typeExpression].Add(identity);
 		
 		
-		var oldEdge = oldTable.GetTableEdge(type_expression);
+		var oldEdge = oldTable.GetTableEdge(typeExpression);
 
 		var newTable = oldEdge.Add;
 
 		if (newTable == null)
 		{
 			var newTypes = oldTable.Types.ToList();
-			newTypes.Add(type_expression);
+			newTypes.Add(typeExpression);
 			newTable = AddTable(new SortedSet<TypeExpression>(newTypes));
 			oldEdge.Add = newTable;
 
-			var newEdge = newTable.GetTableEdge(type_expression);
+			var newEdge = newTable.GetTableEdge(typeExpression);
 			newEdge.Remove = oldTable;
 		}
 
@@ -142,7 +145,7 @@ public sealed class Archetypes
 		meta.Row = newRow;
 		meta.TableId = newTable.Id;
 
-		var storage = newTable.GetStorage(type_expression);
+		var storage = newTable.GetStorage(typeExpression);
 		storage.SetValue(data, newRow);
 	}
 
@@ -161,51 +164,51 @@ public sealed class Archetypes
 
 
 	
-	public bool HasComponent(TypeExpression type_expression, Identity identity)
+	public bool HasComponent(TypeExpression typeExpression, Identity identity)
 	{
 		var meta = Meta[identity.Id];
 		return meta.Identity != Identity.None
 			   && meta.Identity == identity
-			   && Tables[meta.TableId].Types.Contains(type_expression);
+			   && Tables[meta.TableId].Types.Contains(typeExpression);
 	}
 
 	
-	public void RemoveComponent(TypeExpression type_expression, Identity identity)
+	public void RemoveComponent(TypeExpression typeExpression, Identity identity)
 	{
 		ref var meta = ref Meta[identity.Id];
 		var oldTable = Tables[meta.TableId];
 
-		if (!oldTable.Types.Contains(type_expression))
+		if (!oldTable.Types.Contains(typeExpression))
 		{
-			throw new ArgumentException($"cannot remove non-existent component {type_expression.Type.Name} from entity {identity}");
+			throw new ArgumentException($"cannot remove non-existent component {typeExpression.Type.Name} from entity {identity}");
 		}
 
 		if (_isLocked)
 		{
-			_tableOperations.Enqueue(new DeferredOperation { Operation = TableOp.Remove, Identity = identity, TypeExpression = type_expression });
+			_tableOperations.Enqueue(new DeferredOperation { Operation = TableOp.Remove, Identity = identity, TypeExpression = typeExpression });
 			return;
 		}
 		
 
 		// could be _targetsByRelationType[type.Wildcard()].Remove(identity);
 		//(with enough unit test coverage)
-		if (_targetsByRelationType.TryGetValue(type_expression, out var targetSet))
+		if (_targetsByRelationType.TryGetValue(typeExpression, out var targetSet))
 		{
 			targetSet.Remove(identity);
 		}
 		
-		var oldEdge = oldTable.GetTableEdge(type_expression);
+		var oldEdge = oldTable.GetTableEdge(typeExpression);
 
 		var newTable = oldEdge.Remove;
 
 		if (newTable == null)
 		{
 			var newTypes = oldTable.Types.ToList();
-			newTypes.Remove(type_expression);
+			newTypes.Remove(typeExpression);
 			newTable = AddTable(new SortedSet<TypeExpression>(newTypes));
 			oldEdge.Remove = newTable;
 
-			var newEdge = newTable.GetTableEdge(type_expression);
+			var newEdge = newTable.GetTableEdge(typeExpression);
 			newEdge.Add = oldTable;
 
 			//Tables.Add(newTable); <-- already added in AddTable
@@ -231,10 +234,10 @@ public sealed class Archetypes
 		var matchingTables = new List<Table>();
 
 		var type = mask.HasTypes[0];
-		if (!TablesByType.TryGetValue(type, out var typeTables))
+		if (!_tablesByType.TryGetValue(type, out var typeTables))
 		{
-			typeTables = new List<Table>();
-			TablesByType[type] = typeTables;
+			typeTables = [];
+			_tablesByType[type] = typeTables;
 		}
 
 		foreach (var table in typeTables)
@@ -325,14 +328,14 @@ public sealed class Archetypes
 	}
 
 	
-	internal Entity GetTarget(TypeExpression type_expression, Identity identity)
+	internal Entity GetTarget(TypeExpression typeExpression, Identity identity)
 	{
 		var meta = Meta[identity.Id];
 		var table = Tables[meta.TableId];
 
 		foreach (var storageType in table.Types)
 		{
-			if (!storageType.IsRelation || storageType.TypeId != type_expression.TypeId) continue;
+			if (!storageType.IsRelation || storageType.TypeId != typeExpression.TypeId) continue;
 			return new Entity(storageType.Identity);
 		}
 
@@ -340,11 +343,11 @@ public sealed class Archetypes
 	}
 
 	
-	internal Entity[] GetTargets(TypeExpression type_expression, Identity identity)
+	internal Entity[] GetTargets(TypeExpression typeExpression, Identity identity)
 	{
 		if (identity == Identity.Any)
 		{
-			return _targetsByRelationType.TryGetValue(type_expression, out var entitySet)
+			return _targetsByRelationType.TryGetValue(typeExpression, out var entitySet)
 				? entitySet.ToArray()
 				: Array.Empty<Entity>();
 		}
@@ -356,7 +359,7 @@ public sealed class Archetypes
 		var table = Tables[meta.TableId];
 		foreach (var storageType in table.Types)
 		{
-			if (!storageType.IsRelation || storageType.TypeId != type_expression.TypeId) continue;
+			if (!storageType.IsRelation || storageType.TypeId != typeExpression.TypeId) continue;
 			list.Add(new Entity(storageType.Identity));
 		}
 
@@ -396,10 +399,10 @@ public sealed class Archetypes
 
 		foreach (var type in types)
 		{
-			if (!TablesByType.TryGetValue(type, out var tableList))
+			if (!_tablesByType.TryGetValue(type, out var tableList))
 			{
-				tableList = new List<Table>();
-				TablesByType[type] = tableList;
+				tableList = [];
+				_tablesByType[type] = tableList;
 			}
 
 			tableList.Add(table);
@@ -408,7 +411,7 @@ public sealed class Archetypes
 
 			if (!_typesByRelationTarget.TryGetValue(type.Identity, out var typeList))
 			{
-				typeList = new HashSet<TypeExpression>();
+				typeList = [];
 				_typesByRelationTarget[type.Identity] = typeList;
 			}
 
@@ -416,7 +419,7 @@ public sealed class Archetypes
 			
 			if (!_relationsByTypes.TryGetValue(type.TypeId, out var relationTypeSet))
 			{
-				relationTypeSet = new HashSet<TypeExpression>();
+				relationTypeSet = [];
 				_relationsByTypes[type.TypeId] = relationTypeSet;
 			}
 

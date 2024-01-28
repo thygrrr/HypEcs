@@ -29,7 +29,7 @@ public readonly struct TypeExpression :
     
     public override bool Equals(object? obj)
     {
-        return (obj is TypeExpression other) && Value == other.Value;
+        return obj is TypeExpression other && Value == other.Value;
     }
         
     

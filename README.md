@@ -1,8 +1,8 @@
-# ... the tiny, tiny, high-energy Entity Component System!
+# 🚧 ... the tiny, tiny, high-energy Entity Component System!
 
 ![a box of fennecs, 8-color pixel art](Documentation/Logos/fennecs.png)
 
-*fennECS is a re-imagined fork of [HypEcs](https://github.com/Byteron/HypEcs) that builds upon its core strengths and enables cleaner system code and more deliberate, bi-directional entity relations.*
+*fennECS is a re-imagined fork of [HypEcs](https://github.com/Byteron/HypEcs) that builds upon its core strengths and enables cleaner system code and more deliberate, bi-directional entity relations. It makes use of C# language features to further reduce boilerplate and opportunities for error.*
 
 
 ## Plays well with Godot 4.x!
