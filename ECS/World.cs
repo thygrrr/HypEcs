@@ -7,19 +7,14 @@ public struct Element<T>
     
 public sealed class World : IDisposable
 {
-    private readonly Entity _world;
-    private readonly WorldInfo _worldInfo;
+    //private readonly Entity _world;
 
     private readonly Archetypes _archetypes = new();
 
-    public WorldInfo Info => _worldInfo;
 
-    
     public World()
     {
-        _world = _archetypes.Spawn();
-        _worldInfo = new WorldInfo();
-        _archetypes.AddComponent(TypeExpression.Create<WorldInfo>(Identity.None), _world.Identity, _worldInfo);
+        //_world = _archetypes.Spawn();
     }
 
     
@@ -171,6 +166,7 @@ public sealed class World : IDisposable
     }
 
     
+    /* I don't think this is necessary.
     public T GetElement<T>() where T : class
     {
         return _archetypes.GetComponent<Element<T>>(_world.Identity, Identity.None).Value;
@@ -227,6 +223,8 @@ public sealed class World : IDisposable
         var type = TypeExpression.Create<Element<T>>(Identity.None);
         _archetypes.RemoveComponent(type, _world.Identity);
     }
+     */
+    
 
     public QueryBuilder<Entity> Query()
     {
@@ -299,7 +297,8 @@ public sealed class World : IDisposable
         return new QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8>(_archetypes);
     }
 
-    
+
+    /* I don't think this is necessary.
     public void Tick()
     {
         _worldInfo.EntityCount = _archetypes.EntityCount;
@@ -310,6 +309,7 @@ public sealed class World : IDisposable
         _worldInfo.ElementCount = _archetypes.Tables[_archetypes.Meta[_world.Identity.Id].TableId].Types.Count;
         _worldInfo.QueryCount = _archetypes.Queries.Count;
     }
+    */
 
     
     internal Entity GetTypeEntity(Type type)
@@ -319,7 +319,6 @@ public sealed class World : IDisposable
 
     public void Dispose()
     {
-        
     }
 }
 

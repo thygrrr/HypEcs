@@ -12,14 +12,15 @@ public class ConcurrentArrayBenchmarks
     private static readonly Random random = new(1337);
 
     private ConcurrentBag<Vector3> _bag = null!;
-    private readonly ConcurrentBag<Vector3> _bag2 = [];
+    private ConcurrentBag<Vector3> _bag2 = null!;
     private List<Vector3> _list = null!;
     
     [GlobalSetup]
     public void Setup()
     {
         var randoms = Enumerable.Range(0, entityCount).Select(_ => new Vector3(random.Next(), random.Next(), random.Next())).ToArray();
-        _bag = new ConcurrentBag<Vector3>(randoms);
+        _bag = [..randoms];
+        _bag2 = [];
         _list = [..randoms];
     }
 

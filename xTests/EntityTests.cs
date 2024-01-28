@@ -42,6 +42,15 @@ public class EntityTests(ITestOutputHelper output)
     }
 
     [Fact]
+    private void Entity_can_Get_Component()
+    {
+        using var world = new World();
+        var entity = world.Spawn().Add<int>(123).Id();
+        var x = world.GetComponent<int>(entity);
+        Assert.Equal(123, x);
+    }
+
+    [Fact]
     private void Entity_can_Remove_Component()
     {
         using var world = new World();
