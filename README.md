@@ -1,5 +1,5 @@
 ## ... the tiny, tiny, high-energy Entity Component System!
-![GitHub issues](https://img.shields.io/github/issues-raw/thygrrr/fennECS) ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/thygrrr/fennECS/build-nuget) ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/thygrrr/fennECS/build-godot) 
+![GitHub issues](https://img.shields.io/github/issues-raw/thygrrr/fennECS) ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/thygrrr/fennECS/xUnit%20Tests) ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/thygrrr/fennECS/build-godot) 
 ![GitHub commits since latest release (branch)](https://img.shields.io/github/commits-since/thygrrr/fennECS/latest/main)
 
 
