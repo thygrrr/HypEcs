@@ -1,14 +1,12 @@
-# fennECS
+# fennECS, the tiny, tiny, high-energy Entity Component System!
 
-*The tiny, tiny, high-energy Entity Component System!*
-
-![a box of Fennecs, 8-color pixel art](Documentation/Logos/fennecs-social-panel.png)
+![a box of fennecs, 8-color pixel art](Documentation/Logos/fennecs.png)
 
 *fennECS is a re-imagined fork of [HypEcs](https://github.com/Byteron/HypEcs) that builds upon its core strengths and enables cleaner system code and more deliberate, bi-directional entity relations.*
 
 
 ## Plays well with Godot 4.x!
-<img src="Documentation/Logos/godot-icon.svg" width="128px" alt="Godot Engine Logo, Copyright (c) 2017 Andrea Calabró"/>
+<img src="Documentation/Logos/godot-icon.svg" width="128px" alt="Godot Engine Logo, Copyright (c) 2017 Andrea Calabró" />
 
 Coming Soon: fennECS as a NuGet package and as a Godot addon. 
 
