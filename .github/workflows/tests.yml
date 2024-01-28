@@ -19,7 +19,7 @@ jobs:
         dotnet-version: '8.0.x'  # Specify the .NET version
 
     - name: Restore dependencies
-      run: dotnet restore xTests/xTests.csproj  # Path to your project file
+      run: dotnet restore xTests/xTests.csproj
 
     - name: Build
       run: dotnet build --no-restore xTests/xTests.csproj
