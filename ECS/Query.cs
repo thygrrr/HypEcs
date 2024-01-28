@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-
 namespace ECS;
 
 public class Query
@@ -35,13 +30,9 @@ public class Query
     }
 }
 
-public class Query<C> : Query
-    where C : struct
+public class Query<C>(Archetypes archetypes, Mask mask, List<Table> tables) : Query(archetypes, mask, tables) where C : struct
 {
-    public Query(Archetypes archetypes, Mask mask, List<Table> tables) : base(archetypes, mask, tables)
-    {
-    }
-
+    public delegate void SpanAction<T, in TArg>(Span<T> span, TArg arg);
     
     public ref C Get(Entity entity)
     {
@@ -51,6 +42,23 @@ public class Query<C> : Query
         return ref storage[meta.Row];
     }
 
+    public void Run<TArg>(SpanAction<C, TArg> action, in TArg state)
+    {
+        Archetypes.Lock();
+        
+        foreach (var table in Tables)
+        {
+            if (table.IsEmpty) continue;
+
+            var storage = table.GetStorage<C>(Identity.None);
+            var span = storage.AsSpan<C>(0, table.Count);
+
+            action(span, state);
+        }
+        
+        Archetypes.Unlock();
+    }
+    
     public void Run(Action<int, C[]> action)
     {
         Archetypes.Lock();

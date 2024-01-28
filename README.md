@@ -15,7 +15,7 @@
 
 - Unit Test coverage.
 - Benchmarking suite.
-- Clean C# 12 codebase, targeting .NET 7 and .NET 8.
+- Modern C# 12 codebase, targeting .NET 8.
 - Godot 4.x Sample Integrations.
 
 # Legacy Documentation

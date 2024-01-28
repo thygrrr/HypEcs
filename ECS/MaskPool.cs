@@ -1,11 +1,8 @@
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-
 namespace ECS;
 
 public static class MaskPool
 {
-    static readonly Stack<Mask> Stack = new();
+    private static readonly Stack<Mask> Stack = new();
 
     
     public static Mask Get()

@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace ECS;
 
 public struct Element<T>
@@ -10,10 +7,10 @@ public struct Element<T>
     
 public sealed class World : IDisposable
 {
-    readonly Entity _world;
-    readonly WorldInfo _worldInfo;
+    private readonly Entity _world;
+    private readonly WorldInfo _worldInfo;
 
-    readonly Archetypes _archetypes = new();
+    private readonly Archetypes _archetypes = new();
 
     public WorldInfo Info => _worldInfo;
 

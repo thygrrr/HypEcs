@@ -2,7 +2,7 @@
 
 public class StorageTypeTests(ITestOutputHelper output)
 {
-    private struct Type1 { }
+    private struct Type1;
 
     [Fact]
     public void StorageType_is_Comparable()

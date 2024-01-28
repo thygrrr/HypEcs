@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-
 namespace ECS;
 
 public interface ISystem

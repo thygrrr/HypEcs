@@ -1,6 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace ECS;
 
@@ -12,7 +10,7 @@ public sealed class TableEdge
 
 public sealed class Table
 {
-    const int StartCapacity = 4;
+    private const int StartCapacity = 4;
 
     public readonly int Id;
 
@@ -24,13 +22,13 @@ public sealed class Table
     public int Count { get; private set; }
     public bool IsEmpty => Count == 0;
 
-    readonly Archetypes _archetypes;
+    private readonly Archetypes _archetypes;
 
-    Identity[] _identities;
-    readonly Array[] _storages;
+    private Identity[] _identities;
+    private readonly Array[] _storages;
 
-    readonly Dictionary<StorageType, TableEdge> _edges = new();
-    readonly Dictionary<StorageType, int> _indices = new();
+    private readonly Dictionary<StorageType, TableEdge> _edges = new();
+    private readonly Dictionary<StorageType, int> _indices = new();
 
     
     public Table(int id, Archetypes archetypes, SortedSet<StorageType> types)
@@ -116,17 +114,17 @@ public sealed class Table
         return _storages[_indices[type]];
     }
 
-    
-    void EnsureCapacity(int capacity)
+
+    private void EnsureCapacity(int capacity)
     {
         if (capacity <= 0) throw new ArgumentOutOfRangeException(nameof(capacity), "minCapacity must be positive");
         if (capacity <= _identities.Length) return;
 
-        Resize(Math.Max(capacity, StartCapacity) << 1);
+        Resize(Math.Max(capacity, StartCapacity) * 2);
     }
 
-    
-    void Resize(int length)
+
+    private void Resize(int length)
     {
         if (length < 0) throw new ArgumentOutOfRangeException(nameof(length), "length cannot be negative");
         if (length < Count)
@@ -165,11 +163,8 @@ public sealed class Table
 
     public override string ToString()
     {
-        var s = $"Table {Id} ";
-        foreach (var type in Types)
-        {
-            s += $"{type} ";
-        }
-        return s;
+        var sb = new StringBuilder($"Table {Id} ");
+        sb.AppendJoin(" ", Types);
+        return sb.ToString();
     }
 }

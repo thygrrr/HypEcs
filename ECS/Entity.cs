@@ -1,6 +1,3 @@
-using System;
-using System.Runtime.CompilerServices;
-
 namespace ECS;
 
 public readonly struct Entity
@@ -46,7 +43,7 @@ public readonly struct Entity
 public readonly struct EntityBuilder
 {
     internal readonly World World;
-    readonly Entity _entity;
+    private readonly Entity _entity;
 
     
     public EntityBuilder(World world, Entity entity)

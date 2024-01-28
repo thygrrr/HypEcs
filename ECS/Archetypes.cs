@@ -1,6 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Collections.Concurrent;
 
 // ReSharper disable ReturnTypeCanBeEnumerable.Global
 
@@ -18,7 +16,7 @@ public sealed class Archetypes
 
 	internal int EntityCount;
 
-	private readonly List<TableOperation> _tableOperations = new();
+	private readonly ConcurrentQueue<DeferredOperation> _tableOperations = new();
 	private readonly Dictionary<Type, Entity> _typeEntities = new();
 	internal readonly Dictionary<StorageType, List<Table>> TablesByType = new();
 	private readonly Dictionary<Identity, HashSet<StorageType>> _typesByRelationTarget = new();
@@ -61,7 +59,7 @@ public sealed class Archetypes
 
 		if (_isLocked)
 		{
-			_tableOperations.Add(new TableOperation { Despawn = true, Identity = identity });
+			_tableOperations.Enqueue(new DeferredOperation { Operation = TableOp.Despawn, Identity = identity });
 			return;
 		}
 
@@ -76,6 +74,7 @@ public sealed class Archetypes
 
 		UnusedIds.Enqueue(new Identity(identity.Id, (ushort) (identity.Generation + 1)));
 
+		//Remove components from all entities that had a relation pointing to the despawned entity
 		if (!_typesByRelationTarget.TryGetValue(identity, out var list))
 		{
 			return;
@@ -112,7 +111,7 @@ public sealed class Archetypes
 
 		if (_isLocked)
 		{
-			_tableOperations.Add(new TableOperation { Add = true, Identity = identity, Type = type, Data = data });
+			_tableOperations.Enqueue(new DeferredOperation { Operation = TableOp.Add, Identity = identity, Type = type, Data = data! });
 			return;
 		}
 
@@ -183,7 +182,7 @@ public sealed class Archetypes
 
 		if (_isLocked)
 		{
-			_tableOperations.Add(new TableOperation { Add = false, Identity = identity, Type = type });
+			_tableOperations.Enqueue(new DeferredOperation { Operation = TableOp.Remove, Identity = identity, Type = type });
 			return;
 		}
 		
@@ -444,22 +443,33 @@ public sealed class Archetypes
 		return entity;
 	}
 
-	
+
 	private void ApplyTableOperations()
 	{
 		foreach (var op in _tableOperations)
 		{
-			if (!IsAlive(op.Identity)) continue;
+			AssertAlive(op.Identity);
 
-			if (op.Despawn) Despawn(op.Identity);
-			else if (op.Add) AddComponent(op.Type, op.Identity, op.Data);
-			else RemoveComponent(op.Type, op.Identity);
+			switch (op.Operation)
+			{
+				case TableOp.Add:
+					AddComponent(op.Type, op.Identity, op.Data);
+					break;
+				case TableOp.Remove:
+					RemoveComponent(op.Type, op.Identity);
+					break;
+				case TableOp.Despawn:
+					Despawn(op.Identity);
+					break;
+				default:
+					throw new ArgumentOutOfRangeException();
+			}
 		}
 
 		_tableOperations.Clear();
 	}
 
-	
+
 	public void Lock()
 	{
 		_lockCount++;
@@ -476,13 +486,19 @@ public sealed class Archetypes
 		ApplyTableOperations();
 	}
 
-	private struct TableOperation
+	private struct DeferredOperation
 	{
-		public bool Despawn;
-		public bool Add;
+		public required TableOp Operation;
 		public StorageType Type;
 		public Identity Identity;
 		public object Data;
+	}
+
+	private enum TableOp
+	{
+		Add,
+		Remove,
+		Despawn
 	}
 
 

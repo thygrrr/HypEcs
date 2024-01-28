@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-
 namespace ECS;
 
 public class QueryBuilder
@@ -71,7 +67,7 @@ public class QueryBuilder
 public sealed class QueryBuilder<C> : QueryBuilder
     where C : struct
 {
-    static readonly Func<Archetypes, Mask, List<Table>, Query> CreateQuery =
+    private static readonly Func<Archetypes, Mask, List<Table>, Query> CreateQuery =
         (archetypes, mask, matchingTables) => new Query<C>(archetypes, mask, matchingTables);
 
     
@@ -127,7 +123,7 @@ public sealed class QueryBuilder<C1, C2> : QueryBuilder
     where C1 : struct
     where C2 : struct
 {
-    static readonly Func<Archetypes, Mask, List<Table>, Query> CreateQuery =
+    private static readonly Func<Archetypes, Mask, List<Table>, Query> CreateQuery =
         (archetypes, mask, matchingTables) => new Query<C1, C2>(archetypes, mask, matchingTables);
 
     
@@ -184,7 +180,7 @@ public sealed class QueryBuilder<C1, C2, C3> : QueryBuilder
     where C2 : struct
     where C3 : struct
 {
-    static readonly Func<Archetypes, Mask, List<Table>, Query> CreateQuery =
+    private static readonly Func<Archetypes, Mask, List<Table>, Query> CreateQuery =
         (archetypes, mask, matchingTables) => new Query<C1, C2, C3>(archetypes, mask, matchingTables);
 
     
@@ -242,7 +238,7 @@ public sealed class QueryBuilder<C1, C2, C3, C4> : QueryBuilder
     where C3 : struct
     where C4 : struct
 {
-    static readonly Func<Archetypes, Mask, List<Table>, Query> CreateQuery =
+    private static readonly Func<Archetypes, Mask, List<Table>, Query> CreateQuery =
         (archetypes, mask, matchingTables) => new Query<C1, C2, C3, C4>(archetypes, mask, matchingTables);
 
     
@@ -301,7 +297,7 @@ public sealed class QueryBuilder<C1, C2, C3, C4, C5> : QueryBuilder
     where C4 : struct
     where C5 : struct
 {
-    static readonly Func<Archetypes, Mask, List<Table>, Query> CreateQuery =
+    private static readonly Func<Archetypes, Mask, List<Table>, Query> CreateQuery =
         (archetypes, mask, matchingTables) => new Query<C1, C2, C3, C4, C5>(archetypes, mask, matchingTables);
 
     
@@ -361,7 +357,7 @@ public sealed class QueryBuilder<C1, C2, C3, C4, C5, C6> : QueryBuilder
     where C5 : struct
     where C6 : struct
 {
-    static readonly Func<Archetypes, Mask, List<Table>, Query> CreateQuery =
+    private static readonly Func<Archetypes, Mask, List<Table>, Query> CreateQuery =
         (archetypes, mask, matchingTables) => new Query<C1, C2, C3, C4, C5, C6>(archetypes, mask, matchingTables);
 
     
@@ -422,7 +418,7 @@ public sealed class QueryBuilder<C1, C2, C3, C4, C5, C6, C7> : QueryBuilder
     where C6 : struct
     where C7 : struct
 {
-    static readonly Func<Archetypes, Mask, List<Table>, Query> CreateQuery =
+    private static readonly Func<Archetypes, Mask, List<Table>, Query> CreateQuery =
         (archetypes, mask, matchingTables) => new Query<C1, C2, C3, C4, C5, C6, C7>(archetypes, mask, matchingTables);
 
     
@@ -484,7 +480,7 @@ public sealed class QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8> : QueryBuilder
     where C7 : struct
     where C8 : struct
 {
-    static readonly Func<Archetypes, Mask, List<Table>, Query> CreateQuery =
+    private static readonly Func<Archetypes, Mask, List<Table>, Query> CreateQuery =
         (archetypes, mask, matchingTables) => new Query<C1, C2, C3, C4, C5, C6, C7, C8>(archetypes, mask, matchingTables);
 
     
@@ -547,7 +543,7 @@ public sealed class QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8, C9> : QueryBuil
     where C8 : struct
     where C9 : struct
 {
-    static readonly Func<Archetypes, Mask, List<Table>, Query> CreateQuery =
+    private static readonly Func<Archetypes, Mask, List<Table>, Query> CreateQuery =
         (archetypes, mask, matchingTables) => new Query<C1, C2, C3, C4, C5, C6, C7, C8, C9>(archetypes, mask, matchingTables);
 
     

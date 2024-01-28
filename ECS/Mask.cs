@@ -1,13 +1,10 @@
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-
 namespace ECS;
 
 public sealed class Mask
 {
-    internal readonly List<StorageType> HasTypes = new();
-    internal readonly List<StorageType> NotTypes = new();
-    internal readonly List<StorageType> AnyTypes = new();
+    internal readonly List<StorageType> HasTypes = [];
+    internal readonly List<StorageType> NotTypes = [];
+    internal readonly List<StorageType> AnyTypes = [];
 
     
     public void Has(StorageType type)

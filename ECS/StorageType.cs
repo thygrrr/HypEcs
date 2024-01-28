@@ -1,5 +1,3 @@
-using System;
-
 namespace ECS;
 
 public readonly struct StorageType : IComparable<StorageType>, IEquatable<StorageType>
@@ -95,7 +93,7 @@ public static class TypeIdConverter
         return (ushort)value;
     }
 
-    class TypeIdAssigner
+    private class TypeIdAssigner
     {
         protected static ushort Counter;
     }
