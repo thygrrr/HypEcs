@@ -1,17 +1,11 @@
-# 🚧 ... the tiny, tiny, high-energy Entity Component System!
+## ... the tiny, tiny, high-energy Entity Component System!
 
 ![a box of fennecs, 8-color pixel art](Documentation/Logos/fennecs.png)
 
-*fennECS is a re-imagined fork of [HypEcs](https://github.com/Byteron/HypEcs) that builds upon its core strengths and enables cleaner system code and more deliberate, bi-directional entity relations. It makes use of C# language features to further reduce boilerplate and opportunities for error.*
+*fennECS is a re-imagined fork of [HypEcs](https://github.com/Byteron/HypEcs) that builds upon its core strengths and enables cleaner system code and more deliberate, bi-directional entity relations. It makes use of modern C# language features to further reduce boilerplate and opportunities for error.*
 
 
-## Plays well with Godot 4.x!
-<img src="Documentation/Logos/godot-icon.svg" width="128px" alt="Godot Engine Logo, Copyright (c) 2017 Andrea Calabró" />
-
-Coming Soon: fennECS as a NuGet package and as a Godot addon. 
-
-
-# Highlights / Design Goals
+## Highlights / Design Goals
 
 - Entity-Entity-Relations with O(1) lookup time complexity.
 - Entity-Component Queries with O(1) lookup time complexity.
@@ -26,8 +20,14 @@ Coming Soon: fennECS as a NuGet package and as a Godot addon.
 - Godot 4.x Sample Integrations.
 
 
-# Roadmap
+## Future Roadmap
 - Unity Support: Planned for when Unity is on .NET 7 or later, and C# 12 or later.
+- fennECS as a NuGet package
+- fennECS as a Godot addon
+
+## Already plays well with Godot 4.x!
+<img src="Documentation/Logos/godot-icon.svg" width="128px" alt="Godot Engine Logo, Copyright (c) 2017 Andrea Calabró" />
+
 
 
 # Legacy Documentation
