@@ -1,4 +1,6 @@
-# fennECS, the tiny, tiny, high-energy Entity Component System!
+# fennECS
+
+## ... the tiny, tiny, high-energy Entity Component System!
 
 ![a box of fennecs, 8-color pixel art](Documentation/Logos/fennecs.png)
 
