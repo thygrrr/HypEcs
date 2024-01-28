@@ -59,13 +59,17 @@ public readonly struct EntityBuilder
         return this;
     }
 
-    
+    /*
+     I don't like these semantics, but they could be useful.
+     However, this strongly burdens the TypeExpression space.
+     
     public EntityBuilder Add<T>(Type type) where T : struct
     {
         var typeEntity = World.GetTypeEntity(type);
         World.AddComponent<T>(_entity, typeEntity);
         return this;
     }
+    */
 
     
     public EntityBuilder Add<T>(T data) where T : struct
