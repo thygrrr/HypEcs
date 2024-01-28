@@ -7,7 +7,7 @@ public struct EntityMeta(Identity identity, int tableId, int row)
     public int Row = row;
 }
 
-public readonly struct Identity(int id, ushort generation = 1)
+public readonly struct Identity(int id, ushort generation = 1) : IEquatable<Identity>
 {
     public static Identity None = default;
     public static Identity Any = new(int.MaxValue, 0);
@@ -16,11 +16,11 @@ public readonly struct Identity(int id, ushort generation = 1)
     public readonly ushort Generation = generation;
 
 
-    public override bool Equals(object? obj)
-    {
-        return (obj is Identity other) && Id == other.Id && Generation == other.Generation;
-    }
+    public bool Equals(Identity other) => Id == other.Id && Generation == other.Generation;
 
+    //TODO: May be unnecessary
+    [Obsolete("Boxing equality comparisons removed.")]
+    public override bool Equals(object? obj) => obj is Identity other && Id == other.Id && Generation == other.Generation;
     
     public override int GetHashCode()
     {
@@ -36,7 +36,7 @@ public readonly struct Identity(int id, ushort generation = 1)
     
     public override string ToString()
     {
-        return Id.ToString();
+        return $"{id}:{generation}";
     }
 
 

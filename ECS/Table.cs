@@ -14,7 +14,7 @@ public sealed class Table
 
     public readonly int Id;
 
-    public readonly SortedSet<StorageType> Types;
+    public readonly SortedSet<TypeExpression> Types;
 
     public Identity[] Identities => _identities;
     public Array[] Storages => _storages;
@@ -27,11 +27,11 @@ public sealed class Table
     private Identity[] _identities;
     private readonly Array[] _storages;
 
-    private readonly Dictionary<StorageType, TableEdge> _edges = new();
-    private readonly Dictionary<StorageType, int> _indices = new();
+    private readonly Dictionary<TypeExpression, TableEdge> _edges = new();
+    private readonly Dictionary<TypeExpression, int> _indices = new();
 
     
-    public Table(int id, Archetypes archetypes, SortedSet<StorageType> types)
+    public Table(int id, Archetypes archetypes, SortedSet<TypeExpression> types)
     {
         _archetypes = archetypes;
 
@@ -91,12 +91,12 @@ public sealed class Table
     }
 
     
-    public TableEdge GetTableEdge(StorageType type)
+    public TableEdge GetTableEdge(TypeExpression type_expression)
     {
-        if (_edges.TryGetValue(type, out var edge)) return edge;
+        if (_edges.TryGetValue(type_expression, out var edge)) return edge;
 
         edge = new TableEdge();
-        _edges[type] = edge;
+        _edges[type_expression] = edge;
 
         return edge;
     }
@@ -104,14 +104,14 @@ public sealed class Table
     
     public T[] GetStorage<T>(Identity target)
     {
-        var type = StorageType.Create<T>(target);
+        var type = TypeExpression.Create<T>(target);
         return (T[])GetStorage(type);
     }
 
     
-    public Array GetStorage(StorageType type)
+    public Array GetStorage(TypeExpression type_expression)
     {
-        return _storages[_indices[type]];
+        return _storages[_indices[type_expression]];
     }
 
 

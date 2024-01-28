@@ -19,7 +19,7 @@ public sealed class World : IDisposable
     {
         _world = _archetypes.Spawn();
         _worldInfo = new WorldInfo();
-        _archetypes.AddComponent(StorageType.Create<WorldInfo>(Identity.None), _world.Identity, _worldInfo);
+        _archetypes.AddComponent(TypeExpression.Create<WorldInfo>(Identity.None), _world.Identity, _worldInfo);
     }
 
     
@@ -69,33 +69,33 @@ public sealed class World : IDisposable
     
     public bool HasComponent<T>(Entity entity) where T : struct
     {
-        var type = StorageType.Create<T>(Identity.None);
+        var type = TypeExpression.Create<T>(Identity.None);
         return _archetypes.HasComponent(type, entity.Identity);
     }
 
     
     public void AddComponent<T>(Entity entity) where T : struct
     {
-        var type = StorageType.Create<T>(Identity.None);
+        var type = TypeExpression.Create<T>(Identity.None);
         _archetypes.AddComponent(type, entity.Identity, new T());
     }
 
     
     public void AddComponent<T>(Entity entity, T component) where T : struct
     {
-        var type = StorageType.Create<T>(Identity.None);
+        var type = TypeExpression.Create<T>(Identity.None);
         _archetypes.AddComponent(type, entity.Identity, component);
     }
 
     
     public void RemoveComponent<T>(Entity entity) where T : struct
     {
-        var type = StorageType.Create<T>(Identity.None);
+        var type = TypeExpression.Create<T>(Identity.None);
         _archetypes.RemoveComponent(type, entity.Identity);
     }
 
     
-    public IEnumerable<(StorageType, object)> GetComponents(Entity entity)
+    public IEnumerable<(TypeExpression, object)> GetComponents(Entity entity)
     {
         return _archetypes.GetComponents(entity.Identity);
     }
@@ -122,7 +122,7 @@ public sealed class World : IDisposable
     
     public bool HasComponent<T>(Entity entity, Entity target) where T : struct
     {
-        var type = StorageType.Create<T>(target.Identity);
+        var type = TypeExpression.Create<T>(target.Identity);
         return _archetypes.HasComponent(type, entity.Identity);
     }
 
@@ -131,42 +131,42 @@ public sealed class World : IDisposable
     {
         var targetEntity = GetTypeEntity(target);
 
-        var type = StorageType.Create<T>(targetEntity.Identity);
+        var type = TypeExpression.Create<T>(targetEntity.Identity);
         return _archetypes.HasComponent(type, entity.Identity);
     }    
 
     
     public void AddComponent<T>(Entity entity, Entity target) where T : struct
     {
-        var type = StorageType.Create<T>(target.Identity);
+        var type = TypeExpression.Create<T>(target.Identity);
         _archetypes.AddComponent(type, entity.Identity, new T(), target);
     }
 
     
     public void AddComponent<T>(Entity entity, T component, Entity target) where T : struct
     {
-        var type = StorageType.Create<T>(target.Identity);
+        var type = TypeExpression.Create<T>(target.Identity);
         _archetypes.AddComponent(type, entity.Identity, component, target);
     }
 
     
     public void RemoveComponent<T>(Entity entity, Entity target) where T : struct
     {
-        var type = StorageType.Create<T>(target.Identity);
+        var type = TypeExpression.Create<T>(target.Identity);
         _archetypes.RemoveComponent(type, entity.Identity);
     }
 
     
     public Entity GetTarget<T>(Entity entity) where T : struct
     {
-        var type = StorageType.Create<T>(Identity.None);
+        var type = TypeExpression.Create<T>(Identity.None);
         return _archetypes.GetTarget(type, entity.Identity);
     }
 
     
     public IEnumerable<Entity> GetTargets<T>(Entity entity) where T : struct
     {
-        var type = StorageType.Create<T>(Identity.None);
+        var type = TypeExpression.Create<T>(Identity.None);
         return _archetypes.GetTargets(type, entity.Identity);
     }
 
@@ -192,14 +192,14 @@ public sealed class World : IDisposable
     
     public bool HasElement<T>() where T : class
     {
-        var type = StorageType.Create<Element<T>>(Identity.None);
+        var type = TypeExpression.Create<Element<T>>(Identity.None);
         return _archetypes.HasComponent(type, _world.Identity);
     }
 
     
     public void AddElement<T>(T element) where T : class
     {
-        var type = StorageType.Create<Element<T>>(Identity.None);
+        var type = TypeExpression.Create<Element<T>>(Identity.None);
         _archetypes.AddComponent(type, _world.Identity, new Element<T> { Value = element });
     }
 
@@ -224,7 +224,7 @@ public sealed class World : IDisposable
     
     public void RemoveElement<T>() where T : class
     {
-        var type = StorageType.Create<Element<T>>(Identity.None);
+        var type = TypeExpression.Create<Element<T>>(Identity.None);
         _archetypes.RemoveComponent(type, _world.Identity);
     }
 

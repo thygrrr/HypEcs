@@ -15,7 +15,7 @@ public class QueryBuilder
     
     public QueryBuilder Has<T>(Entity target = default)
     {
-        var typeIndex = StorageType.Create<T>(target.Identity);
+        var typeIndex = TypeExpression.Create<T>(target.Identity);
         Mask.Has(typeIndex);
         return this;
     }
@@ -24,7 +24,7 @@ public class QueryBuilder
     public QueryBuilder Has<T>(Type type)
     {
         var entity = Archetypes.GetTypeEntity(type);
-        var typeIndex = StorageType.Create<T>(entity.Identity);
+        var typeIndex = TypeExpression.Create<T>(entity.Identity);
         Mask.Has(typeIndex);
         return this;
     }
@@ -32,7 +32,7 @@ public class QueryBuilder
     
     public QueryBuilder Not<T>(Entity target = default)
     {
-        var typeIndex = StorageType.Create<T>(target.Identity);
+        var typeIndex = TypeExpression.Create<T>(target.Identity);
         Mask.Not(typeIndex);
         return this;
     }
@@ -41,7 +41,7 @@ public class QueryBuilder
     public QueryBuilder Not<T>(Type type)
     {
         var entity = Archetypes.GetTypeEntity(type);
-        var typeIndex = StorageType.Create<T>(entity.Identity);
+        var typeIndex = TypeExpression.Create<T>(entity.Identity);
         Mask.Not(typeIndex);
         return this;
     }
@@ -49,7 +49,7 @@ public class QueryBuilder
     
     public QueryBuilder Any<T>(Entity target = default)
     {
-        var typeIndex = StorageType.Create<T>(target.Identity);
+        var typeIndex = TypeExpression.Create<T>(target.Identity);
         Mask.Any(typeIndex);
         return this;
     }
@@ -58,7 +58,7 @@ public class QueryBuilder
     public QueryBuilder Any<T>(Type type)
     {
         var entity = Archetypes.GetTypeEntity(type);
-        var typeIndex = StorageType.Create<T>(entity.Identity);
+        var typeIndex = TypeExpression.Create<T>(entity.Identity);
         Mask.Any(typeIndex);
         return this;
     }

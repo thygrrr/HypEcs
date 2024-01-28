@@ -18,17 +18,17 @@ public sealed class Archetypes
 
 	private readonly ConcurrentQueue<DeferredOperation> _tableOperations = new();
 	private readonly Dictionary<Type, Entity> _typeEntities = new();
-	internal readonly Dictionary<StorageType, List<Table>> TablesByType = new();
-	private readonly Dictionary<Identity, HashSet<StorageType>> _typesByRelationTarget = new();
-	private readonly Dictionary<WildcardType, HashSet<Entity>> _targetsByRelationType = new();
-	private readonly Dictionary<int, HashSet<StorageType>> _relationsByTypes = new();
+	internal readonly Dictionary<TypeExpression, List<Table>> TablesByType = new();
+	private readonly Dictionary<Identity, HashSet<TypeExpression>> _typesByRelationTarget = new();
+	private readonly Dictionary<TypeFamily, HashSet<Entity>> _targetsByRelationType = new();
+	private readonly Dictionary<int, HashSet<TypeExpression>> _relationsByTypes = new();
 
 	private int _lockCount;
 	private bool _isLocked;
 
 	public Archetypes()
 	{
-		AddTable(new SortedSet<StorageType> { StorageType.Create<Entity>(Identity.None) });
+		AddTable(new SortedSet<TypeExpression> { TypeExpression.Create<Entity>(Identity.None) });
 	}
 
 	
@@ -97,43 +97,43 @@ public sealed class Archetypes
 	}
 
 	
-	public void AddComponent<T>(StorageType type, Identity identity, T data, Entity target = default)
+	public void AddComponent<T>(TypeExpression type_expression, Identity identity, T data, Entity target = default)
 	{
 		AssertAlive(identity);
 
 		ref var meta = ref Meta[identity.Id];
 		var oldTable = Tables[meta.TableId];
 
-		if (oldTable.Types.Contains(type))
+		if (oldTable.Types.Contains(type_expression))
 		{
-			throw new ArgumentException($"Entity {identity} already has component of type {type}");
+			throw new ArgumentException($"Entity {identity} already has component of type {type_expression}");
 		}
 
 		if (_isLocked)
 		{
-			_tableOperations.Enqueue(new DeferredOperation { Operation = TableOp.Add, Identity = identity, Type = type, Data = data! });
+			_tableOperations.Enqueue(new DeferredOperation { Operation = TableOp.Add, Identity = identity, TypeExpression = type_expression, Data = data! });
 			return;
 		}
 
-		if (!_targetsByRelationType.ContainsKey(type))
+		if (!_targetsByRelationType.ContainsKey(type_expression))
 		{
-			_targetsByRelationType[type] = new ();
+			_targetsByRelationType[type_expression] = new ();
 		}
-		_targetsByRelationType[type].Add(identity);
+		_targetsByRelationType[type_expression].Add(identity);
 		
 		
-		var oldEdge = oldTable.GetTableEdge(type);
+		var oldEdge = oldTable.GetTableEdge(type_expression);
 
 		var newTable = oldEdge.Add;
 
 		if (newTable == null)
 		{
 			var newTypes = oldTable.Types.ToList();
-			newTypes.Add(type);
-			newTable = AddTable(new SortedSet<StorageType>(newTypes));
+			newTypes.Add(type_expression);
+			newTable = AddTable(new SortedSet<TypeExpression>(newTypes));
 			oldEdge.Add = newTable;
 
-			var newEdge = newTable.GetTableEdge(type);
+			var newEdge = newTable.GetTableEdge(type_expression);
 			newEdge.Remove = oldTable;
 		}
 
@@ -142,7 +142,7 @@ public sealed class Archetypes
 		meta.Row = newRow;
 		meta.TableId = newTable.Id;
 
-		var storage = newTable.GetStorage(type);
+		var storage = newTable.GetStorage(type_expression);
 		storage.SetValue(data, newRow);
 	}
 
@@ -151,7 +151,7 @@ public sealed class Archetypes
 	{
 		AssertAlive(identity);
 
-		var type = StorageType.Create<T>(target);
+		var type = TypeExpression.Create<T>(target);
 		var meta = Meta[identity.Id];
 		AssertEqual(meta.Identity, identity);
 		var table = Tables[meta.TableId];
@@ -161,51 +161,51 @@ public sealed class Archetypes
 
 
 	
-	public bool HasComponent(StorageType type, Identity identity)
+	public bool HasComponent(TypeExpression type_expression, Identity identity)
 	{
 		var meta = Meta[identity.Id];
 		return meta.Identity != Identity.None
 			   && meta.Identity == identity
-			   && Tables[meta.TableId].Types.Contains(type);
+			   && Tables[meta.TableId].Types.Contains(type_expression);
 	}
 
 	
-	public void RemoveComponent(StorageType type, Identity identity)
+	public void RemoveComponent(TypeExpression type_expression, Identity identity)
 	{
 		ref var meta = ref Meta[identity.Id];
 		var oldTable = Tables[meta.TableId];
 
-		if (!oldTable.Types.Contains(type))
+		if (!oldTable.Types.Contains(type_expression))
 		{
-			throw new ArgumentException($"cannot remove non-existent component {type.Type.Name} from entity {identity}");
+			throw new ArgumentException($"cannot remove non-existent component {type_expression.Type.Name} from entity {identity}");
 		}
 
 		if (_isLocked)
 		{
-			_tableOperations.Enqueue(new DeferredOperation { Operation = TableOp.Remove, Identity = identity, Type = type });
+			_tableOperations.Enqueue(new DeferredOperation { Operation = TableOp.Remove, Identity = identity, TypeExpression = type_expression });
 			return;
 		}
 		
 
 		// could be _targetsByRelationType[type.Wildcard()].Remove(identity);
 		//(with enough unit test coverage)
-		if (_targetsByRelationType.TryGetValue(type, out var targetSet))
+		if (_targetsByRelationType.TryGetValue(type_expression, out var targetSet))
 		{
 			targetSet.Remove(identity);
 		}
 		
-		var oldEdge = oldTable.GetTableEdge(type);
+		var oldEdge = oldTable.GetTableEdge(type_expression);
 
 		var newTable = oldEdge.Remove;
 
 		if (newTable == null)
 		{
 			var newTypes = oldTable.Types.ToList();
-			newTypes.Remove(type);
-			newTable = AddTable(new SortedSet<StorageType>(newTypes));
+			newTypes.Remove(type_expression);
+			newTable = AddTable(new SortedSet<TypeExpression>(newTypes));
 			oldEdge.Remove = newTable;
 
-			var newEdge = newTable.GetTableEdge(type);
+			var newEdge = newTable.GetTableEdge(type_expression);
 			newEdge.Add = oldTable;
 
 			//Tables.Add(newTable); <-- already added in AddTable
@@ -253,13 +253,13 @@ public sealed class Archetypes
 	
 	internal bool IsMaskCompatibleWith(Mask mask, Table table)
 	{
-		var has = ListPool<StorageType>.Get();
-		var not = ListPool<StorageType>.Get();
-		var any = ListPool<StorageType>.Get();
+		var has = ListPool<TypeExpression>.Get();
+		var not = ListPool<TypeExpression>.Get();
+		var any = ListPool<TypeExpression>.Get();
 
-		var hasAnyTarget = ListPool<StorageType>.Get();
-		var notAnyTarget = ListPool<StorageType>.Get();
-		var anyAnyTarget = ListPool<StorageType>.Get();
+		var hasAnyTarget = ListPool<TypeExpression>.Get();
+		var notAnyTarget = ListPool<TypeExpression>.Get();
+		var anyAnyTarget = ListPool<TypeExpression>.Get();
 
 		foreach (var type in mask.HasTypes)
 		{
@@ -296,12 +296,12 @@ public sealed class Archetypes
 			matchesRelation &= table.Types.Overlaps(list);
 		}
 
-		ListPool<StorageType>.Add(has);
-		ListPool<StorageType>.Add(not);
-		ListPool<StorageType>.Add(any);
-		ListPool<StorageType>.Add(hasAnyTarget);
-		ListPool<StorageType>.Add(notAnyTarget);
-		ListPool<StorageType>.Add(anyAnyTarget);
+		ListPool<TypeExpression>.Add(has);
+		ListPool<TypeExpression>.Add(not);
+		ListPool<TypeExpression>.Add(any);
+		ListPool<TypeExpression>.Add(hasAnyTarget);
+		ListPool<TypeExpression>.Add(notAnyTarget);
+		ListPool<TypeExpression>.Add(anyAnyTarget);
 
 		return matchesComponents && matchesRelation;
 	}
@@ -325,14 +325,14 @@ public sealed class Archetypes
 	}
 
 	
-	internal Entity GetTarget(StorageType type, Identity identity)
+	internal Entity GetTarget(TypeExpression type_expression, Identity identity)
 	{
 		var meta = Meta[identity.Id];
 		var table = Tables[meta.TableId];
 
 		foreach (var storageType in table.Types)
 		{
-			if (!storageType.IsRelation || storageType.TypeId != type.TypeId) continue;
+			if (!storageType.IsRelation || storageType.TypeId != type_expression.TypeId) continue;
 			return new Entity(storageType.Identity);
 		}
 
@@ -340,11 +340,11 @@ public sealed class Archetypes
 	}
 
 	
-	internal Entity[] GetTargets(StorageType type, Identity identity)
+	internal Entity[] GetTargets(TypeExpression type_expression, Identity identity)
 	{
 		if (identity == Identity.Any)
 		{
-			return _targetsByRelationType.TryGetValue(type, out var entitySet)
+			return _targetsByRelationType.TryGetValue(type_expression, out var entitySet)
 				? entitySet.ToArray()
 				: Array.Empty<Entity>();
 		}
@@ -356,7 +356,7 @@ public sealed class Archetypes
 		var table = Tables[meta.TableId];
 		foreach (var storageType in table.Types)
 		{
-			if (!storageType.IsRelation || storageType.TypeId != type.TypeId) continue;
+			if (!storageType.IsRelation || storageType.TypeId != type_expression.TypeId) continue;
 			list.Add(new Entity(storageType.Identity));
 		}
 
@@ -367,11 +367,11 @@ public sealed class Archetypes
 	}
 
 	
-	internal (StorageType, object)[] GetComponents(Identity identity)
+	internal (TypeExpression, object)[] GetComponents(Identity identity)
 	{
 		AssertAlive(identity);
 
-		var list = ListPool<(StorageType, object)>.Get();
+		var list = ListPool<(TypeExpression, object)>.Get();
 
 		var meta = Meta[identity.Id];
 		var table = Tables[meta.TableId];
@@ -384,12 +384,12 @@ public sealed class Archetypes
 		}
 
 		var array = list.ToArray();
-		ListPool<(StorageType, object)>.Add(list);
+		ListPool<(TypeExpression, object)>.Add(list);
 		return array;
 	}
 
 	
-	private Table AddTable(SortedSet<StorageType> types)
+	private Table AddTable(SortedSet<TypeExpression> types)
 	{
 		var table = new Table(Tables.Count, this, types);
 		Tables.Add(table);
@@ -408,7 +408,7 @@ public sealed class Archetypes
 
 			if (!_typesByRelationTarget.TryGetValue(type.Identity, out var typeList))
 			{
-				typeList = new HashSet<StorageType>();
+				typeList = new HashSet<TypeExpression>();
 				_typesByRelationTarget[type.Identity] = typeList;
 			}
 
@@ -416,7 +416,7 @@ public sealed class Archetypes
 			
 			if (!_relationsByTypes.TryGetValue(type.TypeId, out var relationTypeSet))
 			{
-				relationTypeSet = new HashSet<StorageType>();
+				relationTypeSet = new HashSet<TypeExpression>();
 				_relationsByTypes[type.TypeId] = relationTypeSet;
 			}
 
@@ -453,10 +453,10 @@ public sealed class Archetypes
 			switch (op.Operation)
 			{
 				case TableOp.Add:
-					AddComponent(op.Type, op.Identity, op.Data);
+					AddComponent(op.TypeExpression, op.Identity, op.Data);
 					break;
 				case TableOp.Remove:
-					RemoveComponent(op.Type, op.Identity);
+					RemoveComponent(op.TypeExpression, op.Identity);
 					break;
 				case TableOp.Despawn:
 					Despawn(op.Identity);
@@ -489,7 +489,7 @@ public sealed class Archetypes
 	private struct DeferredOperation
 	{
 		public required TableOp Operation;
-		public StorageType Type;
+		public TypeExpression TypeExpression;
 		public Identity Identity;
 		public object Data;
 	}

@@ -2,26 +2,26 @@ namespace ECS;
 
 public sealed class Mask
 {
-    internal readonly List<StorageType> HasTypes = [];
-    internal readonly List<StorageType> NotTypes = [];
-    internal readonly List<StorageType> AnyTypes = [];
+    internal readonly List<TypeExpression> HasTypes = [];
+    internal readonly List<TypeExpression> NotTypes = [];
+    internal readonly List<TypeExpression> AnyTypes = [];
 
     
-    public void Has(StorageType type)
+    public void Has(TypeExpression type_expression)
     {
-        HasTypes.Add(type);
+        HasTypes.Add(type_expression);
     }
 
     
-    public void Not(StorageType type)
+    public void Not(TypeExpression type_expression)
     {
-        NotTypes.Add(type);
+        NotTypes.Add(type_expression);
     }
 
     
-    public void Any(StorageType type)
+    public void Any(TypeExpression type_expression)
     {
-        AnyTypes.Add(type);
+        AnyTypes.Add(type_expression);
     }
 
     public void Clear()
