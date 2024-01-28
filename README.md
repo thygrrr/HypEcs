@@ -1,14 +1,21 @@
 # fennECS
 
-![](Documentation/fennecs.png)
+*The tiny, tiny, high-energy Entity Component System!*
 
-*The lightweight and easy to use entity component system with an effective feature set for making games.*
+![a box of Fennecs, 8-color pixel art](Documentation/Logos/fennecs-social-panel.png)
 
-*fennECS is a modernized fork of [HypEcs](https://github.com/Byteron/HypEcs) that builds upon its core strengths and enables cleaner system code.*
+*fennECS is a re-imagined fork of [HypEcs](https://github.com/Byteron/HypEcs) that builds upon its core strengths and enables cleaner system code and more deliberate, bi-directional entity relations.*
+
+
+## Plays well with Godot 4.x!
+![Godot Engine Logo, Copyright (c) 2017 Andrea Calabró](https://github.com/godotengine/godot/raw/master/logo_outlined.svg)
+
+Coming Soon: fennECS as a NuGet package and as a Godot addon. 
+
 
 # Highlights / Design Goals
 
-- Entity-Target-Relations with O(1) lookup time complexity.
+- Entity-Entity-Relations with O(1) lookup time complexity.
 - Entity-Component Queries with O(1) lookup time complexity.
 - Entity Spawning and Despawning with O(1) time complexity.
 - Entity Structural Changes with O(1) time complexity (per individual change).
@@ -19,6 +26,11 @@
 - Benchmarking suite.
 - Modern C# 12 codebase, targeting .NET 8.
 - Godot 4.x Sample Integrations.
+
+
+# Roadmap
+- Unity Support: Planned for when Unity is on .NET 7 or later, and C# 12 or later.
+
 
 # Legacy Documentation
 
