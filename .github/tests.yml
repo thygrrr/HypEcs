@@ -1,0 +1,28 @@
+name: xUnit Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '8.0.x'  # Specify the .NET version
+
+    - name: Restore dependencies
+      run: dotnet restore xTests/xTests.csproj  # Path to your project file
+
+    - name: Build
+      run: dotnet build --no-restore xTests/xTests.csproj
+
+    - name: Test
+      run: dotnet --no-build test xTests/xTests.csproj

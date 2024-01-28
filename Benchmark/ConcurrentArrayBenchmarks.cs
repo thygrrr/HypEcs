@@ -12,7 +12,7 @@ public class ConcurrentArrayBenchmarks
     private static readonly Random random = new(1337);
 
     private ConcurrentBag<Vector3> _bag = null!;
-    private ConcurrentBag<Vector3> _bag2 = [];
+    private readonly ConcurrentBag<Vector3> _bag2 = [];
     private List<Vector3> _list = null!;
     
     [GlobalSetup]
@@ -23,7 +23,7 @@ public class ConcurrentArrayBenchmarks
         _list = [..randoms];
     }
 
-    [Benchmark]
+    //[Benchmark]
     public void TakeOneBag()
     {
         _bag.TryTake(out var x);
@@ -32,9 +32,9 @@ public class ConcurrentArrayBenchmarks
     [Benchmark]
     public void FillBag()
     {
-        for (float i = 0; i < entityCount; i++)
+        for (var i = 0; i < entityCount; i++)
         {
-            _bag2.Add(new Vector3(i,i,i));
+            _bag2.Add(new Vector3(1,2,3));
         }
     }
 
@@ -44,7 +44,7 @@ public class ConcurrentArrayBenchmarks
         while (!_bag.IsEmpty) _bag.TryTake(out var x);
     }
 
-    [Benchmark]
+    //[Benchmark]
     public void TakeAllList()
     {
         while (_list.Count > 0)
