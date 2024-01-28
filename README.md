@@ -8,7 +8,7 @@
 
 
 ## Plays well with Godot 4.x!
-![Godot Engine Logo, Copyright (c) 2017 Andrea Calabró](https://github.com/godotengine/godot/raw/master/logo_outlined.svg)
+![Godot Engine Logo, Copyright (c) 2017 Andrea Calabró](Documentation/Logos/godot-icon.svg){:width="128px"}
 
 Coming Soon: fennECS as a NuGet package and as a Godot addon. 
 
