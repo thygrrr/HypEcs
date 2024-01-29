@@ -5,10 +5,10 @@
 ![GitHub commits since latest release (branch)](https://img.shields.io/github/commits-since/thygrrr/fennECS/latest/main)
 ![Fennecs](https://img.shields.io/badge/fennecs-yip%20yip-blue)
 
-<table style="border: none; border-collapse: collapse; width: 80%">
+<table style="border: none; border-collapse: collapse; width: 70%">
     <tr>
         <td>
-            <img src="Documentation/Logos/fennecs.png" alt="a box of fennecs, 8-color pixel art" style="min-width: 300px"/>
+            <img src="Documentation/Logos/fennecs-320.png" alt="a box of fennecs, 8-color pixel art" style="min-width: 320px"/>
         </td>
         <td style="width: 70%">
             <h3><a href="https://fennecs.tech">fennECS</a> is...</h3>
@@ -27,20 +27,20 @@
 ## Quickstart
 
 ```csharp
-// Declare or use any existing value or reference type as a component.
+// Declare your own or use any existing value or reference type as Components.
 using Position = System.Numerics.Vector3;
 
-// Create a world.
-World world = new World();
+// Create a world. FYI, it's IDisposable, if you like using statements.
+using var world = new World();
 
-// Spawn a new entity into the world with a Vector3 component
+// Spawn an entity into the world with a choice of components, or add them later.
 Entity entity = world.Spawn().Add<Position>().Id();
 
 // Queries are cached, just build them right where you want to use them.
-var query = world.Query<Vector3>().Build();
+var query = world.Query<Position>().Build();
 
-// Run code on all entities in the query. Omit chunk size to just parallelize per archetype.
-query.RunParallel((ref position) => {
+// Run code on all entities in the query. Omit chunk size to parallelize across archetypes only.
+query.RunParallel((ref Position position) => {
     position.Y -= 0.98f * Time.Delta;
 }, chunkSize: 8192);
 ```
