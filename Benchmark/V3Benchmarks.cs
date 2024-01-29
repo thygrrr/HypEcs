@@ -93,7 +93,7 @@ public class V3Benchmarks
     [Benchmark]
     public void PerItemIncrementSpanLambda()
     {
-        PerItemIncrementSpanDelegateImpl((ref Vector3 val) => { val += new Vector3(1, 2, 3); });
+        PerItemIncrementSpanDelegateImpl(( ref Vector3 val) => { val += new Vector3(1, 2, 3); });
     }
 
 

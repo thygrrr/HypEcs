@@ -12,13 +12,13 @@
         </td>
         <td style="width: 70%">
             <h3><a href="https://fennecs.tech">fennECS</a> is...</h3>
-            <ol style='list-style-type: "🐾 ";'>
+            <ul style="list-style-type: '🐾';">
                 <li>zero codegen</li>
                 <li>minimal boilerplate</li>
                 <li>archetype-based</li>
                 <li>intuitively relational</li>
                 <li>lithe and fast</li>
-            </ol>
+            </ul>
             This re-imagined fork of <a href="https://github.com/Byteron/HypEcs">HypEcs</a> <em>feels just right</em> for high performance game development in any modern C# engine. Including, of course, the fantastic <a href="https://godotengine.org">Godot</a>. 
         </td>
     </tr>
