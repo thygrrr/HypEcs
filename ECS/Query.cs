@@ -33,6 +33,9 @@ public class Query
 public class Query<C>(Archetypes archetypes, Mask mask, List<Table> tables) : Query(archetypes, mask, tables) where C : struct
 {
     public delegate void SpanAction<T, in TArg>(Span<T> span, TArg arg);
+
+    public delegate void QueryAction<T>(ref T value);
+    
     
     public ref C Get(Entity entity)
     {
@@ -58,11 +61,11 @@ public class Query<C>(Archetypes archetypes, Mask mask, List<Table> tables) : Qu
         
         Archetypes.Unlock();
     }
-    
+
     public void Run(Action<int, C[]> action)
     {
         Archetypes.Lock();
-        
+
         for (var t = 0; t < Tables.Count; t++)
         {
             var table = Tables[t];
@@ -73,10 +76,26 @@ public class Query<C>(Archetypes archetypes, Mask mask, List<Table> tables) : Qu
 
             action(table.Count, s);
         }
-        
+
         Archetypes.Unlock();
     }
+
     
+    public void Run(QueryAction<C> action)
+    {
+        Archetypes.Lock();
+
+        foreach (var table in Tables)
+        {
+            if (table.IsEmpty) continue;
+
+            var s = table.GetStorage<C>(Identity.None).AsSpan();
+            foreach (ref var c in s) action(ref c);
+        }
+
+        Archetypes.Unlock();
+    }
+
     public void RunParallel(Action<int, C[]> action)
     {
         Archetypes.Lock();

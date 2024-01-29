@@ -1,7 +1,37 @@
-﻿namespace xTests;
+﻿using System.Numerics;
 
-public class EntityTests(ITestOutputHelper output)
+namespace xTests;
+
+public class EntityTests
 {
+    #region Input Data
+    private struct CompoundComponent
+    {
+        // ReSharper disable once NotAccessedField.Local
+        public required bool B1;
+
+        // ReSharper disable once NotAccessedField.Local
+        public required int I1;
+    }
+    
+    private class ComponentDataSource : List<object[]>
+    {
+        public ComponentDataSource()
+        {
+            Add([123]);
+            Add([1.23f]);
+            Add([float.NegativeInfinity]);
+            Add([float.NaN]);
+            Add([new Vector2(1, 2)]);
+            Add([new Vector3(1, 2, 3)]);
+            Add([new Vector4(1, 2, 3, 4)]);
+            Add([new Matrix4x4()]);
+            Add([new CompoundComponent {B1 = true, I1 = 5}]);
+            Add([new CompoundComponent {B1 = default, I1 = default}]);
+        }
+    }
+    #endregion
+
     [Fact]
     public Entity Entity_is_Alive_after_Spawn()
     {
@@ -30,71 +60,80 @@ public class EntityTests(ITestOutputHelper output)
         Assert.True(components.Count() == 1);
     }
 
-    [Fact]
-    private void Entity_can_Add_Component()
+    [Theory]
+    [ClassData(typeof(ComponentDataSource))]
+    private void Entity_can_Add_Component<T>(T t1) where T : struct
     {
         using var world = new World();
         var entity = world.Spawn().Id();
-        world.On(entity).Add<int>();
-        Assert.True(world.HasComponent<int>(entity));
+        world.On(entity).Add(t1);
+        Assert.True(world.HasComponent<T>(entity));
         var components = world.GetComponents(entity);
         Assert.True(components.Count() == 2);
     }
 
-    [Fact]
-    private void Entity_can_Get_Component()
+    [Theory]
+    [ClassData(typeof(ComponentDataSource))]
+    private void Entity_can_Get_Component<T>(T t1) where T : struct
     {
         using var world = new World();
-        var entity = world.Spawn().Add<int>(123).Id();
-        var x = world.GetComponent<int>(entity);
-        Assert.Equal(123, x);
+        var entity = world.Spawn().Add(t1).Id();
+        var x = world.GetComponent<T>(entity);
+        Assert.Equal(t1, x);
     }
 
-    [Fact]
-    private void Entity_can_Remove_Component()
+    [Theory]
+    [ClassData(typeof(ComponentDataSource))]
+    private void Entity_can_Remove_Component<T>(T t1) where T : struct
     {
         using var world = new World();
         var entity = world.Spawn().Id();
-        world.On(entity).Add<int>();
-        world.On(entity).Remove<int>();
-        Assert.False(world.HasComponent<int>(entity));
+        world.On(entity).Add(t1);
+        world.On(entity).Remove<T>();
+        Assert.False(world.HasComponent<T>(entity));
     }
 
-    [Fact]
-    private void Entity_can_ReAdd_Component()
+    [Theory]
+    [ClassData(typeof(ComponentDataSource))]
+    private void Entity_can_ReAdd_Component<T>(T t1) where T : struct
     {
         using var world = new World();
         var entity = world.Spawn().Id();
-        world.On(entity).Add<int>(123);
-        world.On(entity).Remove<int>();
-        world.On(entity).Add<int>(345);
-        Assert.True(world.HasComponent<int>(entity));
+        world.On(entity).Add(t1);
+        world.On(entity).Remove<T>();
+        world.On(entity).Add(t1);
+        Assert.True(world.HasComponent<T>(entity));
     }
 
-    [Fact]
-    private void Entity_cannot_Add_Component_twice()
+    [Theory]
+    [ClassData(typeof(ComponentDataSource))]
+    private void Entity_cannot_Add_Component_twice<T>(T t1) where T : struct 
     {
         using var world = new World();
         var entity = world.Spawn().Id();
-        world.On(entity).Add<int>();
-        Assert.Throws<ArgumentException>(() => world.On(entity).Add<int>());
+        world.On(entity).Add(t1);
+        Assert.Throws<ArgumentException>(() => world.On(entity).Add(t1));
     }
 
-    [Fact]
-    private void Entity_cannot_Remove_Component_twice()
+    [Theory]
+    [ClassData(typeof(ComponentDataSource))]
+    private void Entity_cannot_Remove_Component_twice<T>(T t1) where T : struct
     {
         using var world = new World();
         var entity = world.Spawn().Id();
-        world.On(entity).Add<int>();
-        world.On(entity).Remove<int>();
-        Assert.Throws<ArgumentException>(() => world.On(entity).Remove<int>());
+        world.On(entity).Add(t1);
+        world.On(entity).Remove<T>();
+        Assert.Throws<ArgumentException>(() => world.On(entity).Remove<T>());
     }
 
-    [Fact]
-    private void Entity_cannot_Remove_Component_without_Adding()
+    [Theory]
+    [ClassData(typeof(ComponentDataSource))]
+#pragma warning disable xUnit1026
+    private void Entity_cannot_Remove_Component_without_Adding<T>(T _) where T : struct
     {
         using var world = new World();
         var entity = world.Spawn().Id();
-        Assert.Throws<ArgumentException>(() => world.On(entity).Remove<int>());
+        Assert.Throws<ArgumentException>(() => world.On(entity).Remove<T>());
     }
+#pragma warning restore xUnit1026
 }

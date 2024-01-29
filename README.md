@@ -1,42 +1,98 @@
 ## ... the tiny, tiny, high-energy Entity Component System!
+
 [![GitHub issues](https://img.shields.io/github/issues-raw/thygrrr/fennECS)](https://github.com/thygrrr/fennECS/issues)
 [![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/thygrrr/fennECS/xUnit.yml)](https://github.com/thygrrr/fennECS/actions)
 ![GitHub commits since latest release (branch)](https://img.shields.io/github/commits-since/thygrrr/fennECS/latest/main)
-![Static Badge](https://img.shields.io/badge/fennecs-over%209000-blue)
+![Fennecs](https://img.shields.io/badge/fennecs-yip%20yip-blue)
 
+<table style="border: none; border-collapse: collapse; width: 80%">
+    <tr>
+        <td>
+            <img src="Documentation/Logos/fennecs.png" alt="a box of fennecs, 8-color pixel art" style="min-width: 300px"/>
+        </td>
+        <td style="width: 70%">
+            <h3><a href="https://fennecs.tech">fennECS</a> is...</h3>
+            <ol style='list-style-type: "🐾 ";'>
+                <li>zero codegen</li>
+                <li>minimal boilerplate</li>
+                <li>archetype-based</li>
+                <li>intuitively relational</li>
+                <li>lithe and fast</li>
+            </ol>
+            This re-imagined fork of <a href="https://github.com/Byteron/HypEcs">HypEcs</a> <em>feels just right</em> for high performance game development in any modern C# engine. Including, of course, the fantastic <a href="https://godotengine.org">Godot</a>. 
+        </td>
+    </tr>
+</table>
 
+## Quickstart
 
+```csharp
+// Declare or use any existing value or reference type as a component.
+using Position = System.Numerics.Vector3;
 
+// Create a world.
+World world = new World();
 
-![a box of fennecs, 8-color pixel art](Documentation/Logos/fennecs.png)
+// Spawn a new entity into the world with a Vector3 component
+Entity entity = world.Spawn().Add<Position>().Id();
 
-*fennECS is a re-imagined fork of [HypEcs](https://github.com/Byteron/HypEcs) that builds upon its core strengths and enables cleaner system code and more deliberate, bi-directional entity relations. It makes use of modern C# language features to further reduce boilerplate and opportunities for error.*
+// Queries are cached, just build them right where you want to use them.
+var query = world.Query<Vector3>().Build();
+
+// Run code on all entities in the query. Omit chunk size to just parallelize per archetype.
+query.RunParallel((ref position) => {
+    position.Y -= 0.98f * Time.Delta;
+}, chunkSize: 8192);
+```
+
+## What the fox!? Another ECS?
+
+I know, I know. To help you choose, here are some of the key properties where fennECS might be a better or worse choice than its peers.
+
+|                                                               |      fennECS       | HypEcs | Entitas |   Unity DOTS   | DefaultECS |
+|:--------------------------------------------------------------|:------------------:|:------:|:-------:|:--------------:|:----------:|
+| Boilerplate-to-Feature Ratio                                  |       3-to-1       | 3-to-1 | 12-to-1 |   27-to-1 😱   |   5-to-1   |
+| Entity-Target Relations                                       |         ✅          |   ✅    |    ❌    |       ❌        |     ❌      |
+| Target Querying<br/>*(find all targets of relations of type)* |         ✅          |   ❌    |    ❌    |       ❌        |     ❌      |
+| Entity-Component Queries                                      |         ✅          |   ✅    |    ✅    |       ✅        |     ✅      |
+| Add Shared Components                                         |         ✅          |   🟨   |    ❌    |       🟨       |     ✅      | 
+| Change Shared Components                                      |         ✅          |   🟨   |    ❌    |       ❌        |     ✅      | 
+| Entity-Type-Relations                                         |         ❌          |   ✅    |    ❌    |       ❌        |     ❌      |
+| Entity-Target-Querying                                        |         ✅          |   ❌    |    ❌    |       ❌        |     ❌      |
+| Arbitrary Component Types                                     |         ✅          |   ✅    |    ❌    |       ❌        |     ✅      |
+| Reliable State Change Response                                |         🟨         |   ❌    |    ✅    |       ❌        |     ❌      |
+| No Code Generation Required                                   |         ✅          |   ✅    |    ❌    |       ❌        |     🟨     |
+| Submit Structural Changes at Any Time                         |         ✅          |   ✅    |    ✅    |       🟨       |     🟨     |
+| Apply Structural Changes at Any Time                          |         ❌          |   ❌    |    ✅    |       ❌        |     ❌     |
+| C# 12 support                                                 |         ✅          |   ❌    |    ❌    |       ❌        |     ❌      |
+| Parallel Processing                                           |         ⭐⭐         |   ⭐    |    ❌    |      ⭐⭐⭐   |     ⭐⭐     |
+| Singleton / Unique Components                                 | 🟨(ref types only) |   ❌    |    ✅    | 🟨(per system) |     ✅      |
+| Journaling                                                    |         ❌          |   ❌    |   🟨    |       ✅        |     ❌      |
 
 
 ## Highlights / Design Goals
 
 - Entity-Entity-Relations with O(1) lookup time complexity.
 - Entity-Component Queries with O(1) lookup time complexity.
-- Entity Spawning and Despawning with O(1) time complexity.
+- Entity Spawning and De-Spawning with O(1) time complexity.
 - Entity Structural Changes with O(1) time complexity (per individual change).
 
-- Parallelizable workloads across Archetypes (old) and within Archetypes (new).
+- Workloads can be parallelized across Archetypes (old) and within Archetypes (new).
 
 - Unit Test coverage.
 - Benchmarking suite.
 - Modern C# 12 codebase, targeting .NET 8.
 - Godot 4.x Sample Integrations.
 
-
 ## Future Roadmap
+
 - Unity Support: Planned for when Unity is on .NET 7 or later, and C# 12 or later.
 - fennECS as a NuGet package
 - fennECS as a Godot addon
 
 ## Already plays well with Godot 4.x!
+
 <img src="Documentation/Logos/godot-icon.svg" width="128px" alt="Godot Engine Logo, Copyright (c) 2017 Andrea Calabró" />
-
-
 
 # Legacy Documentation
 
@@ -70,7 +126,7 @@ public class MoveSystem : ISystem
 }
 ```
 
-### Spawning / Despawning Entities
+### Spawning / De-Spawning Entities
 
 ```csharp
 public void Run(World world)
