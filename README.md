@@ -29,7 +29,10 @@
 </table>
 
 ## Quickstart: Let's go!
-You need a world, a number of ~~small foxes~~ entities, and iteration/modification often informed by some uniform data.
+You need
+- a component type
+- a number of ~~small foxes~~ entities
+- a way to iterate/modify components often informed by some uniform data.
 
 #### ... and when we said minimal boilerplate, <em>we meant it.</em>
 
@@ -37,7 +40,7 @@ You need a world, a number of ~~small foxes~~ entities, and iteration/modificati
 // Declare your own or use any existing value or reference type as components.
 using Position = System.Numerics.Vector3;
 
-// Create a world. FYI, it's IDisposable, because using statements do wonders in tests!
+// Create a world. (FYI, it implements IDisposable)
 var world = new World();
 
 // Spawn an entity into the world with a choice of components. (or add/remove them later)
