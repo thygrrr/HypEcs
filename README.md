@@ -1,4 +1,6 @@
 
+# 🚧 Repo, Code, and Documentation Under construction 🚧
+
 ## ... the tiny, tiny, high-energy Entity Component System!
 
 <table style="border: none; border-collapse: collapse; width: 90%">
@@ -14,7 +16,7 @@
         </td>
         <td>
             <h2>What the fox!? Another ECS?</h2>
-            <p>We know... <em>we know.</em>🤦‍♀️</p>  
+            <p>We know... oh, <em>we know.</em>🤦‍♀️</p>  
             <h2>In a nutshell, <a href="https://fennecs.tech">fennECS</a> is...</h2>
             <ul style="list-style-type: '🐾 ';">
                 <li>zero codegen</li>
@@ -29,18 +31,15 @@
 </table>
 
 ## Quickstart: Let's go!
-You need
-- a component type
-- a number of ~~small foxes~~ entities
-- a way to iterate/modify components often informed by some uniform data.
+At the basic level, all you need is a 🧩**component type**, a number of ~~small foxes~~ 🦊**entities**, and a query to ⚙️**iterate/modify** components often informed by some uniform 💾**data**.
 
-#### ... and when we said minimal boilerplate, <em>we meant it.</em>
+#### ...  when we said minimal boilerplate, <em>we foxing meant it.</em>
 
 ```csharp
-// Declare your own or use any existing value or reference type as components.
+// Declare your own component type, or use any existing value or reference type.
 using Position = System.Numerics.Vector3;
 
-// Create a world. (FYI, it implements IDisposable)
+// Create a world. (btw, it implements IDisposable)
 var world = new World();
 
 // Spawn an entity into the world with a choice of components. (or add/remove them later)
@@ -54,6 +53,10 @@ query.RunParallel((ref Position position, in float dt) => {
     position.Y -= 9.81f * dt;
 }, chunkSize: 8192, uniform: Time.Delta);
 ```
+Even using the strictest judgments, that's no more than 2 lines of boilerplate! Merely instantiating the world and building the query aren't directly part of the actor/gravity feature we just built, and must be seen as "enablers" or "infrastructure".
+The real magic is that none of this brevity compromises on performance. 
+
+In fact, it's quite the opposite. fennECS is designed to be fast and simple. Two goals at the same time. 👷<em>"Foxin' A!"</em>
 
 ## Features: What's in the box?
 **fennECS** is a tiny, tiny ECS with a focus on performance and simplicity. And it cares enough to provide a few things you might not expect. Our competition sure didn't.
@@ -63,25 +66,26 @@ query.RunParallel((ref Position position, in float dt) => {
 
 Here are some of the key properties where fennECS might be a better or worse choice than its peers. Our resident fennecs have worked with all of these ECSs, and we're happy to answer any questions you might have.
 
-|                                                               |      fennECS       | HypEcs | Entitas |   Unity DOTS   | DefaultECS |
-|:--------------------------------------------------------------|:------------------:|:------:|:-------:|:--------------:|:----------:|
-| Boilerplate-to-Feature Ratio                                  |       3-to-1       | 3-to-1 | 12-to-1 |   27-to-1 😱   |   5-to-1   |
-| Entity-Target Relations                                       |         ✅          |   ✅    |    ❌    |       ❌        |     ❌      |
-| Target Querying<br/>*(find all targets of relations of type)* |         ✅          |   ❌    |    ❌    |       ❌        |     ❌      |
-| Entity-Component Queries                                      |         ✅          |   ✅    |    ✅    |       ✅        |     ✅      |
-| Add Shared Components                                         |         ✅          |   🟨   |    ❌    |       🟨       |     ✅      | 
-| Change Shared Components                                      |         ✅          |   🟨   |    ❌    |       ❌        |     ✅      | 
-| Entity-Type-Relations                                         |         ❌          |   ✅    |    ❌    |       ❌        |     ❌      |
-| Entity-Target-Querying                                        |         ✅          |   ❌    |    ❌    |       ❌        |     ❌      |
-| Arbitrary Component Types                                     |         ✅          |   ✅    |    ❌    |       ❌        |     ✅      |
-| Reliable State Change Response                                |  🟨(coming soon)   |   ❌    |    ✅    |       ❌        |     ❌      |
-| No Code Generation Required                                   |         ✅          |   ✅    |    ❌    |       ❌        |     🟨     |
-| Enqueue Structural Changes at Any Time                        |         ✅          |   ✅    |    ✅    |       🟨       |     🟨     |
-| Apply Structural Changes at Any Time                          |         ❌          |   ❌    |    ✅    |       ❌        |     ❌     |
-| C# 12 support                                                 |         ✅          |   ❌    |    ❌    |       ❌        |     ❌      |
-| Parallel Processing                                           |         ⭐⭐         |   ⭐    |    ❌    |      ⭐⭐⭐   |     ⭐⭐     |
-| Singleton / Unique Components                                 | 🟨(ref types only) |   ❌    |    ✅    | 🟨(per system) |     ✅      |
-| Journaling                                                    |         ❌          |   ❌    |   🟨    |       ✅        |     ❌      |
+|                                                               |            fennECS            | HypEcs | Entitas |    Unity DOTS    | DefaultECS |
+|:--------------------------------------------------------------|:-----------------------------:|:------:|:-------:|:----------------:|:----------:|
+| Boilerplate-to-Feature Ratio                                  |            3-to-1             | 3-to-1 | 12-to-1 |    27-to-1 😱    |   5-to-1   |
+| Entity-Target Relations                                       |               ✅               |   ✅    |    ❌    |        ❌         |     ❌      |
+| Target Querying<br/>*(find all targets of relations of type)* |               ✅               |   ❌    |    ❌    |        ❌         |     ❌      |
+| Entity-Component Queries                                      |               ✅               |   ✅    |    ✅    |        ✅         |     ✅      |
+| Add Shared Components                                         |               ✅               |   🟨   |    ❌    |        🟨        |     ✅      | 
+| Change Shared Components                                      |               ✅               |   🟨   |    ❌    |        ❌         |     ✅      | 
+| Entity-Type-Relations                                         |               ❌               |   ✅    |    ❌    |        ❌         |     ❌      |
+| Entity-Target-Querying                                        |               ✅               |   ❌    |    ❌    |        ❌         |     ❌      |
+| Arbitrary Component Types                                     |               ✅               |   ✅    |    ❌    |        ❌         |     ✅      |
+| Structural Change Responders                                  |     🟨<br/>(coming soon)      |   ❌    |    ✅    |        ❌         |     ❌      |
+| Automatic Thread Scheduling                                   | 🟨<br/>(coming soon) |    ❌   |      ❌  | ✅<br/>(highly static) |    ✅       |
+| No Code Generation Required                                   |               ✅               |   ✅    |    ❌    |        ❌         |     🟨     |
+| Enqueue Structural Changes at Any Time                        |               ✅               |   ✅    |    ✅    |        🟨        |     🟨     |
+| Apply Structural Changes at Any Time                          |               ❌               |   ❌    |    ✅    |        ❌         |     ❌      |
+| C# 12 support                                                 |               ✅               |   ❌    |    ❌    |        ❌         |     ❌      |
+| Parallel Processing                                           |              ⭐⭐               |   ⭐    |    ❌    |       ⭐⭐⭐        |     ⭐⭐     |
+| Singleton / Unique Components                                 |    🟨<br/>(ref types only)    |   ❌    |    ✅    |  🟨<br/>(per system)  |     ✅      |
+| Journaling                                                    |               ❌               |   ❌    |   🟨    |        ✅         |     ❌      |
 
 </details>
 
@@ -353,3 +357,7 @@ public class GameLoop : Node
     }
 }
 ```
+
+
+# Acknowledgements
+Many thanks to [Byteron / Aaron Winter](https://github.com/Byteron) for creating [HypEcs](https://github.com/Byteron/HypEcs) and [RelEcs](https://github.com/Byteron/RelEcs), the inspiring precursor libraries that fennECS is based on.
