@@ -3,8 +3,7 @@
 
 <table style="border: none; border-collapse: collapse; width: 90%">
     <tr>
-        <td style="width: 50%">
-            <div style="justify-content: center; align-items: center; display: grid;">
+        <td style="min-width: 480px">
             <img src="Documentation/Logos/fennecs-320.png" alt="a box of fennecs, 8-color pixel art" style="min-width: 320px"/>
             <p>
                 <img alt="GitHub top language" src="https://img.shields.io/github/languages/top/thygrrr/fennECS">
@@ -12,9 +11,8 @@
                 <a href="https://github.com/thygrrr/fennECS/issues"><img alt="Open issues" src="https://img.shields.io/github/issues-raw/thygrrr/fennECS"></a>
                 <a href="https://github.com/thygrrr/fennECS/actions"><img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/thygrrr/fennECS/xUnit.yml"></a>
             </p>
-            </div>
         </td>
-        <td style="width: 50%">
+        <td>
             <h2>What the fox!? Another ECS?</h2>
             <p>We know... <em>we know.</em>🤦‍♀️</p>  
             <h2>In a nutshell, <a href="https://fennecs.tech">fennECS</a> is...</h2>
