@@ -29,9 +29,10 @@
 </table>
 
 ## Quickstart: Let's go!
-When we said minimal boilerplate, <em>we meant it.</em>
+You need a world, a number of ~~small foxes~~ entities, and iteration/modification often informed by some uniform data.
 
-Here's a complete example of a world setup, entity spawn, and iteration/modification informed by uniform data.
+#### ... and when we said minimal boilerplate, <em>we meant it.</em>
+
 ```csharp
 // Declare your own or use any existing value or reference type as components.
 using Position = System.Numerics.Vector3;
@@ -52,7 +53,7 @@ query.RunParallel((ref Position position, in float dt) => {
 ```
 
 ## Features: What's in the box?
-. **fennECS** is a tiny, tiny ECS with a focus on performance and simplicity. And it cares enough to provide a few things you might not expect. Our competition sure didn't.
+**fennECS** is a tiny, tiny ECS with a focus on performance and simplicity. And it cares enough to provide a few things you might not expect. Our competition sure didn't.
 
 <details>
 <summary>ECS Comparison Matrix - choices are hard, foxes are soft</summary>

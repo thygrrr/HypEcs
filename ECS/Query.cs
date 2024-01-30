@@ -137,7 +137,7 @@ public class Query<C>(Archetypes archetypes, Mask mask, List<Table> tables) : Qu
         Archetypes.Unlock();
     }
 
-
+/*
     public void Exec<TArg>(SpanAction<C, TArg> action, TArg arg)
     {
         Archetypes.Lock();
@@ -152,7 +152,7 @@ public class Query<C>(Archetypes archetypes, Mask mask, List<Table> tables) : Qu
 
         Archetypes.Unlock();
     }
-
+*/
 /*    public void Loop(QueryAction<C> action)
     {
         Archetypes.Lock();
