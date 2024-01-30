@@ -30,13 +30,70 @@ public class Query
     }
 }
 
+// ReSharper disable InconsistentNaming
+public delegate void QueryActionR<R0>(ref R0 val0);
+public delegate void QueryActionRR<R0, R1>(ref R0 val0, ref R1 val1);
+public delegate void QueryActionRRR<R0, R1, R2>(ref R0 val0, ref R1 val1, ref R2 val2);
+public delegate void QueryActionRRRR<R0, R1, R2, R3>(ref R0 val0, ref R1 val1, ref R2 val2, ref R3 val3);
+
+public delegate void QueryActionI<I0>(in I0 val0);
+
+public delegate void QueryActionII<I0, I1>(in I0 val0, in I1 val1);
+
+public delegate void QueryActionIII<I0, I1, I2>(in I0 val0, in I1 val1, in I2 val2);
+public delegate void QueryActionIIII<I0, I1, I2, I3>(in I0 val0, in I1 val1, in I2 val2, in I3 val3);
+
+
+public delegate void QueryActionIR<I0, R1>(out I0 val0, ref R1 val1);
+
+public delegate void QueryActionIO<I0, O1>(in I0 val0, out O1 val1);
+
+public delegate void QueryActionRI<R0, I1>(ref R0 val0, in I1 val1);
+
+// ReSharper enable InconsistentNaming
+
+
+
+
 public class Query<C>(Archetypes archetypes, Mask mask, List<Table> tables) : Query(archetypes, mask, tables) where C : struct
 {
-    public delegate void SpanAction<T, in TArg>(Span<T> span, TArg arg);
+    public delegate void QueryActionSD<T, in TArg>(Span<T> span, TArg arg);
 
-    public delegate void QueryAction<T>(ref T value);
-    
-    
+    public delegate void QueryActionESD<T, in TArg>(ReadOnlySpan<Entity> entities, Span<T> span0, TArg arg);
+
+    public delegate void QueryActionESSD<T, in TArg>(ReadOnlySpan<Entity> entities, Span<T> span0, Span<T> span1, TArg arg);
+
+    public void Test<T, U>(QueryActionIO<T, U> io)
+    {
+
+    }
+
+    public void Test<T, U>(QueryActionIR<T, U> ia)
+    {
+
+    }
+
+    public void Test<T, U>(QueryActionRI<T, U> ra)
+    {
+
+    }
+
+    public void IAction(in int i)
+    {
+
+    }
+
+    public void RAction(ref int r)
+    {
+
+    }
+
+    public void SyntaxTest()
+    {
+        Test((out int i, ref float r) => { i = 3;});
+        Test((in int i, out float s) => { s = 8; });
+    }
+
     public ref C Get(Entity entity)
     {
         var meta = Archetypes.GetEntityMeta(entity.Identity);
@@ -45,7 +102,7 @@ public class Query<C>(Archetypes archetypes, Mask mask, List<Table> tables) : Qu
         return ref storage[meta.Row];
     }
 
-    public void Run<TArg>(SpanAction<C, TArg> action, in TArg state)
+    public void Run<TArg>(QueryActionSD<C, TArg> action, in TArg state)
     {
         Archetypes.Lock();
         
@@ -80,8 +137,23 @@ public class Query<C>(Archetypes archetypes, Mask mask, List<Table> tables) : Qu
         Archetypes.Unlock();
     }
 
-    
-    public void Run(QueryAction<C> action)
+
+    public void Exec<TArg>(SpanAction<C, TArg> action, TArg arg)
+    {
+        Archetypes.Lock();
+
+        foreach (var table in Tables)
+        {
+            if (table.IsEmpty) continue;
+
+            var s = table.GetStorage<C>(Identity.None).AsSpan();
+            action(s, arg);
+        }
+
+        Archetypes.Unlock();
+    }
+
+/*    public void Loop(QueryAction<C> action)
     {
         Archetypes.Lock();
 
@@ -95,7 +167,7 @@ public class Query<C>(Archetypes archetypes, Mask mask, List<Table> tables) : Qu
 
         Archetypes.Unlock();
     }
-
+*/
     public void RunParallel(Action<int, C[]> action)
     {
         Archetypes.Lock();

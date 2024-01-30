@@ -1,53 +1,65 @@
+
 ## ... the tiny, tiny, high-energy Entity Component System!
 
-[![GitHub issues](https://img.shields.io/github/issues-raw/thygrrr/fennECS)](https://github.com/thygrrr/fennECS/issues)
-[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/thygrrr/fennECS/xUnit.yml)](https://github.com/thygrrr/fennECS/actions)
-![GitHub commits since latest release (branch)](https://img.shields.io/github/commits-since/thygrrr/fennECS/latest/main)
-![Fennecs](https://img.shields.io/badge/fennecs-yip%20yip-blue)
-
-<table style="border: none; border-collapse: collapse; width: 70%">
+<table style="border: none; border-collapse: collapse; width: 90%">
     <tr>
-        <td>
+        <td style="min-width: 420px;">
+            <div style="justify-content: center;  align-items: center;display: grid;">
             <img src="Documentation/Logos/fennecs-320.png" alt="a box of fennecs, 8-color pixel art" style="min-width: 320px"/>
+            <p>
+                <img alt="GitHub top language" src="https://img.shields.io/github/languages/top/thygrrr/fennECS">
+                <a href="https://github.com/thygrrr/fennECS/issues"><img alt="Open issues" src="https://img.shields.io/github/issues-raw/thygrrr/fennECS"></a>
+                <a href="https://github.com/thygrrr/fennECS/actions"><img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/thygrrr/fennECS/xUnit.yml"></a>
+                <a href="https://github.com/thygrrr/fennECS?tab=MIT-1-ov-file#readme"><img alt="License: MIT" src="https://img.shields.io/github/license/thygrrr/fennECS?color=blue"></a>
+            </p>
+            </div>
         </td>
         <td style="width: 70%">
-            <h3><a href="https://fennecs.tech">fennECS</a> is...</h3>
-            <ul style="list-style-type: '🐾';">
+            <h2>What the fox!? Another ECS?</h2>
+            <p>We know... <em>we know.</em>🤦‍♀️</p>  
+            <h2>In a nutshell, <a href="https://fennecs.tech">fennECS</a> is...</h2>
+            <ul style="list-style-type: '🐾 ';">
                 <li>zero codegen</li>
                 <li>minimal boilerplate</li>
                 <li>archetype-based</li>
                 <li>intuitively relational</li>
                 <li>lithe and fast</li>
             </ul>
-            This re-imagined fork of <a href="https://github.com/Byteron/HypEcs">HypEcs</a> <em>feels just right</em> for high performance game development in any modern C# engine. Including, of course, the fantastic <a href="https://godotengine.org">Godot</a>. 
+            <p>This re-imagined fork of <a href="https://github.com/Byteron/HypEcs">HypEcs</a> <em>feels just right</em> for high performance game development in any modern C# engine. Including, of course, the fantastic <a href="https://godotengine.org">Godot</a>.</p> 
         </td>
     </tr>
 </table>
 
-## Quickstart
+## Quickstart: Let's go!
+When we said minimal boilerplate, <em>we meant it.</em>
 
+Here's a complete example of a world setup, entity spawn, and iteration/modification informed by uniform data.
 ```csharp
-// Declare your own or use any existing value or reference type as Components.
+// Declare your own or use any existing value or reference type as components.
 using Position = System.Numerics.Vector3;
 
-// Create a world. FYI, it's IDisposable, if you like using statements.
-using var world = new World();
+// Create a world. FYI, it's IDisposable, because using statements do wonders in tests!
+var world = new World();
 
-// Spawn an entity into the world with a choice of components, or add them later.
+// Spawn an entity into the world with a choice of components. (or add/remove them later)
 Entity entity = world.Spawn().Add<Position>().Id();
 
 // Queries are cached, just build them right where you want to use them.
 var query = world.Query<Position>().Build();
 
 // Run code on all entities in the query. Omit chunk size to parallelize across archetypes only.
-query.RunParallel((ref Position position) => {
-    position.Y -= 0.98f * Time.Delta;
-}, chunkSize: 8192);
+query.RunParallel((ref Position position, in float dt) => {
+    position.Y -= 9.81f * dt;
+}, chunkSize: 8192, uniform: Time.Delta);
 ```
 
-## What the fox!? Another ECS?
+## Features: What's in the box?
+. **fennECS** is a tiny, tiny ECS with a focus on performance and simplicity. And it cares enough to provide a few things you might not expect. Our competition sure didn't.
 
-I know, I know. To help you choose, here are some of the key properties where fennECS might be a better or worse choice than its peers.
+<details>
+<summary>ECS Comparison Matrix - choices are hard, foxes are soft</summary>
+
+Here are some of the key properties where fennECS might be a better or worse choice than its peers. Our resident fennecs have worked with all of these ECSs, and we're happy to answer any questions you might have.
 
 |                                                               |      fennECS       | HypEcs | Entitas |   Unity DOTS   | DefaultECS |
 |:--------------------------------------------------------------|:------------------:|:------:|:-------:|:--------------:|:----------:|
@@ -60,15 +72,16 @@ I know, I know. To help you choose, here are some of the key properties where fe
 | Entity-Type-Relations                                         |         ❌          |   ✅    |    ❌    |       ❌        |     ❌      |
 | Entity-Target-Querying                                        |         ✅          |   ❌    |    ❌    |       ❌        |     ❌      |
 | Arbitrary Component Types                                     |         ✅          |   ✅    |    ❌    |       ❌        |     ✅      |
-| Reliable State Change Response                                |         🟨         |   ❌    |    ✅    |       ❌        |     ❌      |
+| Reliable State Change Response                                |  🟨(coming soon)   |   ❌    |    ✅    |       ❌        |     ❌      |
 | No Code Generation Required                                   |         ✅          |   ✅    |    ❌    |       ❌        |     🟨     |
-| Submit Structural Changes at Any Time                         |         ✅          |   ✅    |    ✅    |       🟨       |     🟨     |
+| Enqueue Structural Changes at Any Time                        |         ✅          |   ✅    |    ✅    |       🟨       |     🟨     |
 | Apply Structural Changes at Any Time                          |         ❌          |   ❌    |    ✅    |       ❌        |     ❌     |
 | C# 12 support                                                 |         ✅          |   ❌    |    ❌    |       ❌        |     ❌      |
 | Parallel Processing                                           |         ⭐⭐         |   ⭐    |    ❌    |      ⭐⭐⭐   |     ⭐⭐     |
 | Singleton / Unique Components                                 | 🟨(ref types only) |   ❌    |    ✅    | 🟨(per system) |     ✅      |
 | Journaling                                                    |         ❌          |   ❌    |   🟨    |       ✅        |     ❌      |
 
+</details>
 
 ## Highlights / Design Goals
 

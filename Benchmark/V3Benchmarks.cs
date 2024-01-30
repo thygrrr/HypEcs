@@ -78,11 +78,11 @@ public class V3Benchmarks
         }
     }
 
-    private delegate void VectorIncrementDelegate(ref Vector3 val);
+    private delegate void VectorIncrementDelegate<T>(ref T val);
 
     private delegate void VectorIncrementDelegateIn(in Vector3 val);
 
-    private VectorIncrementDelegate _incrementDelegate = null!;
+    private VectorIncrementDelegate<Vector3> _incrementDelegate = null!;
     
     [Benchmark]
     public void PerItemIncrementSpanDelegate()
@@ -99,7 +99,7 @@ public class V3Benchmarks
     [Benchmark]
     public void PerItemIncrementSpanLocalDelegate()
     {
-        VectorIncrementDelegate del = (ref Vector3 val) => { val += new Vector3(1, 2, 3); };
+        VectorIncrementDelegate<Vector3> del = (ref Vector3 val) => { val += new Vector3(1, 2, 3); };
         PerItemIncrementSpanDelegateImpl(del);
     }
 
@@ -116,7 +116,7 @@ public class V3Benchmarks
     }
 
 
-    private void PerItemIncrementSpanDelegateImpl(VectorIncrementDelegate del)
+    private void PerItemIncrementSpanDelegateImpl(VectorIncrementDelegate<Vector3> del)
     {
         var span = _input.AsSpan();
         foreach (ref var v in span)
