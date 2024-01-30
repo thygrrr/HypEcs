@@ -3,7 +3,7 @@
 
 <table style="border: none; border-collapse: collapse; width: 90%">
     <tr>
-        <td>
+        <td style="width: 50%">
             <div style="min-width: 480px; justify-content: center;  align-items: center;display: grid;">
             <img src="Documentation/Logos/fennecs-320.png" alt="a box of fennecs, 8-color pixel art" style="min-width: 320px"/>
             <p>
@@ -14,7 +14,7 @@
             </p>
             </div>
         </td>
-        <td style="width: 70%">
+        <td style="width: 50%">
             <h2>What the fox!? Another ECS?</h2>
             <p>We know... <em>we know.</em>🤦‍♀️</p>  
             <h2>In a nutshell, <a href="https://fennecs.tech">fennECS</a> is...</h2>
