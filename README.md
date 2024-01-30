@@ -1,5 +1,5 @@
 
-# 🚧 Repo, Code, and Documentation Under construction 🚧
+# 🚧 Repo, Code, and Docs under construction 🚧
 
 ## ... the tiny, tiny, high-energy Entity Component System!
 
@@ -31,7 +31,7 @@
 </table>
 
 ## Quickstart: Let's go!
-At the basic level, all you need is a 🧩**component type**, a number of ~~small foxes~~ 🦊**entities**, and a query to ⚙️**iterate/modify** components often informed by some uniform 💾**data**.
+At the basic level, all you need is a 🧩**component type**, a number of ~~small foxes~~ 🦊**entities**, and a query to ⚙️**iterate/modify** components, often using some uniform 💾**data**.
 
 #### ...  when we said minimal boilerplate, <em>we foxing meant it.</em>
 
@@ -360,4 +360,4 @@ public class GameLoop : Node
 
 
 # Acknowledgements
-Many thanks to [Byteron / Aaron Winter](https://github.com/Byteron) for creating [HypEcs](https://github.com/Byteron/HypEcs) and [RelEcs](https://github.com/Byteron/RelEcs), the inspiring precursor libraries that fennECS is based on.
+Many thanks to [Byteron (Aaron Winter)](https://github.com/Byteron) for creating [HypEcs](https://github.com/Byteron/HypEcs) and [RelEcs](https://github.com/Byteron/RelEcs), the inspiring libraries that fennECS evolved from.
