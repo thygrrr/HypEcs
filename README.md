@@ -16,8 +16,8 @@
         </td>
         <td>
             <h2>What the fox!? Another ECS?</h2>
-            <p>We know... oh, <em>we know.</em>🤦‍♀️</p>  
-            <h2>In a nutshell, <a href="https://fennecs.tech">fennECS</a> is...</h2>
+            <p>We know... oh, <em>we know.</em> 😩️</p>  
+            <h2>But in a nutshell, <a href="https://fennecs.tech">fennECS</a> is...</h2>
             <ul style="list-style-type: '🐾 ';">
                 <li>zero codegen</li>
                 <li>minimal boilerplate</li>
@@ -47,10 +47,10 @@ Entity entity = world.Spawn().Add<Position>().Id();
 // Queries are cached, just build them right where you want to use them.
 var query = world.Query<Position>().Build();
 
-// Run code on all entities in the query. (omit chunkSize to parallelize across archetypes only)
+// Run code on all entities in the query.
 query.RunParallel((ref Position position, in float dt) => {
     position.Y -= 9.81f * dt;
-}, chunkSize: 8192, uniform: Time.Delta);
+}, uniform: Time.Delta);
 ```
 
 ### ... when we said minimal boilerplate, <em>we foxing meant it.</em>

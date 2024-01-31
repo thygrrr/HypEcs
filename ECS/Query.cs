@@ -1,3 +1,4 @@
+// ReSharper disable ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
 namespace ECS;
 
 public class Query
@@ -31,69 +32,100 @@ public class Query
 }
 
 // ReSharper disable InconsistentNaming
-public delegate void QueryActionR<R0>(ref R0 val0);
-public delegate void QueryActionRR<R0, R1>(ref R0 val0, ref R1 val1);
-public delegate void QueryActionRRR<R0, R1, R2>(ref R0 val0, ref R1 val1, ref R2 val2);
-public delegate void QueryActionRRRR<R0, R1, R2, R3>(ref R0 val0, ref R1 val1, ref R2 val2, ref R3 val3);
-
-public delegate void QueryActionI<I0>(in I0 val0);
-
-public delegate void QueryActionII<I0, I1>(in I0 val0, in I1 val1);
-
-public delegate void QueryActionIII<I0, I1, I2>(in I0 val0, in I1 val1, in I2 val2);
-public delegate void QueryActionIIII<I0, I1, I2, I3>(in I0 val0, in I1 val1, in I2 val2, in I3 val3);
+// ReSharper disable IdentifierTypo
+/*
+public delegate void QueryAction_CWU<C0, U>(ref C0 comp0, World w, U uniform);
+public delegate void QueryAction_CCWU<C0, C1, U>(ref C0 comp0, ref C1 comp1, World w, U uniform);
+public delegate void QueryAction_CCCWU<C0, C1, C3, U>(ref C0 comp0, ref C1 comp1, ref C3 comp2, World w, U uniform);
+public delegate void QueryAction_CCCCWU<C0, C1, C2, C3, U>(ref C0 c0, ref C1 c1, ref C2 c2, ref C3 c3, World w, U uniform);
+public delegate void QueryAction_CCCCCWU<C0, C1, C2, C3, C4, U>(ref C0 c0, ref C1 c1, ref C2 c2, ref C3 c3, ref C4 c4, World w, U uniform);
 
 
-public delegate void QueryActionIR<I0, R1>(out I0 val0, ref R1 val1);
+public delegate void QueryAction_ECWU<C0, U>(in Entity e, ref C0 comp0, World w, U uniform);
+public delegate void QueryAction_ECCWU<C0, C1, U>(in Entity e, ref C0 comp0, ref C1 comp1, World w, U uniform);
+public delegate void QueryAction_ECCCWU<C0, C1, C3, U>(in Entity e, ref C0 comp0, ref C1 comp1, ref C3 comp2, World w, U uniform);
+public delegate void QueryAction_ECCCCWU<C0, C1, C2, C3, U>(in Entity e, ref C0 c0, ref C1 c1, ref C2 c2, ref C3 c3, World w, U uniform);
+public delegate void QueryAction_ECCCCCWU<C0, C1, C2, C3, C4, U>(in Entity e, ref C0 c0, ref C1 c1, ref C2 c2, ref C3 c3, ref C4 c4, World w, U uniform);
 
-public delegate void QueryActionIO<I0, O1>(in I0 val0, out O1 val1);
 
-public delegate void QueryActionRI<R0, I1>(ref R0 val0, in I1 val1);
+public delegate void QueryAction_CW<C0>(ref C0 comp0, World w);
+public delegate void QueryAction_CCW<C0, C1>(ref C0 comp0, ref C1 comp1, World w);
+public delegate void QueryAction_CCCW<C0, C1, C2>(ref C0 comp0, ref C1 comp1, ref C2 comp2, World w);
+public delegate void QueryAction_CCCCW<C0, C1, C2, C3>(ref C0 c0, ref C1 c1, ref C2 c2, ref C3 c3, World w);
+public delegate void QueryAction_CCCCCW<C0, C1, C2, C3, C4>(ref C0 c0, ref C1 c1, ref C2 c2, ref C3 c3, ref C4 c4, World w);
 
+
+public delegate void QueryAction_ECW<C0>(in Entity e, ref C0 comp0, World w);
+public delegate void QueryAction_ECCW<C0, C1>(in Entity e, ref C0 comp0, ref C1 comp1, World w);
+public delegate void QueryAction_ECCCW<C0, C1, C2>(in Entity e, ref C0 comp0, ref C1 comp1, ref C2 comp2, World w);
+public delegate void QueryAction_ECCCCW<C0, C1, C2, C3>(in Entity e, ref C0 c0, ref C1 c1, ref C2 c2, ref C3 c3, World w);
+public delegate void QueryAction_ECCCCCW<C0, C1, C2, C3, C4>(in Entity e, ref C0 c0, ref C1 c1, ref C2 c2, ref C3 c3, ref C4 c4, World w);
+*/
+
+public delegate void QueryAction_C<C0>(ref C0 comp0);
+
+public delegate void QueryAction_CC<C0, C1>(ref C0 comp0, ref C1 comp1);
+
+public delegate void QueryAction_CCC<C0, C1, C2>(ref C0 comp0, ref C1 comp1, ref C2 comp2);
+
+public delegate void QueryAction_CCCC<C0, C1, C2, C3>(ref C0 c0, ref C1 c1, ref C2 c2, ref C3 c3);
+
+public delegate void QueryAction_CCCCC<C0, C1, C2, C3, C4>(ref C0 c0, ref C1 c1, ref C2 c2, ref C3 c3, ref C4 c4);
+
+
+public delegate void QueryAction_CS<C0>(ref C0 comp0, ParallelLoopState state);
+
+public delegate void QueryAction_CCS<C0, C1>(ref C0 comp0, ref C1 comp1, ParallelLoopState state);
+
+public delegate void QueryAction_CCCS<C0, C1, C2>(ref C0 comp0, ref C1 comp1, ref C2 comp2, ParallelLoopState state);
+
+public delegate void QueryAction_CCCCS<C0, C1, C2, C3>(ref C0 c0, ref C1 c1, ref C2 c2, ref C3 c3, ParallelLoopState state);
+
+public delegate void QueryAction_CCCCCS<C0, C1, C2, C3, C4>(ref C0 c0, ref C1 c1, ref C2 c2, ref C3 c3, ref C4 c4, ParallelLoopState state);
+
+
+public delegate void QueryAction_CU<C0, in U>(ref C0 comp0, U uniform);
+
+public delegate void QueryAction_CCU<C0, C1, in U>(ref C0 comp0, ref C1 comp1, U uniform);
+
+public delegate void QueryAction_CCCU<C0, C1, C2, in U>(ref C0 comp0, ref C1 comp1, ref C2 comp2, U uniform);
+
+public delegate void QueryAction_CCCCU<C0, C1, C2, C3, in U>(ref C0 c0, ref C1 c1, ref C2 c2, ref C3 c3, U uniform);
+
+public delegate void QueryAction_CCCCCU<C0, C1, C2, C3, C4, in U>(ref C0 c0, ref C1 c1, ref C2 c2, ref C3 c3, ref C4 c4, U uniform);
+
+
+public delegate void QueryAction_CUS<C0, in U>(ref C0 comp0, U uniform, ParallelLoopState state);
+
+public delegate void QueryAction_CCUS<C0, C1, in U>(ref C0 comp0, ref C1 comp1, U uniform, ParallelLoopState state);
+
+public delegate void QueryAction_CCCUS<C0, C1, C2, in U>(ref C0 comp0, ref C1 comp1, ref C2 comp2, U uniform, ParallelLoopState state);
+
+public delegate void QueryAction_CCCCUS<C0, C1, C2, C3, in U>(ref C0 c0, ref C1 c1, ref C2 c2, ref C3 c3, U uniform, ParallelLoopState state);
+
+public delegate void QueryAction_CCCCCUS<C0, C1, C2, C3, C4, in U>(ref C0 c0, ref C1 c1, ref C2 c2, ref C3 c3, ref C4 c4, U uniform, ParallelLoopState state);
+
+// ReSharper enable IdentifierTypo
 // ReSharper enable InconsistentNaming
 
+/* Big chance we never need them because entities themselves are also a type.
+public delegate void QueryAction_EC<C0>(in Entity e, ref C0 comp0);
+public delegate void QueryAction_ECC<C0, C1>(in Entity e, ref C0 comp0, ref C1 comp1);
+public delegate void QueryAction_ECCC<C0, C1, C2>(in Entity e, ref C0 comp0, ref C1 comp1, ref C2 comp2);
+public delegate void QueryAction_ECCCC<C0, C1, C2, C3>(in Entity e, ref C0 c0, ref C1 c1, ref C2 c2, ref C3 c3);
+public delegate void QueryAction_ECCCCC<C0, C1, C2, C3, C4>(in Entity e, ref C0 c0, ref C1 c1, ref C2 c2, ref C3 c3, ref C4 c4);
+
+public delegate void QueryAction_ECU<C0, in U>(in Entity e, ref C0 comp0, U uniform);
+public delegate void QueryAction_ECCU<C0, C1, in U>(in Entity e, ref C0 comp0, ref C1 comp1, U uniform);
+public delegate void QueryAction_ECCCU<C0, C1, C2, in U>(in Entity e, ref C0 comp0, ref C1 comp1, ref C2 comp2, U uniform);
+public delegate void QueryAction_ECCCCU<C0, C1, C2, C3, in U>(in Entity e, ref C0 c0, ref C1 c1, ref C2 c2, ref C3 c3, U uniform);
+public delegate void QueryAction_ECCCCCU<C0, C1, C2, C3, C4, in U>(in Entity e, ref C0 c0, ref C1 c1, ref C2 c2, ref C3 c3, ref C4 c4, U uniform);
+*/
 
 
 
 public class Query<C>(Archetypes archetypes, Mask mask, List<Table> tables) : Query(archetypes, mask, tables) where C : struct
 {
-    public delegate void QueryActionSD<T, in TArg>(Span<T> span, TArg arg);
-
-    public delegate void QueryActionESD<T, in TArg>(ReadOnlySpan<Entity> entities, Span<T> span0, TArg arg);
-
-    public delegate void QueryActionESSD<T, in TArg>(ReadOnlySpan<Entity> entities, Span<T> span0, Span<T> span1, TArg arg);
-
-    public void Test<T, U>(QueryActionIO<T, U> io)
-    {
-
-    }
-
-    public void Test<T, U>(QueryActionIR<T, U> ia)
-    {
-
-    }
-
-    public void Test<T, U>(QueryActionRI<T, U> ra)
-    {
-
-    }
-
-    public void IAction(in int i)
-    {
-
-    }
-
-    public void RAction(ref int r)
-    {
-
-    }
-
-    public void SyntaxTest()
-    {
-        Test((out int i, ref float r) => { i = 3;});
-        Test((in int i, out float s) => { s = 8; });
-    }
-
     public ref C Get(Entity entity)
     {
         var meta = Archetypes.GetEntityMeta(entity.Identity);
@@ -102,22 +134,66 @@ public class Query<C>(Archetypes archetypes, Mask mask, List<Table> tables) : Qu
         return ref storage[meta.Row];
     }
 
-    public void Run<TArg>(QueryActionSD<C, TArg> action, in TArg state)
+    #region Runners
+    public void Run(QueryAction_C<C> action)
     {
         Archetypes.Lock();
-        
+
         foreach (var table in Tables)
         {
             if (table.IsEmpty) continue;
-
-            var storage = table.GetStorage<C>(Identity.None);
-            var span = storage.AsSpan<C>(0, table.Count);
-
-            action(span, state);
+            var storage = table.GetStorage<C>(Identity.None).AsSpan();
+            foreach (ref var c in storage) action(ref c);
         }
-        
+
         Archetypes.Unlock();
     }
+
+
+    public void Run<U>(QueryAction_CU<C, U> action, U uniform)
+    {
+        Archetypes.Lock();
+
+        foreach (var table in Tables)
+        {
+            if (table.IsEmpty) continue;
+            var storage = table.GetStorage<C>(Identity.None).AsSpan();
+            foreach (ref var c in storage) action(ref c, uniform);
+        }
+
+        Archetypes.Unlock();
+    }
+
+    
+    public void RunParallel(QueryAction_C<C> action)
+    {
+        Archetypes.Lock();
+
+        Parallel.ForEach(Tables, delegate (Table table)
+        {
+            if (table.IsEmpty) return;
+            var storage = table.GetStorage<C>(Identity.None).AsSpan();
+            foreach (ref var c in storage) action(ref c);
+        });
+
+        Archetypes.Unlock();
+    }
+
+
+    public void RunParallel<U>(QueryAction_CU<C, U> action, U uniform)
+    {
+        Archetypes.Lock();
+
+        Parallel.ForEach(Tables, delegate(Table table)
+        {
+            if (table.IsEmpty) return;
+            var storage = table.GetStorage<C>(Identity.None).AsSpan();
+            foreach (ref var c in storage) action(ref c, uniform);
+        });
+
+        Archetypes.Unlock();
+    }
+    #endregion
 
     public void Run(Action<int, C[]> action)
     {
@@ -136,66 +212,12 @@ public class Query<C>(Archetypes archetypes, Mask mask, List<Table> tables) : Qu
 
         Archetypes.Unlock();
     }
-
-/*
-    public void Exec<TArg>(SpanAction<C, TArg> action, TArg arg)
-    {
-        Archetypes.Lock();
-
-        foreach (var table in Tables)
-        {
-            if (table.IsEmpty) continue;
-
-            var s = table.GetStorage<C>(Identity.None).AsSpan();
-            action(s, arg);
-        }
-
-        Archetypes.Unlock();
-    }
-*/
-/*    public void Loop(QueryAction<C> action)
-    {
-        Archetypes.Lock();
-
-        foreach (var table in Tables)
-        {
-            if (table.IsEmpty) continue;
-
-            var s = table.GetStorage<C>(Identity.None).AsSpan();
-            foreach (ref var c in s) action(ref c);
-        }
-
-        Archetypes.Unlock();
-    }
-*/
-    public void RunParallel(Action<int, C[]> action)
-    {
-        Archetypes.Lock();
-
-        Parallel.For(0, Tables.Count, t =>
-        {
-            var table = Tables[t];
-            
-            if (table.IsEmpty) return;
-
-            var s = table.GetStorage<C>(Identity.None);
-            
-            action(table.Count, s);
-        });
-        
-        Archetypes.Unlock();
-    }
 }
 
-public class Query<C1, C2> : Query
+public class Query<C1, C2>(Archetypes archetypes, Mask mask, List<Table> tables) : Query(archetypes, mask, tables)
     where C1 : struct
     where C2 : struct
 {
-    public Query(Archetypes archetypes, Mask mask, List<Table> tables) : base(archetypes, mask, tables)
-    {
-    }
-
-    
     public RefValueTuple<C1, C2> Get(Entity entity)
     {
         var meta = Archetypes.GetEntityMeta(entity.Identity);
@@ -205,55 +227,91 @@ public class Query<C1, C2> : Query
         return new RefValueTuple<C1, C2>(ref storage1[meta.Row], ref storage2[meta.Row]);
     }
 
-    public void Run(Action<int, C1[], C2[]> action)
+    #region Runners
+
+    public void Run(QueryAction_CC<C1, C2> action)
     {
         Archetypes.Lock();
-        
-        for (var t = 0; t < Tables.Count; t++)
-        {
-            var table = Tables[t];
 
+        foreach (var table in Tables)
+        {
             if (table.IsEmpty) continue;
-
-            var s1 = table.GetStorage<C1>(Identity.None);
-            var s2 = table.GetStorage<C2>(Identity.None);
-
-            action(table.Count, s1, s2);
+            var storage1 = table.GetStorage<C1>(Identity.None).AsSpan();
+            var storage2 = table.GetStorage<C2>(Identity.None).AsSpan();
+            for (var i = 0; i < storage1.Length; i++)
+            {
+                action(ref storage1[i], ref storage2[i]);
+            }
         }
-        
+
         Archetypes.Unlock();
     }
-    
-    public void RunParallel(Action<int, C1[], C2[]> action)
+
+
+    public void Run<U>(QueryAction_CCU<C1, C2, U> action, U uniform)
     {
         Archetypes.Lock();
 
-        Parallel.For(0, Tables.Count, t =>
+        foreach (var table in Tables)
         {
-            var table = Tables[t];
+            if (table.IsEmpty) continue;
+            var storage1 = table.GetStorage<C1>(Identity.None).AsSpan();
+            var storage2 = table.GetStorage<C2>(Identity.None).AsSpan();
+            for (var i = 0; i < storage1.Length; i++)
+            {
+                action(ref storage1[i], ref storage2[i], uniform);
+            }
+        }
 
-            if (table.IsEmpty) return;
-
-            var s1 = table.GetStorage<C1>(Identity.None);
-            var s2 = table.GetStorage<C2>(Identity.None);
-
-            action(table.Count, s1, s2);
-        });
-        
         Archetypes.Unlock();
     }
+
+
+    public void RunParallel(QueryAction_CC<C1, C2> action)
+    {
+        Archetypes.Lock();
+
+        Parallel.ForEach(Tables, delegate(Table table)
+        {
+            if (table.IsEmpty) return;
+            var storage1 = table.GetStorage<C1>(Identity.None).AsSpan();
+            var storage2 = table.GetStorage<C2>(Identity.None).AsSpan();
+            for (var i = 0; i < storage1.Length; i++)
+            {
+                action(ref storage1[i], ref storage2[i]);
+            }
+        });
+
+        Archetypes.Unlock();
+    }
+
+
+    public void RunParallel<U>(QueryAction_CCU<C1, C2, U> action, U uniform)
+    {
+        Archetypes.Lock();
+
+        Parallel.ForEach(Tables, delegate(Table table)
+        {
+            if (table.IsEmpty) return;
+            var storage1 = table.GetStorage<C1>(Identity.None).AsSpan();
+            var storage2 = table.GetStorage<C2>(Identity.None).AsSpan();
+            for (var i = 0; i < storage1.Length; i++)
+            {
+                action(ref storage1[i], ref storage2[i], uniform);
+            }
+        });
+
+        Archetypes.Unlock();
+    }
+
+    #endregion
 }
 
-public class Query<C1, C2, C3> : Query
+public class Query<C1, C2, C3>(Archetypes archetypes, Mask mask, List<Table> tables) : Query(archetypes, mask, tables)
     where C1 : struct
     where C2 : struct
     where C3 : struct
 {
-    public Query(Archetypes archetypes, Mask mask, List<Table> tables) : base(archetypes, mask, tables)
-    {
-    }
-
-    
     public RefValueTuple<C1, C2, C3> Get(Entity entity)
     {
         var meta = Archetypes.GetEntityMeta(entity.Identity);
@@ -306,17 +364,12 @@ public class Query<C1, C2, C3> : Query
     }
 }
 
-public class Query<C1, C2, C3, C4> : Query
+public class Query<C1, C2, C3, C4>(Archetypes archetypes, Mask mask, List<Table> tables) : Query(archetypes, mask, tables)
     where C1 : struct
     where C2 : struct
     where C3 : struct
     where C4 : struct
 {
-    public Query(Archetypes archetypes, Mask mask, List<Table> tables) : base(archetypes, mask, tables)
-    {
-    }
-
-    
     public RefValueTuple<C1, C2, C3, C4> Get(Entity entity)
     {
         var meta = Archetypes.GetEntityMeta(entity.Identity);
@@ -372,18 +425,13 @@ public class Query<C1, C2, C3, C4> : Query
     }
 }
 
-public class Query<C1, C2, C3, C4, C5> : Query
+public class Query<C1, C2, C3, C4, C5>(Archetypes archetypes, Mask mask, List<Table> tables) : Query(archetypes, mask, tables)
     where C1 : struct
     where C2 : struct
     where C3 : struct
     where C4 : struct
     where C5 : struct
 {
-    public Query(Archetypes archetypes, Mask mask, List<Table> tables) : base(archetypes, mask, tables)
-    {
-    }
-
-    
     public RefValueTuple<C1, C2, C3, C4, C5> Get(Entity entity)
     {
         var meta = Archetypes.GetEntityMeta(entity.Identity);

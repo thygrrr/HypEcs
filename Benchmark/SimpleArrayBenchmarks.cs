@@ -10,8 +10,8 @@ public class ECSBenchmarks
 
     private static readonly Random random = new(1337);
 
-    private int[] _input;
-    private int[] _output;
+    private int[] _input = null!;
+    private int[] _output = null!;
     
     [GlobalSetup]
     public void Setup()

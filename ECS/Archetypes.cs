@@ -16,15 +16,16 @@ public sealed class Archetypes
 
 	internal int EntityCount;
 
-	private readonly ConcurrentQueue<DeferredOperation> _tableOperations = new();
+	private readonly ConcurrentQueue<DeferredOperation> _deferredOperations = new();
 	private readonly Dictionary<Type, Entity> _typeEntities = new();
 	private readonly Dictionary<TypeExpression, List<Table>> _tablesByType = new();
 	private readonly Dictionary<Identity, HashSet<TypeExpression>> _typesByRelationTarget = new();
 	private readonly Dictionary<TypeFamily, HashSet<Entity>> _targetsByRelationType = new();
 	private readonly Dictionary<int, HashSet<TypeExpression>> _relationsByTypes = new();
 
+	private readonly object _modeChangeLock = new();
 	private int _lockCount;
-	private bool _isLocked;
+	private bool _isDeferredMode;
 
 	public Archetypes()
 	{
@@ -60,9 +61,9 @@ public sealed class Archetypes
 	{
 		if (!IsAlive(identity)) return;
 
-		if (_isLocked)
+		if (_isDeferredMode)
 		{
-			_tableOperations.Enqueue(new DeferredOperation { Operation = TableOp.Despawn, Identity = identity });
+			_deferredOperations.Enqueue(new DeferredOperation { Operation = Deferred.Despawn, Identity = identity });
 			return;
 		}
 
@@ -112,9 +113,9 @@ public sealed class Archetypes
 			throw new ArgumentException($"Entity {identity} already has component of type {typeExpression}");
 		}
 
-		if (_isLocked)
+		if (_isDeferredMode)
 		{
-			_tableOperations.Enqueue(new DeferredOperation { Operation = TableOp.Add, Identity = identity, TypeExpression = typeExpression, Data = data! });
+			_deferredOperations.Enqueue(new DeferredOperation { Operation = Deferred.Add, Identity = identity, TypeExpression = typeExpression, Data = data! });
 			return;
 		}
 
@@ -183,9 +184,9 @@ public sealed class Archetypes
 			throw new ArgumentException($"cannot remove non-existent component {typeExpression.Type.Name} from entity {identity}");
 		}
 
-		if (_isLocked)
+		if (_isDeferredMode)
 		{
-			_tableOperations.Enqueue(new DeferredOperation { Operation = TableOp.Remove, Identity = identity, TypeExpression = typeExpression });
+			_deferredOperations.Enqueue(new DeferredOperation { Operation = Deferred.Remove, Identity = identity, TypeExpression = typeExpression });
 			return;
 		}
 		
@@ -447,21 +448,21 @@ public sealed class Archetypes
 	}
 
 
-	private void ApplyTableOperations()
+	private void ApplyDeferredOperations()
 	{
-		foreach (var op in _tableOperations)
+		foreach (var op in _deferredOperations)
 		{
 			AssertAlive(op.Identity);
 
 			switch (op.Operation)
 			{
-				case TableOp.Add:
+				case Deferred.Add:
 					AddComponent(op.TypeExpression, op.Identity, op.Data);
 					break;
-				case TableOp.Remove:
+				case Deferred.Remove:
 					RemoveComponent(op.TypeExpression, op.Identity);
 					break;
-				case TableOp.Despawn:
+				case Deferred.Despawn:
 					Despawn(op.Identity);
 					break;
 				default:
@@ -469,35 +470,39 @@ public sealed class Archetypes
 			}
 		}
 
-		_tableOperations.Clear();
+		_deferredOperations.Clear();
 	}
 
 
 	public void Lock()
 	{
-		_lockCount++;
-		_isLocked = true;
+		lock (_modeChangeLock)
+		{
+			_lockCount++;
+			_isDeferredMode = _lockCount > 0;
+		}
 	}
-
 	
 	public void Unlock()
 	{
-		_lockCount--;
-		if (_lockCount != 0) return;
-		_isLocked = false;
+		lock (_modeChangeLock)
+		{
+			_lockCount--;
+			_isDeferredMode = _lockCount > 0;
 
-		ApplyTableOperations();
+			if (!_isDeferredMode) ApplyDeferredOperations();
+		}
 	}
 
 	private struct DeferredOperation
 	{
-		public required TableOp Operation;
+		public required Deferred Operation;
 		public TypeExpression TypeExpression;
 		public Identity Identity;
 		public object Data;
 	}
 
-	private enum TableOp
+	private enum Deferred
 	{
 		Add,
 		Remove,
