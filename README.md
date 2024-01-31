@@ -6,7 +6,7 @@
 <table style="border: none; border-collapse: collapse; width: 90%">
     <tr>
         <td>
-            <img src="Documentation/Logos/fennecs-320.png" alt="a box of fennecs, 8-color pixel art" style="min-width: 320px"/>
+            <img src="Documentation/Logos/fennecs-640.png" alt="a box of fennecs, 8-color pixel art" style="min-width: 320px"/>
             <p>
                 <img alt="GitHub top language" src="https://img.shields.io/github/languages/top/thygrrr/fennECS">
                 <a href="https://github.com/thygrrr/fennECS?tab=MIT-1-ov-file#readme"><img alt="License: MIT" src="https://img.shields.io/github/license/thygrrr/fennECS?color=blue"></a>
@@ -25,7 +25,8 @@
                 <li>intuitively relational</li>
                 <li>lithe and fast</li>
             </ul>
-            <p>This re-imagined fork of <a href="https://github.com/Byteron/HypEcs">HypEcs</a> <em>feels just right</em> for high performance game development in any modern C# engine. Including, of course, the fantastic <a href="https://godotengine.org">Godot</a>.</p> 
+            <p>This re-imagined fork of <a href="https://github.com/Byteron/HypEcs">HypEcs</a> <em>feels just right<a href="">*</a></em> for high performance game development in any modern C# engine. Including, of course, the fantastic <a href="https://godotengine.org">Godot</a>.</p>
+            <sub>*subjective experience may vary, terms & conditions apply</sub>
         </td>
     </tr>
 </table>
@@ -33,13 +34,11 @@
 ## Quickstart: Let's go!
 At the basic level, all you need is a 🧩**component type**, a number of ~~small foxes~~ 🦊**entities**, and a query to ⚙️**iterate/modify** components, often using some uniform 💾**data**.
 
-#### ...  when we said minimal boilerplate, <em>we foxing meant it.</em>
-
 ```csharp
-// Declare your own component type, or use any existing value or reference type.
+// Declare your own component types. (you can also use most existing value or reference types)
 using Position = System.Numerics.Vector3;
 
-// Create a world. (btw, it implements IDisposable)
+// Create a world. (fyi, World implements IDisposable)
 var world = new World();
 
 // Spawn an entity into the world with a choice of components. (or add/remove them later)
@@ -48,15 +47,15 @@ Entity entity = world.Spawn().Add<Position>().Id();
 // Queries are cached, just build them right where you want to use them.
 var query = world.Query<Position>().Build();
 
-// Run code on all entities in the query. Omit chunk size to parallelize across archetypes only.
+// Run code on all entities in the query. (omit chunkSize to parallelize across archetypes only)
 query.RunParallel((ref Position position, in float dt) => {
     position.Y -= 9.81f * dt;
 }, chunkSize: 8192, uniform: Time.Delta);
 ```
-Even using the strictest judgments, that's no more than 2 lines of boilerplate! Merely instantiating the world and building the query aren't directly part of the actor/gravity feature we just built, and must be seen as "enablers" or "infrastructure".
-The real magic is that none of this brevity compromises on performance. 
 
-In fact, it's quite the opposite. fennECS is designed to be fast and simple. Two goals at the same time. 👷<em>"Foxin' A!"</em>
+### ... when we said minimal boilerplate, <em>we foxing meant it.</em>
+
+Even using the strictest judgment, that's no more than 2 lines of boilerplate! Merely instantiating the world and building the query aren't directly moving parts of the actor/gravity feature we just built, and should be seen as "enablers" or "infrastructure".  The real magic is that none of this brevity compromises on performance.
 
 ## Features: What's in the box?
 **fennECS** is a tiny, tiny ECS with a focus on performance and simplicity. And it cares enough to provide a few things you might not expect. Our competition sure didn't.
