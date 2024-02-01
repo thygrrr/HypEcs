@@ -3,7 +3,7 @@
 public class RefTupleTests
 {
     [Fact]
-    void RefValueTuple_Maintains_Eefs()
+    private void RefValueTuple_Maintains_Refs()
     {
         var a = 1;
         var b = 2;

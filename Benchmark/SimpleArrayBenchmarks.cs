@@ -5,7 +5,7 @@ namespace Benchmark;
 [MemoryDiagnoser(false)]
 public class ECSBenchmarks
 {
-    [Params(1000, 10000)] 
+    [Params(1_000, 1_000_000)] 
     public int entityCount { get; set; }
 
     private static readonly Random random = new(1337);

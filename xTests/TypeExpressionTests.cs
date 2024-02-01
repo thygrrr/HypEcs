@@ -1,7 +1,8 @@
 ﻿namespace xTests;
 
-public class TypeExpressionTests(ITestOutputHelper output)
+public class TypeExpressionTests
 {
+
     private struct Type1;
 
     [Fact]

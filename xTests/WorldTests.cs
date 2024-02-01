@@ -2,7 +2,7 @@ namespace xTests;
 
 using ECS;
 
-public class WorldTests(ITestOutputHelper output)
+public class WorldTests
 {
     [Fact]
     public World World_Creates()
