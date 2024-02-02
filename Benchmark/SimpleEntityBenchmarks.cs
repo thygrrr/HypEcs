@@ -6,15 +6,16 @@ using ECS;
 namespace Benchmark;
 
 
-[SimpleJob(RuntimeMoniker.Net80)]
-[RPlotExporter]
+[ShortRunJob(RuntimeMoniker.Net80)]
+//[ThreadingDiagnoser]
+//[MemoryDiagnoser]
 public class SimpleEntityBenchmarks
 {
     // ReSharper disable once UnusedAutoPropertyAccessor.Global
-    [Params(100_000_000)] 
+    [Params(10_000_000)] 
     public int entityCount { get; set; }
 
-    private static readonly Random random = new(1337);
+    //private static readonly Random random = new(1337);
 
     private World _world = null!;
     
@@ -29,16 +30,21 @@ public class SimpleEntityBenchmarks
         _vectors = new Vector3[entityCount];
         
 
-        for (var i = 0; i < entityCount; i+=4)
+        for (var i = 0; i < entityCount; i+=8)
         {
             _world.Spawn().Add<Vector3>().Id();
             _world.Spawn().Add<Vector3>().Add<int>().Id();
+            _world.Spawn().Add<Vector3>().Add<byte>().Id();
+            _world.Spawn().Add<Vector3>().Add<double>().Id();
+            _world.Spawn().Add<Vector3>().Add<short>().Id();
+            _world.Spawn().Add<Vector3>().Add<ushort>().Id();
             _world.Spawn().Add<Vector3>().Add<float>().Id();
-            _world.Spawn().Add<Vector3>().Add<long>().Id();
+            _world.Spawn().Add<Vector3>().Add<long>().Add<float>().Id();
         }
     }
 
-    [Benchmark]
+
+    //[Benchmark]
     public void AddPlainVector3Array()
     {
         for (var i = 0; i < entityCount; i++)
@@ -56,16 +62,37 @@ public class SimpleEntityBenchmarks
         }
     }
 
-    [Benchmark]
+    //[Benchmark]
     public void AddECSVector3Lambda()
     {
         _queryV3.Run((ref Vector3 v) => { v += Vector3.One; });
     }
 
-    [Benchmark]
+    //[Benchmark]
     public void AddECSVector3ParallelLambda()
     {
         _queryV3.RunParallel((ref Vector3 v) => { v += Vector3.One; });
+    }
+
+    public void AddECSHypStyleArray()
+    {
+        _queryV3.RunHypStyle(delegate(int count, Vector3[] vectors)
+        {
+            for (var i = 0; i < count; i++)
+            {
+                vectors[i] += Vector3.One;
+            }
+        });
+    }
+
+    [Benchmark(Baseline = true)]
+    public void AddECSHypStyleParallel()
+    {
+        var opts = new ParallelOptions {MaxDegreeOfParallelism = 16};
+        _queryV3.RunHypStyle(delegate(int count, Vector3[] vectors)
+        {
+            Parallel.For(0, count, opts, delegate (int i) { vectors[i] += Vector3.One; });
+        });
     }
 
     [Benchmark]
@@ -77,6 +104,24 @@ public class SimpleEntityBenchmarks
     [Benchmark]
     public void AddECSVector3ParallelDelegate()
     {
-        _queryV3.RunParallel(delegate (ref Vector3 v) { v += Vector3.One; });
+        _queryV3.RunParallel(delegate(ref Vector3 v) { v += Vector3.One; });
+    }
+
+    [Benchmark]
+    public async Task AddECSVector3Channeled()
+    {
+        await _queryV3.RunParallelChanneled(delegate(ref Vector3 v) { v += Vector3.One; });
+    }
+
+    [Benchmark]
+    public async Task AddECSVector3TaskedDelegate()
+    {
+        await _queryV3.RunTasked(delegate(ref Vector3 v) { v += Vector3.One; });
+    }
+
+    [Benchmark]
+    public void AddECSVector3ParallelDelegateChunked()
+    {
+        _queryV3.RunParallelChunked(delegate(ref Vector3 v) { v += Vector3.One; });
     }
 }

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>Benchmark.SimpleEntityBenchmarks-20240202-133357</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: right; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet v0.13.12, Windows 11 (10.0.22631.3085/23H2/2023Update/SunValley3)
+AMD Ryzen 9 5900X, 1 CPU, 24 logical and 12 physical cores
+.NET SDK 8.0.101
+  [Host]   : .NET 8.0.1 (8.0.123.58001), X64 RyuJIT AVX2
+  ShortRun : .NET 8.0.1 (8.0.123.58001), X64 RyuJIT AVX2
+</code></pre>
+<pre><code>Job=ShortRun  Platform=X64  IterationCount=3  
+LaunchCount=1  RunStrategy=Monitoring  WarmupCount=3  
+</code></pre>
+
+<table>
+<thead><tr><th>Method                        </th><th>entityCount</th><th>Mean</th><th>Error</th><th>StdDev</th><th>Median</th><th>Ratio</th><th>RatioSD</th>
+</tr>
+</thead><tbody><tr><td>AddPlainVector3Array</td><td>1000000</td><td>1,094.6 &mu;s</td><td>3,855.9 &mu;s</td><td>211.35 &mu;s</td><td>1,027.5 &mu;s</td><td>1.39</td><td>0.33</td>
+</tr><tr><td>AddPlainVector3ArrayEC</td><td>1000000</td><td>760.0 &mu;s</td><td>1,191.8 &mu;s</td><td>65.33 &mu;s</td><td>729.8 &mu;s</td><td>0.96</td><td>0.02</td>
+</tr><tr><td>AddPlainVector3Span</td><td>1000000</td><td>649.2 &mu;s</td><td>223.5 &mu;s</td><td>12.25 &mu;s</td><td>647.4 &mu;s</td><td>0.82</td><td>0.04</td>
+</tr><tr><td>AddECSHypStyleArray</td><td>1000000</td><td>792.6 &mu;s</td><td>980.8 &mu;s</td><td>53.76 &mu;s</td><td>768.0 &mu;s</td><td>1.00</td><td>0.00</td>
+</tr><tr><td>AddECSHypStyleSpan</td><td>1000000</td><td>885.5 &mu;s</td><td>2,119.2 &mu;s</td><td>116.16 &mu;s</td><td>862.9 &mu;s</td><td>1.11</td><td>0.07</td>
+</tr><tr><td>AddECSVector3Delegate</td><td>1000000</td><td>1,251.5 &mu;s</td><td>2,268.4 &mu;s</td><td>124.34 &mu;s</td><td>1,321.9 &mu;s</td><td>1.58</td><td>0.16</td>
+</tr><tr><td>AddECSVector3ParallelDelegate</td><td>1000000</td><td>597.4 &mu;s</td><td>2,286.5 &mu;s</td><td>125.33 &mu;s</td><td>590.7 &mu;s</td><td>0.75</td><td>0.11</td>
+</tr><tr><td>AddECSVector3ParallelDelegateChunked</td><td>1000000</td><td>1,261.3 &mu;s</td><td>977.0 &mu;s</td><td>53.55 &mu;s</td><td>1,291.5 &mu;s</td><td>1.59</td><td>0.10</td>
+</tr></tbody></table>
+</body>
+</html>

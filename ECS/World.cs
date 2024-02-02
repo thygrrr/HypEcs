@@ -11,7 +11,6 @@ public sealed class World : IDisposable
 
     private readonly Archetypes _archetypes = new();
 
-
     public World()
     {
         //_world = _archetypes.Spawn();
@@ -40,7 +39,7 @@ public sealed class World : IDisposable
     {
         var query = Query<Entity>().Has<T>().Build();
         
-        query.Run((count, entities) =>
+        query.RunHypStyle((count, entities) =>
         {
             for (var i = 0; i < count; i++)
             {

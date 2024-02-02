@@ -1,4 +1,8 @@
 // ReSharper disable ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
+
+using System.Runtime.CompilerServices;
+using System.Threading.Channels;
+
 namespace ECS;
 
 public class Query
@@ -8,7 +12,6 @@ public class Query
     internal readonly Archetypes Archetypes;
     internal readonly Mask Mask;
 
-    
     public Query(Archetypes archetypes, Mask mask, List<Table> tables)
     {
         Tables = tables;
@@ -122,10 +125,55 @@ public delegate void QueryAction_ECCCCU<C0, C1, C2, C3, in U>(in Entity e, ref C
 public delegate void QueryAction_ECCCCCU<C0, C1, C2, C3, C4, in U>(in Entity e, ref C0 c0, ref C1 c1, ref C2 c2, ref C3 c3, ref C4 c4, U uniform);
 */
 
-
-
-public class Query<C>(Archetypes archetypes, Mask mask, List<Table> tables) : Query(archetypes, mask, tables) where C : struct
+public struct ChannelWorkload<C>(int start, int count, C[] storage, QueryAction_C<C> action)
 {
+    public int Start = start;
+    public int Count = count;
+    public C[] Storage = storage;
+    public QueryAction_C<C> action = action;
+}
+
+public class Query<C> : Query
+    where C : struct
+{
+    private readonly ParallelOptions opts = new() {MaxDegreeOfParallelism = 16};
+
+    private readonly CancellationTokenSource _cts = new();
+
+    private readonly Channel<ChannelWorkload<C>> _channel = Channel.CreateUnbounded<ChannelWorkload<C>>(new UnboundedChannelOptions {SingleWriter = true, SingleReader = false});
+
+    private int _completed = 0;
+    
+    public Query(Archetypes archetypes, Mask mask, List<Table> tables) : base(archetypes, mask, tables)
+    {
+        for (var i = 0; i < opts.MaxDegreeOfParallelism; i++)
+        {
+            // Start all worker threads...
+            Task.Run(() => ChannelWorker(_cts.Token));
+        }
+    }
+    private void Work<C1>(ChannelWorkload<C1> workload)
+    {
+        var storage = workload.Storage.AsSpan(workload.Start, Math.Min(workload.Count, workload.Storage.Length - workload.Start));
+        foreach (ref var comp0 in storage) workload.action(ref comp0);
+
+        Interlocked.Add(ref _completed, storage.Length);
+    }
+    
+    private async Task ChannelWorker(CancellationToken ct)
+    {
+        while (!ct.IsCancellationRequested)
+        {
+            if (!await _channel.Reader.WaitToReadAsync(ct).ConfigureAwait(false)) continue;
+            if (_channel.Reader.TryRead(out var workload)) Work(workload);
+        }
+    }
+
+    ~Query()
+    {
+        _cts.Cancel();
+    }
+    
     public ref C Get(Entity entity)
     {
         var meta = Archetypes.GetEntityMeta(entity.Identity);
@@ -135,6 +183,7 @@ public class Query<C>(Archetypes archetypes, Mask mask, List<Table> tables) : Qu
     }
 
     #region Runners
+
     public void Run(QueryAction_C<C> action)
     {
         Archetypes.Lock();
@@ -149,6 +198,72 @@ public class Query<C>(Archetypes archetypes, Mask mask, List<Table> tables) : Qu
         Archetypes.Unlock();
     }
 
+    public void RunParallel(QueryAction_C<C> action)
+    {
+        Archetypes.Lock();
+
+        Parallel.ForEach(Tables.Where(t => !t.IsEmpty).ToArray(), opts, delegate(Table table)
+        {
+            var storage = table.GetStorage<C>(Identity.None).AsSpan();
+            foreach (ref var c in storage) action(ref c);
+        });
+
+        Archetypes.Unlock();
+    }
+
+
+    public async Task RunTasked(QueryAction_C<C> action)
+    {
+        Archetypes.Lock();
+
+        var tasks = Tables.Where(t => !t.IsEmpty).Select(t => new Task(() =>
+        {
+            var storage = t.GetStorage<C>(Identity.None).AsSpan();
+            foreach (ref var c in storage) action(ref c);
+        }, TaskCreationOptions.None)).ToArray();
+
+        foreach (var task in tasks) task.Start(TaskScheduler.Default);
+        
+        await Task.WhenAll(tasks).ConfigureAwait(false);
+        
+        Archetypes.Unlock();
+    }
+
+
+    public void RunParallelChunked(QueryAction_C<C> action)
+    {
+        Archetypes.Lock();
+
+        foreach (var table in Tables)
+        {
+            if (table.IsEmpty) return;
+            var storage = table.GetStorage<C>(Identity.None);
+            Parallel.For(0, storage.Length, opts, delegate(int i) { action(ref storage[i]); });
+        }
+
+        Archetypes.Unlock();
+    }
+
+    public async Task RunParallelChanneled(QueryAction_C<C> action)
+    {
+        Archetypes.Lock();
+        
+        foreach (var table in Tables)
+        {
+            if (table.IsEmpty) continue;
+            _completed = 0;
+            
+            var storage = table.GetStorage<C>(Identity.None);
+            for (var i = 0; i < storage.Length; i += storage.Length / opts.MaxDegreeOfParallelism)
+            {
+                await _channel.Writer.WriteAsync(new ChannelWorkload<C>(i, storage.Length / opts.MaxDegreeOfParallelism, storage, action)).ConfigureAwait(false);
+            }
+            
+            while (_completed < storage.Length) await Task.Yield();
+        }
+        Archetypes.Unlock();
+    }
+    
 
     public void Run<U>(QueryAction_CU<C, U> action, U uniform)
     {
@@ -164,27 +279,12 @@ public class Query<C>(Archetypes archetypes, Mask mask, List<Table> tables) : Qu
         Archetypes.Unlock();
     }
 
-    
-    public void RunParallel(QueryAction_C<C> action)
-    {
-        Archetypes.Lock();
-
-        Parallel.ForEach(Tables, delegate (Table table)
-        {
-            if (table.IsEmpty) return;
-            var storage = table.GetStorage<C>(Identity.None).AsSpan();
-            foreach (ref var c in storage) action(ref c);
-        });
-
-        Archetypes.Unlock();
-    }
-
 
     public void RunParallel<U>(QueryAction_CU<C, U> action, U uniform)
     {
         Archetypes.Lock();
 
-        Parallel.ForEach(Tables, delegate(Table table)
+        Parallel.ForEach(Tables, opts, delegate(Table table)
         {
             if (table.IsEmpty) return;
             var storage = table.GetStorage<C>(Identity.None).AsSpan();
@@ -193,9 +293,10 @@ public class Query<C>(Archetypes archetypes, Mask mask, List<Table> tables) : Qu
 
         Archetypes.Unlock();
     }
+
     #endregion
 
-    public void Run(Action<int, C[]> action)
+    public void RunHypStyle(Action<int, C[]> action)
     {
         Archetypes.Lock();
 

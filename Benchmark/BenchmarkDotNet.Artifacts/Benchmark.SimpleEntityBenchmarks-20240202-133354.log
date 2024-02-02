@@ -1,0 +1,486 @@
+// Validating benchmarks:
+// ***** BenchmarkRunner: Start   *****
+// ***** Found 8 benchmark(s) in total *****
+// ***** Building 1 exe(s) in Parallel: Start   *****
+// start dotnet  restore /p:UseSharedCompilation=false /p:BuildInParallel=false /m:1 /p:Deterministic=true /p:Optimize=true in C:\Projects\fennECS\Benchmark\bin\Release\net8.0\5f4a8c51-7b5b-4467-9f53-ce76e8b00a34
+// command took 0.85 sec and exited with 0
+// start dotnet  build -c Release --no-restore /p:UseSharedCompilation=false /p:BuildInParallel=false /m:1 /p:Deterministic=true /p:Optimize=true in C:\Projects\fennECS\Benchmark\bin\Release\net8.0\5f4a8c51-7b5b-4467-9f53-ce76e8b00a34
+// command took 2.05 sec and exited with 0
+// ***** Done, took 00:00:02 (2.96 sec)   *****
+// Found 8 benchmarks:
+//   SimpleEntityBenchmarks.AddPlainVector3Array: ShortRun(Platform=X64, IterationCount=3, LaunchCount=1, RunStrategy=Monitoring, WarmupCount=3) [entityCount=1000000]
+//   SimpleEntityBenchmarks.AddPlainVector3ArrayEC: ShortRun(Platform=X64, IterationCount=3, LaunchCount=1, RunStrategy=Monitoring, WarmupCount=3) [entityCount=1000000]
+//   SimpleEntityBenchmarks.AddPlainVector3Span: ShortRun(Platform=X64, IterationCount=3, LaunchCount=1, RunStrategy=Monitoring, WarmupCount=3) [entityCount=1000000]
+//   SimpleEntityBenchmarks.AddECSHypStyleArray: ShortRun(Platform=X64, IterationCount=3, LaunchCount=1, RunStrategy=Monitoring, WarmupCount=3) [entityCount=1000000]
+//   SimpleEntityBenchmarks.AddECSHypStyleSpan: ShortRun(Platform=X64, IterationCount=3, LaunchCount=1, RunStrategy=Monitoring, WarmupCount=3) [entityCount=1000000]
+//   SimpleEntityBenchmarks.AddECSVector3Delegate: ShortRun(Platform=X64, IterationCount=3, LaunchCount=1, RunStrategy=Monitoring, WarmupCount=3) [entityCount=1000000]
+//   SimpleEntityBenchmarks.AddECSVector3ParallelDelegate: ShortRun(Platform=X64, IterationCount=3, LaunchCount=1, RunStrategy=Monitoring, WarmupCount=3) [entityCount=1000000]
+//   SimpleEntityBenchmarks.AddECSVector3ParallelDelegateChunked: ShortRun(Platform=X64, IterationCount=3, LaunchCount=1, RunStrategy=Monitoring, WarmupCount=3) [entityCount=1000000]
+
+Setup power plan (GUID: 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c FriendlyName: High performance)
+// **************************
+// Benchmark: SimpleEntityBenchmarks.AddPlainVector3Array: ShortRun(Platform=X64, IterationCount=3, LaunchCount=1, RunStrategy=Monitoring, WarmupCount=3) [entityCount=1000000]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet 5f4a8c51-7b5b-4467-9f53-ce76e8b00a34.dll --anonymousPipes 1764 1696 --benchmarkName "Benchmark.SimpleEntityBenchmarks.AddPlainVector3Array(entityCount: 1000000)" --job ShortRun --benchmarkId 0 in C:\Projects\fennECS\Benchmark\bin\Release\net8.0\5f4a8c51-7b5b-4467-9f53-ce76e8b00a34\bin\Release\net8.0
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// BenchmarkDotNet v0.13.12
+// Runtime=.NET 8.0.1 (8.0.123.58001), X64 RyuJIT AVX2
+// GC=Concurrent Workstation
+// HardwareIntrinsics=AVX2,AES,BMI1,BMI2,FMA,LZCNT,PCLMUL,POPCNT VectorSize=256
+// Job: ShortRun(Platform=X64, IterationCount=3, LaunchCount=1, RunStrategy=Monitoring, WarmupCount=3)
+
+WorkloadWarmup   1: 1 op, 4140600.00 ns, 4.1406 ms/op
+WorkloadWarmup   2: 1 op, 802700.00 ns, 802.7000 us/op
+WorkloadWarmup   3: 1 op, 760300.00 ns, 760.3000 us/op
+
+// BeforeActualRun
+WorkloadActual   1: 1 op, 925000.00 ns, 925.0000 us/op
+WorkloadActual   2: 1 op, 1331400.00 ns, 1.3314 ms/op
+WorkloadActual   3: 1 op, 1027500.00 ns, 1.0275 ms/op
+
+// AfterActualRun
+WorkloadResult   1: 1 op, 925000.00 ns, 925.0000 us/op
+WorkloadResult   2: 1 op, 1331400.00 ns, 1.3314 ms/op
+WorkloadResult   3: 1 op, 1027500.00 ns, 1.0275 ms/op
+
+// AfterAll
+// Benchmark Process 69580 has exited with code 0.
+
+Mean = 1.095 ms, StdErr = 0.122 ms (11.15%), N = 3, StdDev = 0.211 ms
+Min = 0.925 ms, Q1 = 0.976 ms, Median = 1.028 ms, Q3 = 1.179 ms, Max = 1.331 ms
+IQR = 0.203 ms, LowerFence = 0.671 ms, UpperFence = 1.484 ms
+ConfidenceInterval = [-2.761 ms; 4.951 ms] (CI 99.9%), Margin = 3.856 ms (352.25% of Mean)
+Skewness = 0.29, Kurtosis = 0.67, MValue = 2
+
+// ** Remained 7 (87,5 %) benchmark(s) to run. Estimated finish 2024-02-02 13:34 (0h 0m from now) **
+Setup power plan (GUID: 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c FriendlyName: High performance)
+// **************************
+// Benchmark: SimpleEntityBenchmarks.AddPlainVector3ArrayEC: ShortRun(Platform=X64, IterationCount=3, LaunchCount=1, RunStrategy=Monitoring, WarmupCount=3) [entityCount=1000000]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet 5f4a8c51-7b5b-4467-9f53-ce76e8b00a34.dll --anonymousPipes 1764 2112 --benchmarkName "Benchmark.SimpleEntityBenchmarks.AddPlainVector3ArrayEC(entityCount: 1000000)" --job ShortRun --benchmarkId 1 in C:\Projects\fennECS\Benchmark\bin\Release\net8.0\5f4a8c51-7b5b-4467-9f53-ce76e8b00a34\bin\Release\net8.0
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// BenchmarkDotNet v0.13.12
+// Runtime=.NET 8.0.1 (8.0.123.58001), X64 RyuJIT AVX2
+// GC=Concurrent Workstation
+// HardwareIntrinsics=AVX2,AES,BMI1,BMI2,FMA,LZCNT,PCLMUL,POPCNT VectorSize=256
+// Job: ShortRun(Platform=X64, IterationCount=3, LaunchCount=1, RunStrategy=Monitoring, WarmupCount=3)
+
+WorkloadWarmup   1: 1 op, 4136500.00 ns, 4.1365 ms/op
+WorkloadWarmup   2: 1 op, 917200.00 ns, 917.2000 us/op
+WorkloadWarmup   3: 1 op, 953800.00 ns, 953.8000 us/op
+
+// BeforeActualRun
+WorkloadActual   1: 1 op, 835000.00 ns, 835.0000 us/op
+WorkloadActual   2: 1 op, 729800.00 ns, 729.8000 us/op
+WorkloadActual   3: 1 op, 715300.00 ns, 715.3000 us/op
+
+// AfterActualRun
+WorkloadResult   1: 1 op, 835000.00 ns, 835.0000 us/op
+WorkloadResult   2: 1 op, 729800.00 ns, 729.8000 us/op
+WorkloadResult   3: 1 op, 715300.00 ns, 715.3000 us/op
+
+// AfterAll
+// Benchmark Process 77836 has exited with code 0.
+
+Mean = 760.033 μs, StdErr = 37.716 μs (4.96%), N = 3, StdDev = 65.327 μs
+Min = 715.300 μs, Q1 = 722.550 μs, Median = 729.800 μs, Q3 = 782.400 μs, Max = 835.000 μs
+IQR = 59.850 μs, LowerFence = 632.775 μs, UpperFence = 872.175 μs
+ConfidenceInterval = [-431.767 μs; 1,951.834 μs] (CI 99.9%), Margin = 1,191.800 μs (156.81% of Mean)
+Skewness = 0.36, Kurtosis = 0.67, MValue = 2
+
+// ** Remained 6 (75,0 %) benchmark(s) to run. Estimated finish 2024-02-02 13:34 (0h 0m from now) **
+Setup power plan (GUID: 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c FriendlyName: High performance)
+// **************************
+// Benchmark: SimpleEntityBenchmarks.AddPlainVector3Span: ShortRun(Platform=X64, IterationCount=3, LaunchCount=1, RunStrategy=Monitoring, WarmupCount=3) [entityCount=1000000]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet 5f4a8c51-7b5b-4467-9f53-ce76e8b00a34.dll --anonymousPipes 1764 2112 --benchmarkName "Benchmark.SimpleEntityBenchmarks.AddPlainVector3Span(entityCount: 1000000)" --job ShortRun --benchmarkId 2 in C:\Projects\fennECS\Benchmark\bin\Release\net8.0\5f4a8c51-7b5b-4467-9f53-ce76e8b00a34\bin\Release\net8.0
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// BenchmarkDotNet v0.13.12
+// Runtime=.NET 8.0.1 (8.0.123.58001), X64 RyuJIT AVX2
+// GC=Concurrent Workstation
+// HardwareIntrinsics=AVX2,AES,BMI1,BMI2,FMA,LZCNT,PCLMUL,POPCNT VectorSize=256
+// Job: ShortRun(Platform=X64, IterationCount=3, LaunchCount=1, RunStrategy=Monitoring, WarmupCount=3)
+
+WorkloadWarmup   1: 1 op, 4039300.00 ns, 4.0393 ms/op
+WorkloadWarmup   2: 1 op, 805100.00 ns, 805.1000 us/op
+WorkloadWarmup   3: 1 op, 707300.00 ns, 707.3000 us/op
+
+// BeforeActualRun
+WorkloadActual   1: 1 op, 662300.00 ns, 662.3000 us/op
+WorkloadActual   2: 1 op, 638000.00 ns, 638.0000 us/op
+WorkloadActual   3: 1 op, 647400.00 ns, 647.4000 us/op
+
+// AfterActualRun
+WorkloadResult   1: 1 op, 662300.00 ns, 662.3000 us/op
+WorkloadResult   2: 1 op, 638000.00 ns, 638.0000 us/op
+WorkloadResult   3: 1 op, 647400.00 ns, 647.4000 us/op
+
+// AfterAll
+// Benchmark Process 76324 has exited with code 0.
+
+Mean = 649.233 μs, StdErr = 7.074 μs (1.09%), N = 3, StdDev = 12.253 μs
+Min = 638.000 μs, Q1 = 642.700 μs, Median = 647.400 μs, Q3 = 654.850 μs, Max = 662.300 μs
+IQR = 12.150 μs, LowerFence = 624.475 μs, UpperFence = 673.075 μs
+ConfidenceInterval = [425.688 μs; 872.779 μs] (CI 99.9%), Margin = 223.546 μs (34.43% of Mean)
+Skewness = 0.15, Kurtosis = 0.67, MValue = 2
+
+// ** Remained 5 (62,5 %) benchmark(s) to run. Estimated finish 2024-02-02 13:34 (0h 0m from now) **
+Setup power plan (GUID: 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c FriendlyName: High performance)
+// **************************
+// Benchmark: SimpleEntityBenchmarks.AddECSHypStyleArray: ShortRun(Platform=X64, IterationCount=3, LaunchCount=1, RunStrategy=Monitoring, WarmupCount=3) [entityCount=1000000]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet 5f4a8c51-7b5b-4467-9f53-ce76e8b00a34.dll --anonymousPipes 2120 1844 --benchmarkName "Benchmark.SimpleEntityBenchmarks.AddECSHypStyleArray(entityCount: 1000000)" --job ShortRun --benchmarkId 3 in C:\Projects\fennECS\Benchmark\bin\Release\net8.0\5f4a8c51-7b5b-4467-9f53-ce76e8b00a34\bin\Release\net8.0
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// BenchmarkDotNet v0.13.12
+// Runtime=.NET 8.0.1 (8.0.123.58001), X64 RyuJIT AVX2
+// GC=Concurrent Workstation
+// HardwareIntrinsics=AVX2,AES,BMI1,BMI2,FMA,LZCNT,PCLMUL,POPCNT VectorSize=256
+// Job: ShortRun(Platform=X64, IterationCount=3, LaunchCount=1, RunStrategy=Monitoring, WarmupCount=3)
+
+WorkloadWarmup   1: 1 op, 2665900.00 ns, 2.6659 ms/op
+WorkloadWarmup   2: 1 op, 732800.00 ns, 732.8000 us/op
+WorkloadWarmup   3: 1 op, 701200.00 ns, 701.2000 us/op
+
+// BeforeActualRun
+WorkloadActual   1: 1 op, 854300.00 ns, 854.3000 us/op
+WorkloadActual   2: 1 op, 768000.00 ns, 768.0000 us/op
+WorkloadActual   3: 1 op, 755600.00 ns, 755.6000 us/op
+
+// AfterActualRun
+WorkloadResult   1: 1 op, 854300.00 ns, 854.3000 us/op
+WorkloadResult   2: 1 op, 768000.00 ns, 768.0000 us/op
+WorkloadResult   3: 1 op, 755600.00 ns, 755.6000 us/op
+
+// AfterAll
+// Benchmark Process 76076 has exited with code 0.
+
+Mean = 792.633 μs, StdErr = 31.040 μs (3.92%), N = 3, StdDev = 53.764 μs
+Min = 755.600 μs, Q1 = 761.800 μs, Median = 768.000 μs, Q3 = 811.150 μs, Max = 854.300 μs
+IQR = 49.350 μs, LowerFence = 687.775 μs, UpperFence = 885.175 μs
+ConfidenceInterval = [-188.215 μs; 1,773.481 μs] (CI 99.9%), Margin = 980.848 μs (123.75% of Mean)
+Skewness = 0.36, Kurtosis = 0.67, MValue = 2
+
+// ** Remained 4 (50,0 %) benchmark(s) to run. Estimated finish 2024-02-02 13:34 (0h 0m from now) **
+Setup power plan (GUID: 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c FriendlyName: High performance)
+// **************************
+// Benchmark: SimpleEntityBenchmarks.AddECSHypStyleSpan: ShortRun(Platform=X64, IterationCount=3, LaunchCount=1, RunStrategy=Monitoring, WarmupCount=3) [entityCount=1000000]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet 5f4a8c51-7b5b-4467-9f53-ce76e8b00a34.dll --anonymousPipes 1804 2120 --benchmarkName "Benchmark.SimpleEntityBenchmarks.AddECSHypStyleSpan(entityCount: 1000000)" --job ShortRun --benchmarkId 4 in C:\Projects\fennECS\Benchmark\bin\Release\net8.0\5f4a8c51-7b5b-4467-9f53-ce76e8b00a34\bin\Release\net8.0
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// BenchmarkDotNet v0.13.12
+// Runtime=.NET 8.0.1 (8.0.123.58001), X64 RyuJIT AVX2
+// GC=Concurrent Workstation
+// HardwareIntrinsics=AVX2,AES,BMI1,BMI2,FMA,LZCNT,PCLMUL,POPCNT VectorSize=256
+// Job: ShortRun(Platform=X64, IterationCount=3, LaunchCount=1, RunStrategy=Monitoring, WarmupCount=3)
+
+WorkloadWarmup   1: 1 op, 3491800.00 ns, 3.4918 ms/op
+WorkloadWarmup   2: 1 op, 1131300.00 ns, 1.1313 ms/op
+WorkloadWarmup   3: 1 op, 1169500.00 ns, 1.1695 ms/op
+
+// BeforeActualRun
+WorkloadActual   1: 1 op, 1011300.00 ns, 1.0113 ms/op
+WorkloadActual   2: 1 op, 862900.00 ns, 862.9000 us/op
+WorkloadActual   3: 1 op, 782300.00 ns, 782.3000 us/op
+
+// AfterActualRun
+WorkloadResult   1: 1 op, 1011300.00 ns, 1.0113 ms/op
+WorkloadResult   2: 1 op, 862900.00 ns, 862.9000 us/op
+WorkloadResult   3: 1 op, 782300.00 ns, 782.3000 us/op
+
+// AfterAll
+// Benchmark Process 42876 has exited with code 0.
+
+Mean = 885.500 μs, StdErr = 67.065 μs (7.57%), N = 3, StdDev = 116.161 μs
+Min = 782.300 μs, Q1 = 822.600 μs, Median = 862.900 μs, Q3 = 937.100 μs, Max = 1,011.300 μs
+IQR = 114.500 μs, LowerFence = 650.850 μs, UpperFence = 1,108.850 μs
+ConfidenceInterval = [-1,233.705 μs; 3,004.705 μs] (CI 99.9%), Margin = 2,119.205 μs (239.32% of Mean)
+Skewness = 0.19, Kurtosis = 0.67, MValue = 2
+
+// ** Remained 3 (37,5 %) benchmark(s) to run. Estimated finish 2024-02-02 13:34 (0h 0m from now) **
+Setup power plan (GUID: 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c FriendlyName: High performance)
+// **************************
+// Benchmark: SimpleEntityBenchmarks.AddECSVector3Delegate: ShortRun(Platform=X64, IterationCount=3, LaunchCount=1, RunStrategy=Monitoring, WarmupCount=3) [entityCount=1000000]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet 5f4a8c51-7b5b-4467-9f53-ce76e8b00a34.dll --anonymousPipes 1748 1856 --benchmarkName "Benchmark.SimpleEntityBenchmarks.AddECSVector3Delegate(entityCount: 1000000)" --job ShortRun --benchmarkId 5 in C:\Projects\fennECS\Benchmark\bin\Release\net8.0\5f4a8c51-7b5b-4467-9f53-ce76e8b00a34\bin\Release\net8.0
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// BenchmarkDotNet v0.13.12
+// Runtime=.NET 8.0.1 (8.0.123.58001), X64 RyuJIT AVX2
+// GC=Concurrent Workstation
+// HardwareIntrinsics=AVX2,AES,BMI1,BMI2,FMA,LZCNT,PCLMUL,POPCNT VectorSize=256
+// Job: ShortRun(Platform=X64, IterationCount=3, LaunchCount=1, RunStrategy=Monitoring, WarmupCount=3)
+
+WorkloadWarmup   1: 1 op, 3807500.00 ns, 3.8075 ms/op
+WorkloadWarmup   2: 1 op, 1176600.00 ns, 1.1766 ms/op
+WorkloadWarmup   3: 1 op, 1123400.00 ns, 1.1234 ms/op
+
+// BeforeActualRun
+WorkloadActual   1: 1 op, 1321900.00 ns, 1.3219 ms/op
+WorkloadActual   2: 1 op, 1107900.00 ns, 1.1079 ms/op
+WorkloadActual   3: 1 op, 1324600.00 ns, 1.3246 ms/op
+
+// AfterActualRun
+WorkloadResult   1: 1 op, 1321900.00 ns, 1.3219 ms/op
+WorkloadResult   2: 1 op, 1107900.00 ns, 1.1079 ms/op
+WorkloadResult   3: 1 op, 1324600.00 ns, 1.3246 ms/op
+
+// AfterAll
+// Benchmark Process 74136 has exited with code 0.
+
+Mean = 1.251 ms, StdErr = 0.072 ms (5.74%), N = 3, StdDev = 0.124 ms
+Min = 1.108 ms, Q1 = 1.215 ms, Median = 1.322 ms, Q3 = 1.323 ms, Max = 1.325 ms
+IQR = 0.108 ms, LowerFence = 1.052 ms, UpperFence = 1.486 ms
+ConfidenceInterval = [-1.017 ms; 3.520 ms] (CI 99.9%), Margin = 2.268 ms (181.26% of Mean)
+Skewness = -0.38, Kurtosis = 0.67, MValue = 2
+
+// ** Remained 2 (25,0 %) benchmark(s) to run. Estimated finish 2024-02-02 13:34 (0h 0m from now) **
+Setup power plan (GUID: 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c FriendlyName: High performance)
+// **************************
+// Benchmark: SimpleEntityBenchmarks.AddECSVector3ParallelDelegate: ShortRun(Platform=X64, IterationCount=3, LaunchCount=1, RunStrategy=Monitoring, WarmupCount=3) [entityCount=1000000]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet 5f4a8c51-7b5b-4467-9f53-ce76e8b00a34.dll --anonymousPipes 1760 1848 --benchmarkName "Benchmark.SimpleEntityBenchmarks.AddECSVector3ParallelDelegate(entityCount: 1000000)" --job ShortRun --benchmarkId 6 in C:\Projects\fennECS\Benchmark\bin\Release\net8.0\5f4a8c51-7b5b-4467-9f53-ce76e8b00a34\bin\Release\net8.0
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// BenchmarkDotNet v0.13.12
+// Runtime=.NET 8.0.1 (8.0.123.58001), X64 RyuJIT AVX2
+// GC=Concurrent Workstation
+// HardwareIntrinsics=AVX2,AES,BMI1,BMI2,FMA,LZCNT,PCLMUL,POPCNT VectorSize=256
+// Job: ShortRun(Platform=X64, IterationCount=3, LaunchCount=1, RunStrategy=Monitoring, WarmupCount=3)
+
+WorkloadWarmup   1: 1 op, 8083100.00 ns, 8.0831 ms/op
+WorkloadWarmup   2: 1 op, 867000.00 ns, 867.0000 us/op
+WorkloadWarmup   3: 1 op, 796200.00 ns, 796.2000 us/op
+
+// BeforeActualRun
+WorkloadActual   1: 1 op, 725900.00 ns, 725.9000 us/op
+WorkloadActual   2: 1 op, 590700.00 ns, 590.7000 us/op
+WorkloadActual   3: 1 op, 475500.00 ns, 475.5000 us/op
+
+// AfterActualRun
+WorkloadResult   1: 1 op, 725900.00 ns, 725.9000 us/op
+WorkloadResult   2: 1 op, 590700.00 ns, 590.7000 us/op
+WorkloadResult   3: 1 op, 475500.00 ns, 475.5000 us/op
+
+// AfterAll
+// Benchmark Process 3132 has exited with code 0.
+
+Mean = 597.367 μs, StdErr = 72.361 μs (12.11%), N = 3, StdDev = 125.333 μs
+Min = 475.500 μs, Q1 = 533.100 μs, Median = 590.700 μs, Q3 = 658.300 μs, Max = 725.900 μs
+IQR = 125.200 μs, LowerFence = 345.300 μs, UpperFence = 846.100 μs
+ConfidenceInterval = [-1,689.175 μs; 2,883.908 μs] (CI 99.9%), Margin = 2,286.541 μs (382.77% of Mean)
+Skewness = 0.05, Kurtosis = 0.67, MValue = 2
+
+// ** Remained 1 (12,5 %) benchmark(s) to run. Estimated finish 2024-02-02 13:34 (0h 0m from now) **
+Setup power plan (GUID: 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c FriendlyName: High performance)
+// **************************
+// Benchmark: SimpleEntityBenchmarks.AddECSVector3ParallelDelegateChunked: ShortRun(Platform=X64, IterationCount=3, LaunchCount=1, RunStrategy=Monitoring, WarmupCount=3) [entityCount=1000000]
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet 5f4a8c51-7b5b-4467-9f53-ce76e8b00a34.dll --anonymousPipes 1996 1768 --benchmarkName "Benchmark.SimpleEntityBenchmarks.AddECSVector3ParallelDelegateChunked(entityCount: 1000000)" --job ShortRun --benchmarkId 7 in C:\Projects\fennECS\Benchmark\bin\Release\net8.0\5f4a8c51-7b5b-4467-9f53-ce76e8b00a34\bin\Release\net8.0
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// BenchmarkDotNet v0.13.12
+// Runtime=.NET 8.0.1 (8.0.123.58001), X64 RyuJIT AVX2
+// GC=Concurrent Workstation
+// HardwareIntrinsics=AVX2,AES,BMI1,BMI2,FMA,LZCNT,PCLMUL,POPCNT VectorSize=256
+// Job: ShortRun(Platform=X64, IterationCount=3, LaunchCount=1, RunStrategy=Monitoring, WarmupCount=3)
+
+WorkloadWarmup   1: 1 op, 9678600.00 ns, 9.6786 ms/op
+WorkloadWarmup   2: 1 op, 1486700.00 ns, 1.4867 ms/op
+WorkloadWarmup   3: 1 op, 1559200.00 ns, 1.5592 ms/op
+
+// BeforeActualRun
+WorkloadActual   1: 1 op, 1293000.00 ns, 1.2930 ms/op
+WorkloadActual   2: 1 op, 1199500.00 ns, 1.1995 ms/op
+WorkloadActual   3: 1 op, 1291500.00 ns, 1.2915 ms/op
+
+// AfterActualRun
+WorkloadResult   1: 1 op, 1293000.00 ns, 1.2930 ms/op
+WorkloadResult   2: 1 op, 1199500.00 ns, 1.1995 ms/op
+WorkloadResult   3: 1 op, 1291500.00 ns, 1.2915 ms/op
+
+// AfterAll
+// Benchmark Process 67172 has exited with code 0.
+
+Mean = 1.261 ms, StdErr = 0.031 ms (2.45%), N = 3, StdDev = 0.054 ms
+Min = 1.200 ms, Q1 = 1.246 ms, Median = 1.292 ms, Q3 = 1.292 ms, Max = 1.293 ms
+IQR = 0.047 ms, LowerFence = 1.175 ms, UpperFence = 1.362 ms
+ConfidenceInterval = [0.284 ms; 2.238 ms] (CI 99.9%), Margin = 0.977 ms (77.46% of Mean)
+Skewness = -0.38, Kurtosis = 0.67, MValue = 2
+
+// ** Remained 0 (0,0 %) benchmark(s) to run. Estimated finish 2024-02-02 13:34 (0h 0m from now) **
+Successfully reverted power plan (GUID: 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c FriendlyName: High performance)
+// ***** BenchmarkRunner: Finish  *****
+
+// * Export *
+  BenchmarkDotNet.Artifacts\results\Benchmark.SimpleEntityBenchmarks-report.csv
+  BenchmarkDotNet.Artifacts\results\Benchmark.SimpleEntityBenchmarks-report-github.md
+  BenchmarkDotNet.Artifacts\results\Benchmark.SimpleEntityBenchmarks-report.html
+  BenchmarkDotNet.Artifacts\results\Benchmark.SimpleEntityBenchmarks-measurements.csv
+RPlotExporter couldn't find Rscript.exe in your PATH and no R_HOME environment variable is defined
+  BenchmarkDotNet.Artifacts\results\BuildPlots.R
+
+// * Detailed results *
+SimpleEntityBenchmarks.AddPlainVector3Array: ShortRun(Platform=X64, IterationCount=3, LaunchCount=1, RunStrategy=Monitoring, WarmupCount=3) [entityCount=1000000]
+Runtime = .NET 8.0.1 (8.0.123.58001), X64 RyuJIT AVX2; GC = Concurrent Workstation
+Mean = 1.095 ms, StdErr = 0.122 ms (11.15%), N = 3, StdDev = 0.211 ms
+Min = 0.925 ms, Q1 = 0.976 ms, Median = 1.028 ms, Q3 = 1.179 ms, Max = 1.331 ms
+IQR = 0.203 ms, LowerFence = 0.671 ms, UpperFence = 1.484 ms
+ConfidenceInterval = [-2.761 ms; 4.951 ms] (CI 99.9%), Margin = 3.856 ms (352.25% of Mean)
+Skewness = 0.29, Kurtosis = 0.67, MValue = 2
+-------------------- Histogram --------------------
+[0.784 ms ; 1.169 ms) | @@
+[1.169 ms ; 1.524 ms) | @
+---------------------------------------------------
+
+SimpleEntityBenchmarks.AddPlainVector3ArrayEC: ShortRun(Platform=X64, IterationCount=3, LaunchCount=1, RunStrategy=Monitoring, WarmupCount=3) [entityCount=1000000]
+Runtime = .NET 8.0.1 (8.0.123.58001), X64 RyuJIT AVX2; GC = Concurrent Workstation
+Mean = 760.033 μs, StdErr = 37.716 μs (4.96%), N = 3, StdDev = 65.327 μs
+Min = 715.300 μs, Q1 = 722.550 μs, Median = 729.800 μs, Q3 = 782.400 μs, Max = 835.000 μs
+IQR = 59.850 μs, LowerFence = 632.775 μs, UpperFence = 872.175 μs
+ConfidenceInterval = [-431.767 μs; 1,951.834 μs] (CI 99.9%), Margin = 1,191.800 μs (156.81% of Mean)
+Skewness = 0.36, Kurtosis = 0.67, MValue = 2
+-------------------- Histogram --------------------
+[655.850 μs ; 782.000 μs) | @@
+[782.000 μs ; 894.450 μs) | @
+---------------------------------------------------
+
+SimpleEntityBenchmarks.AddPlainVector3Span: ShortRun(Platform=X64, IterationCount=3, LaunchCount=1, RunStrategy=Monitoring, WarmupCount=3) [entityCount=1000000]
+Runtime = .NET 8.0.1 (8.0.123.58001), X64 RyuJIT AVX2; GC = Concurrent Workstation
+Mean = 649.233 μs, StdErr = 7.074 μs (1.09%), N = 3, StdDev = 12.253 μs
+Min = 638.000 μs, Q1 = 642.700 μs, Median = 647.400 μs, Q3 = 654.850 μs, Max = 662.300 μs
+IQR = 12.150 μs, LowerFence = 624.475 μs, UpperFence = 673.075 μs
+ConfidenceInterval = [425.688 μs; 872.779 μs] (CI 99.9%), Margin = 223.546 μs (34.43% of Mean)
+Skewness = 0.15, Kurtosis = 0.67, MValue = 2
+-------------------- Histogram --------------------
+[631.549 μs ; 653.851 μs) | @@
+[653.851 μs ; 673.451 μs) | @
+---------------------------------------------------
+
+SimpleEntityBenchmarks.AddECSHypStyleArray: ShortRun(Platform=X64, IterationCount=3, LaunchCount=1, RunStrategy=Monitoring, WarmupCount=3) [entityCount=1000000]
+Runtime = .NET 8.0.1 (8.0.123.58001), X64 RyuJIT AVX2; GC = Concurrent Workstation
+Mean = 792.633 μs, StdErr = 31.040 μs (3.92%), N = 3, StdDev = 53.764 μs
+Min = 755.600 μs, Q1 = 761.800 μs, Median = 768.000 μs, Q3 = 811.150 μs, Max = 854.300 μs
+IQR = 49.350 μs, LowerFence = 687.775 μs, UpperFence = 885.175 μs
+ConfidenceInterval = [-188.215 μs; 1,773.481 μs] (CI 99.9%), Margin = 980.848 μs (123.75% of Mean)
+Skewness = 0.36, Kurtosis = 0.67, MValue = 2
+-------------------- Histogram --------------------
+[706.673 μs ; 810.727 μs) | @@
+[810.727 μs ; 903.227 μs) | @
+---------------------------------------------------
+
+SimpleEntityBenchmarks.AddECSHypStyleSpan: ShortRun(Platform=X64, IterationCount=3, LaunchCount=1, RunStrategy=Monitoring, WarmupCount=3) [entityCount=1000000]
+Runtime = .NET 8.0.1 (8.0.123.58001), X64 RyuJIT AVX2; GC = Concurrent Workstation
+Mean = 885.500 μs, StdErr = 67.065 μs (7.57%), N = 3, StdDev = 116.161 μs
+Min = 782.300 μs, Q1 = 822.600 μs, Median = 862.900 μs, Q3 = 937.100 μs, Max = 1,011.300 μs
+IQR = 114.500 μs, LowerFence = 650.850 μs, UpperFence = 1,108.850 μs
+ConfidenceInterval = [-1,233.705 μs; 3,004.705 μs] (CI 99.9%), Margin = 2,119.205 μs (239.32% of Mean)
+Skewness = 0.19, Kurtosis = 0.67, MValue = 2
+-------------------- Histogram --------------------
+[716.889 μs ;   928.311 μs) | @@
+[928.311 μs ; 1,117.011 μs) | @
+---------------------------------------------------
+
+SimpleEntityBenchmarks.AddECSVector3Delegate: ShortRun(Platform=X64, IterationCount=3, LaunchCount=1, RunStrategy=Monitoring, WarmupCount=3) [entityCount=1000000]
+Runtime = .NET 8.0.1 (8.0.123.58001), X64 RyuJIT AVX2; GC = Concurrent Workstation
+Mean = 1.251 ms, StdErr = 0.072 ms (5.74%), N = 3, StdDev = 0.124 ms
+Min = 1.108 ms, Q1 = 1.215 ms, Median = 1.322 ms, Q3 = 1.323 ms, Max = 1.325 ms
+IQR = 0.108 ms, LowerFence = 1.052 ms, UpperFence = 1.486 ms
+ConfidenceInterval = [-1.017 ms; 3.520 ms] (CI 99.9%), Margin = 2.268 ms (181.26% of Mean)
+Skewness = -0.38, Kurtosis = 0.67, MValue = 2
+-------------------- Histogram --------------------
+[1.103 ms ; 1.329 ms) | @@@
+---------------------------------------------------
+
+SimpleEntityBenchmarks.AddECSVector3ParallelDelegate: ShortRun(Platform=X64, IterationCount=3, LaunchCount=1, RunStrategy=Monitoring, WarmupCount=3) [entityCount=1000000]
+Runtime = .NET 8.0.1 (8.0.123.58001), X64 RyuJIT AVX2; GC = Concurrent Workstation
+Mean = 597.367 μs, StdErr = 72.361 μs (12.11%), N = 3, StdDev = 125.333 μs
+Min = 475.500 μs, Q1 = 533.100 μs, Median = 590.700 μs, Q3 = 658.300 μs, Max = 725.900 μs
+IQR = 125.200 μs, LowerFence = 345.300 μs, UpperFence = 846.100 μs
+ConfidenceInterval = [-1,689.175 μs; 2,883.908 μs] (CI 99.9%), Margin = 2,286.541 μs (382.77% of Mean)
+Skewness = 0.05, Kurtosis = 0.67, MValue = 2
+-------------------- Histogram --------------------
+[419.042 μs ; 647.158 μs) | @@
+[647.158 μs ; 839.958 μs) | @
+---------------------------------------------------
+
+SimpleEntityBenchmarks.AddECSVector3ParallelDelegateChunked: ShortRun(Platform=X64, IterationCount=3, LaunchCount=1, RunStrategy=Monitoring, WarmupCount=3) [entityCount=1000000]
+Runtime = .NET 8.0.1 (8.0.123.58001), X64 RyuJIT AVX2; GC = Concurrent Workstation
+Mean = 1.261 ms, StdErr = 0.031 ms (2.45%), N = 3, StdDev = 0.054 ms
+Min = 1.200 ms, Q1 = 1.246 ms, Median = 1.292 ms, Q3 = 1.292 ms, Max = 1.293 ms
+IQR = 0.047 ms, LowerFence = 1.175 ms, UpperFence = 1.362 ms
+ConfidenceInterval = [0.284 ms; 2.238 ms] (CI 99.9%), Margin = 0.977 ms (77.46% of Mean)
+Skewness = -0.38, Kurtosis = 0.67, MValue = 2
+-------------------- Histogram --------------------
+[1.198 ms ; 1.295 ms) | @@@
+---------------------------------------------------
+
+// * Summary *
+
+BenchmarkDotNet v0.13.12, Windows 11 (10.0.22631.3085/23H2/2023Update/SunValley3)
+AMD Ryzen 9 5900X, 1 CPU, 24 logical and 12 physical cores
+.NET SDK 8.0.101
+  [Host]   : .NET 8.0.1 (8.0.123.58001), X64 RyuJIT AVX2
+  ShortRun : .NET 8.0.1 (8.0.123.58001), X64 RyuJIT AVX2
+
+Job=ShortRun  Platform=X64  IterationCount=3  
+LaunchCount=1  RunStrategy=Monitoring  WarmupCount=3  
+
+| Method                               | entityCount | Mean       | Error      | StdDev    | Median     | Ratio | RatioSD |
+|------------------------------------- |------------ |-----------:|-----------:|----------:|-----------:|------:|--------:|
+| AddPlainVector3Array                 | 1000000     | 1,094.6 μs | 3,855.9 μs | 211.35 μs | 1,027.5 μs |  1.39 |    0.33 |
+| AddPlainVector3ArrayEC               | 1000000     |   760.0 μs | 1,191.8 μs |  65.33 μs |   729.8 μs |  0.96 |    0.02 |
+| AddPlainVector3Span                  | 1000000     |   649.2 μs |   223.5 μs |  12.25 μs |   647.4 μs |  0.82 |    0.04 |
+| AddECSHypStyleArray                  | 1000000     |   792.6 μs |   980.8 μs |  53.76 μs |   768.0 μs |  1.00 |    0.00 |
+| AddECSHypStyleSpan                   | 1000000     |   885.5 μs | 2,119.2 μs | 116.16 μs |   862.9 μs |  1.11 |    0.07 |
+| AddECSVector3Delegate                | 1000000     | 1,251.5 μs | 2,268.4 μs | 124.34 μs | 1,321.9 μs |  1.58 |    0.16 |
+| AddECSVector3ParallelDelegate        | 1000000     |   597.4 μs | 2,286.5 μs | 125.33 μs |   590.7 μs |  0.75 |    0.11 |
+| AddECSVector3ParallelDelegateChunked | 1000000     | 1,261.3 μs |   977.0 μs |  53.55 μs | 1,291.5 μs |  1.59 |    0.10 |
+
+// * Warnings *
+MinIterationTime
+  SimpleEntityBenchmarks.AddPlainVector3Array: ShortRun                 -> The minimum observed iteration time is 925.0000 μs which is very small. It's recommended to increase it to at least 100.0000 ms using more operations.
+  SimpleEntityBenchmarks.AddPlainVector3ArrayEC: ShortRun               -> The minimum observed iteration time is 715.3000 μs which is very small. It's recommended to increase it to at least 100.0000 ms using more operations.
+  SimpleEntityBenchmarks.AddPlainVector3Span: ShortRun                  -> The minimum observed iteration time is 638.0000 μs which is very small. It's recommended to increase it to at least 100.0000 ms using more operations.
+  SimpleEntityBenchmarks.AddECSHypStyleArray: ShortRun                  -> The minimum observed iteration time is 755.6000 μs which is very small. It's recommended to increase it to at least 100.0000 ms using more operations.
+  SimpleEntityBenchmarks.AddECSHypStyleSpan: ShortRun                   -> The minimum observed iteration time is 782.3000 μs which is very small. It's recommended to increase it to at least 100.0000 ms using more operations.
+  SimpleEntityBenchmarks.AddECSVector3Delegate: ShortRun                -> The minimum observed iteration time is 1.1079 ms which is very small. It's recommended to increase it to at least 100.0000 ms using more operations.
+  SimpleEntityBenchmarks.AddECSVector3ParallelDelegate: ShortRun        -> The minimum observed iteration time is 475.5000 μs which is very small. It's recommended to increase it to at least 100.0000 ms using more operations.
+  SimpleEntityBenchmarks.AddECSVector3ParallelDelegateChunked: ShortRun -> The minimum observed iteration time is 1.1995 ms which is very small. It's recommended to increase it to at least 100.0000 ms using more operations.
+
+// * Legends *
+  entityCount : Value of the 'entityCount' parameter
+  Mean        : Arithmetic mean of all measurements
+  Error       : Half of 99.9% confidence interval
+  StdDev      : Standard deviation of all measurements
+  Median      : Value separating the higher half of all measurements (50th percentile)
+  Ratio       : Mean of the ratio distribution ([Current]/[Baseline])
+  RatioSD     : Standard deviation of the ratio distribution ([Current]/[Baseline])
+  1 μs        : 1 Microsecond (0.000001 sec)
+
+// ***** BenchmarkRunner: End *****
+Run time: 00:00:07 (7.15 sec), executed benchmarks: 8
+
+Global total time: 00:00:10 (10.32 sec), executed benchmarks: 8
+// * Artifacts cleanup *
+Artifacts cleanup is finished
