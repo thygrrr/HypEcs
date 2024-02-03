@@ -135,7 +135,7 @@ public struct ChannelWorkload<C>(int start, int count, C[] storage, QueryAction_
 public class Query<C> : Query
     where C : struct
 {
-    private readonly ParallelOptions opts = new() {MaxDegreeOfParallelism = 2};
+    private readonly ParallelOptions opts = new() {MaxDegreeOfParallelism = 16};
 
     private readonly CancellationTokenSource _cts = new();
 
@@ -204,7 +204,48 @@ public class Query<C> : Query
         Archetypes.Unlock();
     }
 
-    public void RunParallel(QueryAction_C<C> action)
+    public void RunParallel(QueryAction_C<C> action, int chunkSize = int.MaxValue)
+    {
+        Archetypes.Lock();
+
+        var queued = 0;
+
+        foreach (var table in Tables)
+        {
+            if (table.IsEmpty) return;
+            var storage = table.GetStorage<C>(Identity.None);
+
+            var partitions = Math.Min(opts.MaxDegreeOfParallelism, storage.Length / chunkSize);
+            var partitionSize = partitions == 0 ? storage.Length : storage.Length / partitions;
+
+            for (var partition = 1; partition < partitions; partition++)
+            {
+                Interlocked.Increment(ref queued);
+
+                ThreadPool.QueueUserWorkItem(delegate(int part)
+                {
+                    foreach (ref var c in storage.AsSpan(part * partitionSize, partitionSize))
+                    {
+                        action(ref c);
+                    }
+
+                    // ReSharper disable once AccessToModifiedClosure
+                    Interlocked.Decrement(ref queued);
+                }, partition, preferLocal: true);
+            }
+
+            //Optimization: Also process one partition right here on the calling thread.
+            foreach (ref var c in storage.AsSpan(0, partitionSize))
+            {
+                action(ref c);
+            }
+        }
+
+        while (queued > 0) Thread.Yield();
+        Archetypes.Unlock();
+    }
+
+    public void RunParallelFor(QueryAction_C<C> action)
     {
         Archetypes.Lock();
 
