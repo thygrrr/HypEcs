@@ -1,24 +1,16 @@
 // ReSharper disable ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
 
+using System.Buffers;
 using System.Threading.Channels;
 
 namespace ECS;
 
-public class Query
+public class Query(Archetypes archetypes, Mask mask, List<Table> tables)
 {
-    public readonly List<Table> Tables;
+    private protected readonly List<Table> Tables = tables;
+    private protected readonly Archetypes Archetypes = archetypes;
+    protected internal readonly Mask Mask = mask;
 
-    internal readonly Archetypes Archetypes;
-    internal readonly Mask Mask;
-
-    public Query(Archetypes archetypes, Mask mask, List<Table> tables)
-    {
-        Tables = tables;
-        Archetypes = archetypes;
-        Mask = mask;
-    }
-
-    
     public bool Has(Entity entity)
     {
         var meta = Archetypes.GetEntityMeta(entity.Identity);
@@ -35,35 +27,6 @@ public class Query
 
 // ReSharper disable InconsistentNaming
 // ReSharper disable IdentifierTypo
-/*
-public delegate void QueryAction_CWU<C0, U>(ref C0 comp0, World w, U uniform);
-public delegate void QueryAction_CCWU<C0, C1, U>(ref C0 comp0, ref C1 comp1, World w, U uniform);
-public delegate void QueryAction_CCCWU<C0, C1, C3, U>(ref C0 comp0, ref C1 comp1, ref C3 comp2, World w, U uniform);
-public delegate void QueryAction_CCCCWU<C0, C1, C2, C3, U>(ref C0 c0, ref C1 c1, ref C2 c2, ref C3 c3, World w, U uniform);
-public delegate void QueryAction_CCCCCWU<C0, C1, C2, C3, C4, U>(ref C0 c0, ref C1 c1, ref C2 c2, ref C3 c3, ref C4 c4, World w, U uniform);
-
-
-public delegate void QueryAction_ECWU<C0, U>(in Entity e, ref C0 comp0, World w, U uniform);
-public delegate void QueryAction_ECCWU<C0, C1, U>(in Entity e, ref C0 comp0, ref C1 comp1, World w, U uniform);
-public delegate void QueryAction_ECCCWU<C0, C1, C3, U>(in Entity e, ref C0 comp0, ref C1 comp1, ref C3 comp2, World w, U uniform);
-public delegate void QueryAction_ECCCCWU<C0, C1, C2, C3, U>(in Entity e, ref C0 c0, ref C1 c1, ref C2 c2, ref C3 c3, World w, U uniform);
-public delegate void QueryAction_ECCCCCWU<C0, C1, C2, C3, C4, U>(in Entity e, ref C0 c0, ref C1 c1, ref C2 c2, ref C3 c3, ref C4 c4, World w, U uniform);
-
-
-public delegate void QueryAction_CW<C0>(ref C0 comp0, World w);
-public delegate void QueryAction_CCW<C0, C1>(ref C0 comp0, ref C1 comp1, World w);
-public delegate void QueryAction_CCCW<C0, C1, C2>(ref C0 comp0, ref C1 comp1, ref C2 comp2, World w);
-public delegate void QueryAction_CCCCW<C0, C1, C2, C3>(ref C0 c0, ref C1 c1, ref C2 c2, ref C3 c3, World w);
-public delegate void QueryAction_CCCCCW<C0, C1, C2, C3, C4>(ref C0 c0, ref C1 c1, ref C2 c2, ref C3 c3, ref C4 c4, World w);
-
-
-public delegate void QueryAction_ECW<C0>(in Entity e, ref C0 comp0, World w);
-public delegate void QueryAction_ECCW<C0, C1>(in Entity e, ref C0 comp0, ref C1 comp1, World w);
-public delegate void QueryAction_ECCCW<C0, C1, C2>(in Entity e, ref C0 comp0, ref C1 comp1, ref C2 comp2, World w);
-public delegate void QueryAction_ECCCCW<C0, C1, C2, C3>(in Entity e, ref C0 c0, ref C1 c1, ref C2 c2, ref C3 c3, World w);
-public delegate void QueryAction_ECCCCCW<C0, C1, C2, C3, C4>(in Entity e, ref C0 c0, ref C1 c1, ref C2 c2, ref C3 c3, ref C4 c4, World w);
-*/
-
 public delegate void QueryAction_C<C0>(ref C0 comp0);
 
 public delegate void QueryAction_CC<C0, C1>(ref C0 comp0, ref C1 comp1);
@@ -97,6 +60,18 @@ public delegate void QueryAction_CCCCU<C0, C1, C2, C3, in U>(ref C0 c0, ref C1 c
 public delegate void QueryAction_CCCCCU<C0, C1, C2, C3, C4, in U>(ref C0 c0, ref C1 c1, ref C2 c2, ref C3 c3, ref C4 c4, U uniform);
 
 
+public delegate void SpanAction_C<C0>(Span<C0> comp0);
+
+public delegate void SpanAction_CC<C0, C1>(Span<C0> comp0, Span<C1> comp1);
+
+public delegate void SpanAction_CCC<C0, C1, C2>(Span<C0> comp0, ref C1 comp1, ref C2 comp2);
+
+public delegate void SpanAction_CCCC<C0, C1, C2, C3>(Span<C0> c0, Span<C1> c1, Span<C2> c2, Span<C3> c3);
+
+public delegate void SpanAction_CCCCC<C0, C1, C2, C3, C4>(Span<C0> c0, Span<C1> c1, Span<C2> c2, Span<C3> c3, Span<C4> c4);
+
+
+/* TODO: These would be used for "early out" and search type algorithms.
 public delegate void QueryAction_CUS<C0, in U>(ref C0 comp0, U uniform, ParallelLoopState state);
 
 public delegate void QueryAction_CCUS<C0, C1, in U>(ref C0 comp0, ref C1 comp1, U uniform, ParallelLoopState state);
@@ -106,82 +81,17 @@ public delegate void QueryAction_CCCUS<C0, C1, C2, in U>(ref C0 comp0, ref C1 co
 public delegate void QueryAction_CCCCUS<C0, C1, C2, C3, in U>(ref C0 c0, ref C1 c1, ref C2 c2, ref C3 c3, U uniform, ParallelLoopState state);
 
 public delegate void QueryAction_CCCCCUS<C0, C1, C2, C3, C4, in U>(ref C0 c0, ref C1 c1, ref C2 c2, ref C3 c3, ref C4 c4, U uniform, ParallelLoopState state);
+*/
 
 // ReSharper enable IdentifierTypo
 // ReSharper enable InconsistentNaming
 
-/* Big chance we never need them because entities themselves are also a type.
-public delegate void QueryAction_EC<C0>(in Entity e, ref C0 comp0);
-public delegate void QueryAction_ECC<C0, C1>(in Entity e, ref C0 comp0, ref C1 comp1);
-public delegate void QueryAction_ECCC<C0, C1, C2>(in Entity e, ref C0 comp0, ref C1 comp1, ref C2 comp2);
-public delegate void QueryAction_ECCCC<C0, C1, C2, C3>(in Entity e, ref C0 c0, ref C1 c1, ref C2 c2, ref C3 c3);
-public delegate void QueryAction_ECCCCC<C0, C1, C2, C3, C4>(in Entity e, ref C0 c0, ref C1 c1, ref C2 c2, ref C3 c3, ref C4 c4);
-
-public delegate void QueryAction_ECU<C0, in U>(in Entity e, ref C0 comp0, U uniform);
-public delegate void QueryAction_ECCU<C0, C1, in U>(in Entity e, ref C0 comp0, ref C1 comp1, U uniform);
-public delegate void QueryAction_ECCCU<C0, C1, C2, in U>(in Entity e, ref C0 comp0, ref C1 comp1, ref C2 comp2, U uniform);
-public delegate void QueryAction_ECCCCU<C0, C1, C2, C3, in U>(in Entity e, ref C0 c0, ref C1 c1, ref C2 c2, ref C3 c3, U uniform);
-public delegate void QueryAction_ECCCCCU<C0, C1, C2, C3, C4, in U>(in Entity e, ref C0 c0, ref C1 c1, ref C2 c2, ref C3 c3, ref C4 c4, U uniform);
-*/
-
-public struct ChannelWorkload<C>(int start, int count, C[] storage, QueryAction_C<C> action)
-{
-    public int Start = start;
-    public int Count = count;
-    public C[] Storage = storage;
-    public QueryAction_C<C> action = action;
-}
-
-public class Query<C> : Query
+public class Query<C>(Archetypes archetypes, Mask mask, List<Table> tables) : Query(archetypes, mask, tables)
     where C : struct
 {
     private const int SPIN_TIMEOUT = 420; // ~10 microseconds
-    
     private readonly ParallelOptions opts = new() {MaxDegreeOfParallelism = 16};
 
-    private readonly CancellationTokenSource _cts = new();
-
-    private readonly Channel<ChannelWorkload<C>> _channel = Channel.CreateUnbounded<ChannelWorkload<C>>(new UnboundedChannelOptions {SingleWriter = true, SingleReader = false});
-
-    private int _completed = 0;
-    
-    public Query(Archetypes archetypes, Mask mask, List<Table> tables) : base(archetypes, mask, tables)
-    {
-        for (var i = 0; i < opts.MaxDegreeOfParallelism; i++)
-        {
-            // Start all worker threads...
-            var task = new Task(Action, _cts.Token, TaskCreationOptions.LongRunning);
-            task.Start();
-        }
-    }
-
-    private async void Action()
-    {
-        await ChannelWorker(_cts.Token).ConfigureAwait(false);
-    }
-
-    private void Work<C1>(ChannelWorkload<C1> workload)
-    {
-        var storage = workload.Storage.AsSpan(workload.Start, Math.Min(workload.Count, workload.Storage.Length - workload.Start));
-        foreach (ref var comp0 in storage) workload.action(ref comp0);
-
-        Interlocked.Add(ref _completed, storage.Length);
-    }
-    
-    private async Task ChannelWorker(CancellationToken ct)
-    {
-        while (!ct.IsCancellationRequested)
-        {
-            if (!await _channel.Reader.WaitToReadAsync(ct).ConfigureAwait(false)) continue;
-            if (_channel.Reader.TryRead(out var workload)) Work(workload);
-        }
-    }
-
-    ~Query()
-    {
-        _cts.Cancel();
-    }
-    
     public ref C Get(Entity entity)
     {
         var meta = Archetypes.GetEntityMeta(entity.Identity);
@@ -191,7 +101,6 @@ public class Query<C> : Query
     }
 
     #region Runners
-
     public void Run(QueryAction_C<C> action)
     {
         Archetypes.Lock();
@@ -214,11 +123,12 @@ public class Query<C> : Query
 
         foreach (var table in Tables)
         {
-            if (table.IsEmpty) return;
+            if (table.IsEmpty) continue;
             var storage = table.GetStorage<C>(Identity.None);
+            var length = table.Count;
 
-            var partitions = Math.Min(opts.MaxDegreeOfParallelism, storage.Length / chunkSize);
-            var partitionSize = partitions == 0 ? storage.Length : storage.Length / partitions;
+            var partitions = Math.Clamp(length / chunkSize, 1, opts.MaxDegreeOfParallelism);
+            var partitionSize = length / partitions;
 
             for (var partition = 1; partition < partitions; partition++)
             {
@@ -247,73 +157,7 @@ public class Query<C> : Query
         Archetypes.Unlock();
     }
 
-
-    public void RunParallelFor(QueryAction_C<C> action)
-    {
-        Archetypes.Lock();
-
-        Parallel.ForEach(Tables.Where(t => !t.IsEmpty).ToArray(), opts, delegate(Table table)
-        {
-            var storage = table.GetStorage<C>(Identity.None).AsSpan();
-            foreach (ref var c in storage) action(ref c);
-        });
-
-        Archetypes.Unlock();
-    }
-
-
-    public async Task RunTasked(QueryAction_C<C> action)
-    {
-        Archetypes.Lock();
-        
-        var tasks = Tables.Where(t => !t.IsEmpty).Select(t => new Task(() =>
-        {
-            var storage = t.GetStorage<C>(Identity.None).AsSpan();
-            foreach (ref var c in storage) action(ref c);
-        }, TaskCreationOptions.PreferFairness)).ToArray();
-
-        foreach (var task in tasks) task.Start(TaskScheduler.Default);
-        
-        await Task.WhenAll(tasks).ConfigureAwait(false);
-        
-        Archetypes.Unlock();
-    }
-
-
-    public void RunParallelChunked(QueryAction_C<C> action)
-    {
-        Archetypes.Lock();
-
-        foreach (var table in Tables)
-        {
-            if (table.IsEmpty) return;
-            var storage = table.GetStorage<C>(Identity.None);
-            Parallel.For(0, storage.Length, opts, delegate(int i) { action(ref storage[i]); });
-        }
-
-        Archetypes.Unlock();
-    }
-
-    public async Task RunParallelChanneled(QueryAction_C<C> action)
-    {
-        Archetypes.Lock();
-        
-        foreach (var table in Tables)
-        {
-            if (table.IsEmpty) continue;
-            _completed = 0;
-            
-            var storage = table.GetStorage<C>(Identity.None);
-            for (var i = 0; i < storage.Length; i += storage.Length / opts.MaxDegreeOfParallelism)
-            {
-                await _channel.Writer.WriteAsync(new ChannelWorkload<C>(i, storage.Length / opts.MaxDegreeOfParallelism, storage, action)).ConfigureAwait(false);
-            }
-            
-            while (_completed < storage.Length) await Task.Yield();
-        }
-        Archetypes.Unlock();
-    }
-    
+ 
 
     public void Run<U>(QueryAction_CU<C, U> action, U uniform)
     {
@@ -322,7 +166,7 @@ public class Query<C> : Query
         foreach (var table in Tables)
         {
             if (table.IsEmpty) continue;
-            var storage = table.GetStorage<C>(Identity.None).AsSpan();
+            var storage = table.GetStorage<C>(Identity.None).AsSpan(0, table.Count);
             foreach (ref var c in storage) action(ref c, uniform);
         }
 
@@ -337,10 +181,13 @@ public class Query<C> : Query
 
         foreach (var table in Tables)
         {
+            if (table.IsEmpty) continue;
             var storage = table.GetStorage<C>(Identity.None);
 
-            var partitions = Math.Min(opts.MaxDegreeOfParallelism, storage.Length / chunkSize);
-            var partitionSize = partitions == 0 ? storage.Length : storage.Length / partitions;
+            var length = table.Count;
+            
+            var partitions = Math.Clamp(length / chunkSize, 1, opts.MaxDegreeOfParallelism);
+            var partitionSize = length / partitions;
 
             for (var partition = 1; partition < partitions; partition++)
             {
@@ -370,25 +217,29 @@ public class Query<C> : Query
     }
 
 
-    #endregion
-
-    public void RunHypStyle(Action<int, C[]> action)
+    public void Run(SpanAction_C<C> action)
     {
         Archetypes.Lock();
-
-        for (var t = 0; t < Tables.Count; t++)
+        foreach (var table in Tables)
         {
-            var table = Tables[t];
-
             if (table.IsEmpty) continue;
-
-            var s = table.GetStorage<C>(Identity.None);
-
-            action(table.Count, s);
+            action(table.GetStorage<C>(Identity.None).AsSpan(0, table.Count));
         }
 
         Archetypes.Unlock();
     }
+    
+    public void Raw(Action<Memory<C>> action)
+    {
+        Archetypes.Lock();
+        foreach (var table in Tables)
+        {
+            if (table.IsEmpty) continue;
+            action(table.GetStorage<C>(Identity.None).AsMemory(0, table.Count));
+        }
+        Archetypes.Unlock();
+    }
+    #endregion
 }
 
 public class Query<C1, C2>(Archetypes archetypes, Mask mask, List<Table> tables) : Query(archetypes, mask, tables)
@@ -667,7 +518,7 @@ public class Query<C1, C2, C3, C4, C5>(Archetypes archetypes, Mask mask, List<Ta
     }
 }
 
-public class Query<C1, C2, C3, C4, C5, C6> : Query
+public class Query<C1, C2, C3, C4, C5, C6>(Archetypes archetypes, Mask mask, List<Table> tables) : Query(archetypes, mask, tables)
     where C1 : struct
     where C2 : struct
     where C3 : struct
@@ -675,11 +526,6 @@ public class Query<C1, C2, C3, C4, C5, C6> : Query
     where C5 : struct
     where C6 : struct
 {
-    public Query(Archetypes archetypes, Mask mask, List<Table> tables) : base(archetypes, mask, tables)
-    {
-    }
-
-    
     public RefValueTuple<C1, C2, C3, C4, C5, C6> Get(Entity entity)
     {
         var meta = Archetypes.GetEntityMeta(entity.Identity);

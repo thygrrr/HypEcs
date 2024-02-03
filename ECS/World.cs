@@ -38,13 +38,9 @@ public sealed class World : IDisposable
     public void DespawnAllWith<T>() where T : struct
     {
         var query = Query<Entity>().Has<T>().Build();
-        
-        query.RunHypStyle((count, entities) =>
+        query.Run(delegate (Span<Entity> entities)
         {
-            for (var i = 0; i < count; i++)
-            {
-                Despawn(entities[i]);
-            }
+            foreach (var entity in entities) Despawn(entity);
         });
     }
 
