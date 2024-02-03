@@ -1,6 +1,5 @@
 // ReSharper disable ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
 
-using System.Runtime.CompilerServices;
 using System.Threading.Channels;
 
 namespace ECS;
@@ -149,9 +148,16 @@ public class Query<C> : Query
         for (var i = 0; i < opts.MaxDegreeOfParallelism; i++)
         {
             // Start all worker threads...
-            Task.Run(() => ChannelWorker(_cts.Token));
+            var task = new Task(Action, _cts.Token, TaskCreationOptions.LongRunning);
+            task.Start();
         }
     }
+
+    private async void Action()
+    {
+        await ChannelWorker(_cts.Token).ConfigureAwait(false);
+    }
+
     private void Work<C1>(ChannelWorkload<C1> workload)
     {
         var storage = workload.Storage.AsSpan(workload.Start, Math.Min(workload.Count, workload.Storage.Length - workload.Start));
@@ -215,12 +221,12 @@ public class Query<C> : Query
     public async Task RunTasked(QueryAction_C<C> action)
     {
         Archetypes.Lock();
-
+        
         var tasks = Tables.Where(t => !t.IsEmpty).Select(t => new Task(() =>
         {
             var storage = t.GetStorage<C>(Identity.None).AsSpan();
             foreach (ref var c in storage) action(ref c);
-        }, TaskCreationOptions.None)).ToArray();
+        }, TaskCreationOptions.PreferFairness)).ToArray();
 
         foreach (var task in tasks) task.Start(TaskScheduler.Default);
         
