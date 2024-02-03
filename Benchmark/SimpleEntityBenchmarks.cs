@@ -12,7 +12,7 @@ namespace Benchmark;
 public class SimpleEntityBenchmarks
 {
     // ReSharper disable once UnusedAutoPropertyAccessor.Global
-    [Params(10_000, 1_000_000)] 
+    [Params(1_000, 10_000, 100_000, 1_000_000)] 
     public int entityCount { get; set; }
 
     private static readonly Random random = new(1337);
@@ -55,14 +55,14 @@ public class SimpleEntityBenchmarks
     private static readonly Vector3 UniformConstantVector = new(3, 4, 5);
     private static readonly ParallelOptions options = new() {MaxDegreeOfParallelism = 12};
 
-    //[Benchmark]
+    [Benchmark]
     //A lambda is passed each Vector3 by ref.
     public void Single_ECS_Lambda()
     {
         _queryV3.Run((ref Vector3 v) => { v = Vector3.Cross(v, UniformConstantVector); });
     }
 
-    //[Benchmark]
+    [Benchmark]
     //Parallel.Foreach passes each Vector3 by ref to a lambda.
     public void Parallel_ECS_Lambda()
     {
@@ -78,14 +78,14 @@ public class SimpleEntityBenchmarks
         });
     }
 
-    //[Benchmark]
+    [Benchmark]
     //Work passed into delegate as ref Vector3.
     public void Single_ECS_Delegate()
     {
         _queryV3.Run(delegate (ref Vector3 v) { v = Vector3.Cross(v, UniformConstantVector); });
     }
 
-    //[Benchmark]
+    [Benchmark]
     //Work parallelized by Archetype, passed into delegate as ref Vector3.
     public void Single_ECS_Raw()
     {
@@ -98,58 +98,29 @@ public class SimpleEntityBenchmarks
         });
     }
 
-    //[Benchmark]
+    [Benchmark]
+    public void Parallel_ECS_Raw()
+    {
+        _queryV3.RawParallel(delegate(Memory<Vector3> vectors)
+        {
+            foreach (ref var v in vectors.Span)
+            {
+                v = Vector3.Cross(v, UniformConstantVector);
+            }
+        });
+    }
+
+    [Benchmark]
     //Work parallelized by Archetype, passed into delegate as ref Vector3.
     public void Parallel_ECS_Delegate_Archetype()
     {
         _queryV3.RunParallel(delegate(ref Vector3 v) { v = Vector3.Cross(v, UniformConstantVector); });
     }
 
-    //[Benchmark]
+    [Benchmark]
     //Work parallelized by Archetype, passed into delegate as ref Vector3.
     public void Parallel_ECS_Delegate_Chunk1k()
     {
         _queryV3.RunParallel(delegate(ref Vector3 v) { v = Vector3.Cross(v, UniformConstantVector); }, chunkSize: 1_000);
     }
-
-    //[Benchmark]
-    //Work parallelized by Archetype, passed into delegate as ref Vector3.
-    public void Parallel_ECS_Delegate_Chunk100k()
-    {
-        _queryV3.RunParallel(delegate(ref Vector3 v) { v = Vector3.Cross(v, UniformConstantVector); }, chunkSize: 100_000);
-    }
-
-    [Benchmark]
-    public void Parallel_ECS_Raw()
-    {
-        _queryV3.Raw(vectors =>
-        {
-            var slices = options.MaxDegreeOfParallelism;
-            var queued = 0;
-            
-            for (var i = 1; i < slices; i++)
-            {
-                Interlocked.Increment(ref queued);
-                
-                ThreadPool.QueueUserWorkItem(slice =>
-                {
-                    foreach (ref var v in slice.Span)
-                    {
-                        v = Vector3.Cross(v, UniformConstantVector);
-                    }
-                    // ReSharper disable once AccessToModifiedClosure
-                    Interlocked.Decrement(ref queued);
-                }, vectors.Slice(i * vectors.Length / slices, vectors.Length / slices), preferLocal: true);
-            }
-
-            
-            foreach (ref var v in vectors.Slice(0, entityCount / slices).Span)
-            {
-                v = Vector3.Cross(v, UniformConstantVector);
-            }
-            
-            while (queued > 0) Thread.SpinWait(420);
-        });
-    }
-    
 }
