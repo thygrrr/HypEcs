@@ -47,10 +47,11 @@ Entity entity = world.Spawn().Add<Position>().Id();
 // Queries are cached, just build them right where you want to use them.
 var query = world.Query<Position>().Build();
 
-// Run code on all entities in the query.
+// Run code on all entities in the query. (omit chunksize to schedule partitioned by archetypes)
 query.RunParallel((ref Position position, in float dt) => {
     position.Y -= 9.81f * dt;
-}, uniform: Time.Delta);
+}, uniform: Time.Delta, chunkSize: 2048);
+```
 ```
 
 ### ... when we said minimal boilerplate, <em>we foxing meant it.</em>

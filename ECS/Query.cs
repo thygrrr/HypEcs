@@ -241,7 +241,7 @@ public class Query<C> : Query
             }
         }
 
-        while (queued > 0) Thread.Yield();
+        while (queued > 0) Thread.SpinWait(420);
         Archetypes.Unlock();
     }
 
@@ -327,19 +327,45 @@ public class Query<C> : Query
     }
 
 
-    public void RunParallel<U>(QueryAction_CU<C, U> action, U uniform)
+    public void RunParallel<U>(QueryAction_CU<C, U> action, U uniform, int chunkSize = int.MaxValue)
     {
         Archetypes.Lock();
+        var queued = 0;
 
-        Parallel.ForEach(Tables, opts, delegate(Table table)
+        foreach (var table in Tables)
         {
-            if (table.IsEmpty) return;
-            var storage = table.GetStorage<C>(Identity.None).AsSpan();
-            foreach (ref var c in storage) action(ref c, uniform);
-        });
+            var storage = table.GetStorage<C>(Identity.None);
 
+            var partitions = Math.Min(opts.MaxDegreeOfParallelism, storage.Length / chunkSize);
+            var partitionSize = partitions == 0 ? storage.Length : storage.Length / partitions;
+
+            for (var partition = 1; partition < partitions; partition++)
+            {
+                Interlocked.Increment(ref queued);
+
+                ThreadPool.QueueUserWorkItem(delegate(int part)
+                {
+                    foreach (ref var c in storage.AsSpan(part * partitionSize, partitionSize))
+                    {
+                        action(ref c, uniform);
+                    }
+
+                    // ReSharper disable once AccessToModifiedClosure
+                    Interlocked.Decrement(ref queued);
+                }, partition, preferLocal: true);
+            }
+
+            //Optimization: Also process one partition right here on the calling thread.
+            foreach (ref var c in storage.AsSpan(0, partitionSize))
+            {
+                action(ref c, uniform);
+            }
+        }
+
+        while (queued > 0) Thread.Yield();
         Archetypes.Unlock();
     }
+
 
     #endregion
 

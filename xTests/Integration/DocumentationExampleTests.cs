@@ -14,10 +14,10 @@ public class DocumentationExampleTests
 
         const float MULTIPLIER = 10f;
         
-        query.Run((ref Position pos, float uniform) =>
+        query.RunParallel((ref Position pos, float uniform) =>
         {
             pos *= uniform;
-        }, MULTIPLIER);
+        }, MULTIPLIER, chunkSize: 4000);
 
         var pos1 = world.GetComponent<Position>(entity1);
         var expected = new Position() * MULTIPLIER;
