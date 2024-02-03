@@ -25,10 +25,6 @@ public class SimpleEntityBenchmarks
     [GlobalSetup]
     public void Setup()
     {
-        //This command doesn't DO anything?!
-        ThreadPool.SetMinThreads(10, 10);
-        Console.WriteLine("ThreadPool.ThreadCount: " + ThreadPool.ThreadCount);
-
         _world = new World();
         _queryV3 = _world.Query<Vector3>().Build();
         _vectorsRaw = new Vector3[entityCount];
@@ -59,236 +55,21 @@ public class SimpleEntityBenchmarks
     private static readonly Vector3 UniformConstantVector = new(3, 4, 5);
     private static readonly ParallelOptions options = new() {MaxDegreeOfParallelism = 12};
 
-    //[Benchmark]
-    //[Benchmark(Description = "for() loop over Array of Vector3 locally (raw data, baseline processing speed).")]
-    public void Single_Direct_Array()
-    {
-        for (var i = 0; i < entityCount; i++)
-        {
-            _vectorsRaw[i] = Vector3.Cross(_vectorsRaw[i], UniformConstantVector);
-        }
-    }
-
-    //[Benchmark(Baseline = true)]
-    //[Benchmark(Description = "foreach() loop over Span of Vector3 locally (raw data, baseline processing speed).")]
-    public void Single_Direct_Span()
-    {
-        foreach (ref var v in _vectorsRaw.AsSpan())
-        {
-            v = Vector3.Cross(v, UniformConstantVector);
-        }
-    }
-
-    //[Benchmark]
-    //[Benchmark(Description = "Parallel.For over Array of Vector3 locally (raw data, parallel speed).")]
-    public void Parallel_Direct_Array()
-    {
-        Parallel.For(0, _vectorsRaw.Length, options,
-            i => { _vectorsRaw[i] = Vector3.Cross(_vectorsRaw[i], UniformConstantVector); });
-    }
-
-    //[Benchmark]
-    public void Parallel2_Direct_Array()
-    {
-        var opts = new ParallelOptions {MaxDegreeOfParallelism = 2};
-        Parallel.For(0, _vectorsRaw.Length, opts,
-            i => { _vectorsRaw[i] = Vector3.Cross(_vectorsRaw[i], UniformConstantVector); });
-    }
-
-    //[Benchmark]
-    public void Parallel2_Partitioned_Array()
-    {
-        var slices = 2;
-        var completed = 0;
-
-        for (var i = 0; i < slices; i++)
-        {
-            ThreadPool.QueueUserWorkItem((int iteration) =>
-            {
-                foreach (ref var v in _vectorsRaw.AsSpan(iteration * entityCount / slices, entityCount / slices))
-                {
-                    v = Vector3.Cross(v, UniformConstantVector);
-                }
-                Interlocked.Increment(ref completed);
-            }, i, preferLocal: true);
-        }
-
-        while (completed < slices) Thread.Yield();
-    }
-
-    //[Benchmark]
-    public void Parallel8_Partitioned_Array()
-    {
-        var slices = 8;
-        var completed = 0;
-
-        for (var i = 0; i < slices; i++)
-        {
-            ThreadPool.QueueUserWorkItem((int iteration) =>
-            {
-                foreach (ref var v in _vectorsRaw.AsSpan(iteration * entityCount / slices, entityCount / slices))
-                {
-                    v = Vector3.Cross(v, UniformConstantVector);
-                }
-
-                Interlocked.Increment(ref completed);
-            }, i, preferLocal: true);
-        }
-
-        while (completed < slices) Thread.Yield();
-    }
-
-    //[Benchmark]
-    public void Parallel2_Partition_Unrolled()
-    {
-        var slices = 2;
-        var completed = 0;
-
-        for (var i = 1; i < slices; i++)
-        {
-            ThreadPool.QueueUserWorkItem((int iteration) =>
-            {
-                foreach (ref var v in _vectorsRaw.AsSpan(iteration * entityCount / slices, entityCount / slices))
-                {
-                    v = Vector3.Cross(v, UniformConstantVector);
-                }
-
-                Interlocked.Increment(ref completed);
-            }, i, preferLocal: true);
-        }
-
-        foreach (ref var v in _vectorsRaw.AsSpan(0, entityCount / slices))
-        {
-            v = Vector3.Cross(v, UniformConstantVector);
-        }
-
-        while (completed < slices - 1) Thread.Yield();
-    }
-
-
-    //[Benchmark]
-    public void Parallel4_Partition_Unrolled()
-    {
-        var slices = 4;
-        var completed = 0;
-
-        for (var i = 1; i < slices; i++)
-        {
-            ThreadPool.QueueUserWorkItem((int iteration) =>
-            {
-                foreach (ref var v in _vectorsRaw.AsSpan(iteration * entityCount / slices, entityCount / slices))
-                {
-                    v = Vector3.Cross(v, UniformConstantVector);
-                }
-
-                Interlocked.Increment(ref completed);
-            }, i, preferLocal: true);
-        }
-
-        foreach (ref var v in _vectorsRaw.AsSpan(0, entityCount / slices))
-        {
-            v = Vector3.Cross(v, UniformConstantVector);
-        }
-
-        while (completed < slices - 1) Thread.Yield();
-    }
-
-
-    //[Benchmark]
-    public void Parallel8_Partition_Unrolled()
-    {
-        var slices = 8;
-        var completed = 0;
-
-        for (var i = 1; i < slices; i++)
-        {
-            ThreadPool.QueueUserWorkItem((int iteration) =>
-            {
-                foreach (ref var v in _vectorsRaw.AsSpan(iteration * entityCount / slices, entityCount / slices))
-                {
-                    v = Vector3.Cross(v, UniformConstantVector);
-                }
-
-                Interlocked.Increment(ref completed);
-            }, i, preferLocal: true);
-        }
-
-        foreach (ref var v in _vectorsRaw.AsSpan(0, entityCount / slices))
-        {
-            v = Vector3.Cross(v, UniformConstantVector);
-        }
-
-        while (completed < slices - 1) Thread.Yield();
-    }
-
-
-    //[Benchmark]
-    public void Parallel16_Partition_Unrolled()
-    {
-        var slices = 16;
-        var completed = 0;
-
-        for (var i = 1; i < slices; i++)
-        {
-            ThreadPool.QueueUserWorkItem((int iteration) =>
-            {
-                foreach (ref var v in _vectorsRaw.AsSpan(iteration * entityCount / slices, entityCount / slices))
-                {
-                    v = Vector3.Cross(v, UniformConstantVector);
-                }
-
-                Interlocked.Increment(ref completed);
-            }, i, preferLocal: true);
-        }
-
-        foreach (ref var v in _vectorsRaw.AsSpan(0, entityCount / slices))
-        {
-            v = Vector3.Cross(v, UniformConstantVector);
-        }
-
-        while (completed < slices - 1) Thread.Yield();
-    }
-
-
-    //[Benchmark]
-    public void Parallel4_Direct_Array()
-    {
-        var opts = new ParallelOptions {MaxDegreeOfParallelism = 4};
-        Parallel.For(0, _vectorsRaw.Length, opts,
-            i => { _vectorsRaw[i] = Vector3.Cross(_vectorsRaw[i], UniformConstantVector); });
-    }
-
-    //[Benchmark]
-    public void Parallel10_Direct_Array()
-    {
-        var opts = new ParallelOptions {MaxDegreeOfParallelism = 10};
-        Parallel.For(0, _vectorsRaw.Length, opts,
-            i => { _vectorsRaw[i] = Vector3.Cross(_vectorsRaw[i], UniformConstantVector); });
-    }
-
-    //[Benchmark]
-    public void Parallel20_Direct_Array()
-    {
-        var opts = new ParallelOptions {MaxDegreeOfParallelism = 20};
-        Parallel.For(0, _vectorsRaw.Length, opts,
-            i => { _vectorsRaw[i] = Vector3.Cross(_vectorsRaw[i], UniformConstantVector); });
-    }
-
-    //[Benchmark]
+    [Benchmark]
     //[Benchmark(Description = "A lambda is passed each Vector3 by ref.")]
     public void Single_ECS_Lambda()
     {
         _queryV3.Run((ref Vector3 v) => { v = Vector3.Cross(v, UniformConstantVector); });
     }
 
-    //[Benchmark]
+    [Benchmark]
     //[Benchmark(Description = "Parallel.Foreach passes each Vector3 by ref to a lambda.")]
     public void Parallel_ECS_Lambda()
     {
         _queryV3.RunParallel((ref Vector3 v) => { v = Vector3.Cross(v, UniformConstantVector); });
     }
 
-    [Benchmark(Baseline = true)]
+    [Benchmark]
     //[Benchmark(Baseline = true, Description = "Work on Array passed in by ECS in a delegate.")]
     public void Single_HypStyle_Array_Delegate()
     {
@@ -301,7 +82,7 @@ public class SimpleEntityBenchmarks
         });
     }
 
-    [Benchmark]
+    [Benchmark(Baseline = true)]
     //[Benchmark(Description = "Array passed in by ECS in a delegate, processed locally in Parallel.For.")]
     public void Parallel_HypStyle_Array_Delegate()
     {
@@ -339,21 +120,21 @@ public class SimpleEntityBenchmarks
         _queryV3.RunParallel(delegate(ref Vector3 v) { v = Vector3.Cross(v, UniformConstantVector); }, chunkSize: 100_000);
     }
 
-    //[Benchmark]
+    [Benchmark]
     //[Benchmark(Description = "Work split into chunks, passed to Workers which invoke delegates passing individual ref Vector3s.")]
     public async Task Parallel_ECS_Channeled()
     {
         await _queryV3.RunParallelChanneled(delegate(ref Vector3 v) { v = Vector3.Cross(v, UniformConstantVector); });
     }
 
-    //[Benchmark]
+    [Benchmark]
     //[Benchmark(Description = "Work split into Tasks per Archetype, each worker passing individual ref Vector3s to delegate.")]
     public async Task Parallel_ECS_Tasked()
     {
         await _queryV3.RunTasked(delegate(ref Vector3 v) { v = Vector3.Cross(v, UniformConstantVector); });
     }
 
-    //[Benchmark]
+    [Benchmark]
     //[Benchmark(Description = "Work split into chunks, each worker passing individual ref Vector3s to delegate.")]
     public void Parallel_ECS_Chunked()
     {
