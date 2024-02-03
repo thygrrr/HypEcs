@@ -12,7 +12,7 @@ namespace Benchmark;
 public class SimpleEntityBenchmarks
 {
     // ReSharper disable once UnusedAutoPropertyAccessor.Global
-    [Params(10_000_000)] 
+    [Params(100_000_000)] 
     public int entityCount { get; set; }
 
     private static readonly Random random = new(1337);
@@ -25,7 +25,8 @@ public class SimpleEntityBenchmarks
     [GlobalSetup]
     public void Setup()
     {
-        ThreadPool.SetMaxThreads(4, 4);
+        //This command doesn't DO anything?!
+        // ThreadPool.SetMaxThreads(2, 2);
 
         _world = new World();
         _queryV3 = _world.Query<Vector3>().Build();
@@ -55,7 +56,7 @@ public class SimpleEntityBenchmarks
     }
 
     private static readonly Vector3 UniformConstantVector = new(3, 4, 5);
-
+    private static readonly ParallelOptions options = new() {MaxDegreeOfParallelism = 20};
 
     [Benchmark]
     //[Benchmark(Description = "for() loop over Array of Vector3 locally (raw data, baseline processing speed).")]
@@ -67,7 +68,7 @@ public class SimpleEntityBenchmarks
         }
     }
 
-    [Benchmark]
+    //[Benchmark]
     //[Benchmark(Description = "foreach() loop over Span of Vector3 locally (raw data, baseline processing speed).")]
     public void Single_Direct_Span()
     {
@@ -77,32 +78,61 @@ public class SimpleEntityBenchmarks
         }
     }
 
-    [Benchmark]
+    //[Benchmark]
     //[Benchmark(Description = "Parallel.For over Array of Vector3 locally (raw data, parallel speed).")]
     public void Parallel_Direct_Array()
     {
-        Parallel.For(0, _vectorsRaw.Length,
-            i =>
-            {
-                _vectorsRaw[i] = Vector3.Cross(_vectorsRaw[i], UniformConstantVector);
-            });
+        Parallel.For(0, _vectorsRaw.Length, options,
+            i => { _vectorsRaw[i] = Vector3.Cross(_vectorsRaw[i], UniformConstantVector); });
     }
 
     [Benchmark]
+    public void Parallel2_Direct_Array()
+    {
+        var opts = new ParallelOptions {MaxDegreeOfParallelism = 3};
+        Parallel.For(0, _vectorsRaw.Length, opts,
+            i => { _vectorsRaw[i] = Vector3.Cross(_vectorsRaw[i], UniformConstantVector); });
+    }
+
+    [Benchmark]
+    public void Parallel4_Direct_Array()
+    {
+        var opts = new ParallelOptions {MaxDegreeOfParallelism = 5};
+        Parallel.For(0, _vectorsRaw.Length, opts,
+            i => { _vectorsRaw[i] = Vector3.Cross(_vectorsRaw[i], UniformConstantVector); });
+    }
+
+    [Benchmark]
+    public void Parallel10_Direct_Array()
+    {
+        var opts = new ParallelOptions {MaxDegreeOfParallelism = 11};
+        Parallel.For(0, _vectorsRaw.Length, opts,
+            i => { _vectorsRaw[i] = Vector3.Cross(_vectorsRaw[i], UniformConstantVector); });
+    }
+
+    [Benchmark(Baseline = true)]
+    public void Parallel20_Direct_Array()
+    {
+        var opts = new ParallelOptions {MaxDegreeOfParallelism = 21};
+        Parallel.For(0, _vectorsRaw.Length, opts,
+            i => { _vectorsRaw[i] = Vector3.Cross(_vectorsRaw[i], UniformConstantVector); });
+    }
+
+    //[Benchmark]
     //[Benchmark(Description = "A lambda is passed each Vector3 by ref.")]
     public void Single_ECS_Lambda()
     {
         _queryV3.Run((ref Vector3 v) => { v = Vector3.Cross(v, UniformConstantVector); });
     }
 
-    [Benchmark]
+    //[Benchmark]
     //[Benchmark(Description = "Parallel.Foreach passes each Vector3 by ref to a lambda.")]
     public void Parallel_ECS_Lambda()
     {
         _queryV3.RunParallel((ref Vector3 v) => { v = Vector3.Cross(v, UniformConstantVector); });
     }
 
-    [Benchmark(Baseline = true)]
+    //[Benchmark(Baseline = true)]
     //[Benchmark(Baseline = true, Description = "Work on Array passed in by ECS in a delegate.")]
     public void Single_HypStyle_Array_Delegate()
     {
@@ -115,46 +145,45 @@ public class SimpleEntityBenchmarks
         });
     }
 
-    [Benchmark]
+    //[Benchmark]
     //[Benchmark(Description = "Array passed in by ECS in a delegate, processed locally in Parallel.For.")]
     public void Parallel_HypStyle_Array_Delegate()
     {
-        var opts = new ParallelOptions {MaxDegreeOfParallelism = 16};
         _queryV3.RunHypStyle(delegate(int count, Vector3[] vectors)
         {
-            Parallel.For(0, count, opts, delegate (int i) { vectors[i] = Vector3.Cross(vectors[i], UniformConstantVector); });
+            Parallel.For(0, count, options, delegate (int i) { vectors[i] = Vector3.Cross(vectors[i], UniformConstantVector); });
         });
     }
 
-    [Benchmark]
+    //[Benchmark]
     //[Benchmark(Description = "Work passed into delegate as ref Vector3.")]
     public void Single_ECS_Delegate()
     {
         _queryV3.Run(delegate (ref Vector3 v) { v = Vector3.Cross(v, UniformConstantVector); });
     }
 
-    [Benchmark]
+    //[Benchmark]
     //[Benchmark(Description = "Work parallelized by Archetype, passed into delegate as ref Vector3.")]
     public void Parallel_ECS_Delegate_Archetype()
     {
         _queryV3.RunParallel(delegate(ref Vector3 v) { v = Vector3.Cross(v, UniformConstantVector); });
     }
 
-    [Benchmark]
+    //[Benchmark]
     //[Benchmark(Description = "Work split into chunks, passed to Workers which invoke delegates passing individual ref Vector3s.")]
     public async Task Parallel_ECS_Channeled()
     {
         await _queryV3.RunParallelChanneled(delegate(ref Vector3 v) { v = Vector3.Cross(v, UniformConstantVector); });
     }
 
-    [Benchmark]
+    //[Benchmark]
     //[Benchmark(Description = "Work split into Tasks per Archetype, each worker passing individual ref Vector3s to delegate.")]
     public async Task Parallel_ECS_Tasked()
     {
         await _queryV3.RunTasked(delegate(ref Vector3 v) { v = Vector3.Cross(v, UniformConstantVector); });
     }
 
-    [Benchmark]
+    //[Benchmark]
     //[Benchmark(Description = "Work split into chunks, each worker passing individual ref Vector3s to delegate.")]
     public void Parallel_ECS_Chunked()
     {

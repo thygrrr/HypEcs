@@ -135,7 +135,7 @@ public struct ChannelWorkload<C>(int start, int count, C[] storage, QueryAction_
 public class Query<C> : Query
     where C : struct
 {
-    private readonly ParallelOptions opts = new() {MaxDegreeOfParallelism = 16};
+    private readonly ParallelOptions opts = new() {MaxDegreeOfParallelism = 2};
 
     private readonly CancellationTokenSource _cts = new();
 
