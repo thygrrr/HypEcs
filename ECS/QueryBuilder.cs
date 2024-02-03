@@ -349,6 +349,7 @@ public sealed class QueryBuilder<C1, C2, C3, C4, C5> : QueryBuilder
     }
 }
 
+/*
 public sealed class QueryBuilder<C1, C2, C3, C4, C5, C6> : QueryBuilder
     where C1 : struct
     where C2 : struct
@@ -594,3 +595,4 @@ public sealed class QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8, C9> : QueryBuil
         return (Query<C1, C2, C3, C4, C5, C6, C7, C8, C9>)Archetypes.GetQuery(Mask, CreateQuery);
     }
 }
+*/

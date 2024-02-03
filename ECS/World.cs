@@ -1,22 +1,12 @@
 namespace ECS;
 
-public struct Element<T>
-{
-    public T Value;
-}
-    
 public sealed class World : IDisposable
 {
     //private readonly Entity _world;
 
     private readonly Archetypes _archetypes = new();
 
-    public World()
-    {
-        //_world = _archetypes.Spawn();
-    }
 
-    
     public EntityBuilder Spawn()
     {
         return new EntityBuilder(this, _archetypes.Spawn());
@@ -258,6 +248,7 @@ public sealed class World : IDisposable
         return new QueryBuilder<C1, C2, C3, C4, C5>(_archetypes);
     }
 
+    /*
     public QueryBuilder<C1, C2, C3, C4, C5, C6> Query<C1, C2, C3, C4, C5, C6>() where C1 : struct
         where C2 : struct
         where C3 : struct
@@ -291,6 +282,7 @@ public sealed class World : IDisposable
     {
         return new QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8>(_archetypes);
     }
+    */
 
 
     /* I don't think this is necessary.
