@@ -135,6 +135,8 @@ public struct ChannelWorkload<C>(int start, int count, C[] storage, QueryAction_
 public class Query<C> : Query
     where C : struct
 {
+    private const int SPIN_TIMEOUT = 420; // ~10 microseconds
+    
     private readonly ParallelOptions opts = new() {MaxDegreeOfParallelism = 16};
 
     private readonly CancellationTokenSource _cts = new();
@@ -240,10 +242,11 @@ public class Query<C> : Query
                 action(ref c);
             }
         }
-
-        while (queued > 0) Thread.SpinWait(420);
+        
+        while (queued > 0) Thread.SpinWait(SPIN_TIMEOUT);
         Archetypes.Unlock();
     }
+
 
     public void RunParallelFor(QueryAction_C<C> action)
     {
