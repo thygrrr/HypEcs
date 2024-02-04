@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 namespace ECS;
 
 public static class MaskPool

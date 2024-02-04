@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 namespace ECS;
 
 public struct EntityMeta(Identity identity, int tableId, int row)

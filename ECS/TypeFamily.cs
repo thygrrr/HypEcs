@@ -1,4 +1,6 @@
-﻿namespace ECS;
+﻿// SPDX-License-Identifier: MIT
+
+namespace ECS;
 
 public readonly struct TypeFamily : 
     IComparable<TypeExpression>, 

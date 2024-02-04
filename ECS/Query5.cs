@@ -1,4 +1,4 @@
-﻿// ReSharper disable ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
+﻿// SPDX-License-Identifier: MIT
 
 namespace ECS;
 

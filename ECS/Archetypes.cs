@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 using System.Collections.Concurrent;
 
 // ReSharper disable ReturnTypeCanBeEnumerable.Global
