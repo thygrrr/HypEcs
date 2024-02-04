@@ -52,7 +52,6 @@ query.RunParallel((ref Position position, in float dt) => {
     position.Y -= 9.81f * dt;
 }, uniform: Time.Delta, chunkSize: 2048);
 ```
-```
 
 ### ... when we said minimal boilerplate, <em>we foxing meant it.</em>
 
@@ -62,9 +61,11 @@ Even using the strictest judgment, that's no more than 2 lines of boilerplate! M
 **fennECS** is a tiny, tiny ECS with a focus on performance and simplicity. And it cares enough to provide a few things you might not expect. Our competition sure didn't.
 
 <details>
+
 <summary>ECS Comparison Matrix - choices are hard, foxes are soft</summary>
 
 Here are some of the key properties where fennECS might be a better or worse choice than its peers. Our resident fennecs have worked with all of these ECSs, and we're happy to answer any questions you might have.
+
 
 |                                                               |            fennECS            | HypEcs | Entitas |    Unity DOTS    | DefaultECS |
 |:--------------------------------------------------------------|:-----------------------------:|:------:|:-------:|:----------------:|:----------:|
@@ -78,14 +79,15 @@ Here are some of the key properties where fennECS might be a better or worse cho
 | Entity-Target-Querying                                        |               ✅               |   ❌    |    ❌    |        ❌         |     ❌      |
 | Arbitrary Component Types                                     |               ✅               |   ✅    |    ❌    |        ❌         |     ✅      |
 | Structural Change Responders                                  |     🟨<br/>(coming soon)      |   ❌    |    ✅    |        ❌         |     ❌      |
-| Automatic Thread Scheduling                                   | 🟨<br/>(coming soon) |    ❌   |      ❌  | ✅<br/>(highly static) |    ✅       |
+| Automatic Thread Scheduling                                   |  🟨<br/>(coming soon)  |    ❌   |      ❌  | ✅<br/>(highly static) |    ✅       |
 | No Code Generation Required                                   |               ✅               |   ✅    |    ❌    |        ❌         |     🟨     |
 | Enqueue Structural Changes at Any Time                        |               ✅               |   ✅    |    ✅    |        🟨        |     🟨     |
 | Apply Structural Changes at Any Time                          |               ❌               |   ❌    |    ✅    |        ❌         |     ❌      |
 | C# 12 support                                                 |               ✅               |   ❌    |    ❌    |        ❌         |     ❌      |
-| Parallel Processing                                           |              ⭐⭐               |   ⭐    |    ❌    |       ⭐⭐⭐        |     ⭐⭐     |
-| Singleton / Unique Components                                 |    🟨<br/>(ref types only)    |   ❌    |    ✅    |  🟨<br/>(per system)  |     ✅      |
+| Parallel Processing                                           |              ⭐⭐               |   ⭐    |    ❌    |       ⭐⭐⭐        |     ⭐⭐  |
+| Singleton / Unique Components                                 |    🟨<br/>(ref types only)    |   ❌    |    ✅    |  🟨<br/>(per system)  |     ✅     |
 | Journaling                                                    |               ❌               |   ❌    |   🟨    |        ✅         |     ❌      |
+
 
 </details>
 
