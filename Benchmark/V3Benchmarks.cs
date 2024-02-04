@@ -4,10 +4,11 @@ using BenchmarkDotNet.Attributes;
 namespace Benchmark;
 
 [ShortRunJob]
-[MemoryDiagnoser(true)]
+[MemoryDiagnoser]
 public class V3Benchmarks
 {
-    [Params(1000, 1000000)] 
+    [Params(1_000, 1_000_000)] 
+    // ReSharper disable once UnusedAutoPropertyAccessor.Global
     public int entityCount { get; set; }
 
     private static readonly Random random = new(1337);
@@ -81,8 +82,6 @@ public class V3Benchmarks
 
     private delegate void VectorIncrementDelegate<T>(ref T val);
 
-    private delegate void VectorIncrementDelegateIn(in Vector3 val);
-
     private VectorIncrementDelegate<Vector3> _incrementDelegate = null!;
     
     [Benchmark]
@@ -117,23 +116,12 @@ public class V3Benchmarks
     }
 
 
-    [Benchmark]
     private void PerItemIncrementSpanDelegateImpl(VectorIncrementDelegate<Vector3> del)
     {
         var span = _input.AsSpan();
         foreach (ref var v in span)
         {
             del(ref v);
-        }
-    }
-
-    [Benchmark]
-    private void PerItemIncrementSpanDelegateImplIn(VectorIncrementDelegateIn del)
-    {
-        var span = _input.AsSpan();
-        foreach (ref var v in span)
-        {
-            del(in v);
         }
     }
 

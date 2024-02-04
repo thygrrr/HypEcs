@@ -1,6 +1,5 @@
 ﻿using System.Numerics;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Jobs;
 
 namespace Benchmark;
 
@@ -73,7 +72,7 @@ public class SyntheticSchedulerThroughputBenchmarks
 
         for (var i = 0; i < slices; i++)
         {
-            ThreadPool.QueueUserWorkItem((int iteration) =>
+            ThreadPool.QueueUserWorkItem(iteration =>
             {
                 foreach (ref var v in _vectorsRaw.AsSpan(iteration * entityCount / slices, entityCount / slices))
                 {
@@ -94,7 +93,7 @@ public class SyntheticSchedulerThroughputBenchmarks
 
         for (var i = 0; i < slices; i++)
         {
-            ThreadPool.QueueUserWorkItem((int iteration) =>
+            ThreadPool.QueueUserWorkItem(iteration =>
             {
                 foreach (ref var v in _vectorsRaw.AsSpan(iteration * entityCount / slices, entityCount / slices))
                 {
@@ -116,7 +115,7 @@ public class SyntheticSchedulerThroughputBenchmarks
 
         for (var i = 1; i < slices; i++)
         {
-            ThreadPool.QueueUserWorkItem((int iteration) =>
+            ThreadPool.QueueUserWorkItem(iteration =>
             {
                 foreach (ref var v in _vectorsRaw.AsSpan(iteration * entityCount / slices, entityCount / slices))
                 {
@@ -144,7 +143,7 @@ public class SyntheticSchedulerThroughputBenchmarks
 
         for (var i = 1; i < slices; i++)
         {
-            ThreadPool.QueueUserWorkItem((int iteration) =>
+            ThreadPool.QueueUserWorkItem(iteration =>
             {
                 foreach (ref var v in _vectorsRaw.AsSpan(iteration * entityCount / slices, entityCount / slices))
                 {
@@ -172,7 +171,7 @@ public class SyntheticSchedulerThroughputBenchmarks
 
         for (var i = 1; i < slices; i++)
         {
-            ThreadPool.QueueUserWorkItem((int iteration) =>
+            ThreadPool.QueueUserWorkItem(iteration =>
             {
                 foreach (ref var v in _vectorsRaw.AsSpan(iteration * entityCount / slices, entityCount / slices))
                 {
@@ -200,7 +199,7 @@ public class SyntheticSchedulerThroughputBenchmarks
 
         for (var i = 1; i < slices; i++)
         {
-            ThreadPool.QueueUserWorkItem((int iteration) =>
+            ThreadPool.QueueUserWorkItem(iteration =>
             {
                 foreach (ref var v in _vectorsRaw.AsSpan(iteration * entityCount / slices, entityCount / slices))
                 {
