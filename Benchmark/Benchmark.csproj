@@ -20,7 +20,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\ECS\ECS.csproj" />
+      <ProjectReference Include="..\fennecs\fennecs.csproj" />
     </ItemGroup>
 
     <ItemGroup>
