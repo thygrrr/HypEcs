@@ -157,8 +157,12 @@ public class Query<C>(Archetypes archetypes, Mask mask, List<Table> tables) : Qu
     public void RawParallel(Action<Memory<C>> action)
     {
         Archetypes.Lock();
-        Parallel.ForEach(Tables.Where(t => !t.IsEmpty), Options, table => { action(table.GetStorage<C>(Identity.None).AsMemory(0, table.Count)); });
-
+        Parallel.ForEach(Tables, Options, table =>
+        {
+            if (table.IsEmpty) return; //TODO: This wastes a scheduled thread.
+            action(table.GetStorage<C>(Identity.None).AsMemory(0, table.Count)); 
+        });
+        
         Archetypes.Unlock();
     }
     #endregion

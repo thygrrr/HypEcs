@@ -177,9 +177,11 @@ public class Query<C1, C2>(Archetypes archetypes, Mask mask, List<Table> tables)
     public void RawParallel(Action<Memory<C1>, Memory<C2>> action)
     {
         Archetypes.Lock();
-        Parallel.ForEach(Tables.Where(t => !t.IsEmpty), Options,
+        
+        Parallel.ForEach(Tables, Options,
             table =>
             {
+                if (table.IsEmpty) return; //TODO: This wastes a scheduled thread.
                 var m1 = table.GetStorage<C1>(Identity.None).AsMemory(0, table.Count);
                 var m2 = table.GetStorage<C2>(Identity.None).AsMemory(0, table.Count);
                 action(m1, m2);

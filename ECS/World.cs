@@ -150,6 +150,16 @@ public sealed class World : IDisposable
         return _archetypes.GetTargets(type, entity.Identity);
     }
 
+
+    internal Entity GetTypeEntity(Type type)
+    {
+        return _archetypes.GetTypeEntity(type);
+    }
+
+    public void Dispose()
+    {
+    }
+
     
     /* I don't think this is necessary.
     public T GetElement<T>() where T : class
@@ -297,28 +307,4 @@ public sealed class World : IDisposable
         _worldInfo.QueryCount = _archetypes.Queries.Count;
     }
     */
-
-    
-    internal Entity GetTypeEntity(Type type)
-    {
-        return _archetypes.GetTypeEntity(type);
-    }
-
-    public void Dispose()
-    {
-    }
-}
-
-public sealed class WorldInfo
-{
-    public readonly Guid WorldId = Guid.NewGuid();
-    public int EntityCount;
-    public int UnusedEntityCount;
-    public int AllocatedEntityCount;
-
-    public int ArchetypeCount;
-
-    // public int RelationCount;
-    public int ElementCount;
-    public int QueryCount;
 }

@@ -202,9 +202,10 @@ public class Query<C1, C2, C3, C4>(Archetypes archetypes, Mask mask, List<Table>
     public void RawParallel(Action<Memory<C1>, Memory<C2>, Memory<C3>, Memory<C4>> action)
     {
         Archetypes.Lock();
-        Parallel.ForEach(Tables.Where(t => !t.IsEmpty), Options,
+        Parallel.ForEach(Tables, Options,
             table =>
             {
+                if (table.IsEmpty) return; //TODO: This wastes a scheduled thread.
                 var m1 = table.GetStorage<C1>(Identity.None).AsMemory(0, table.Count);
                 var m2 = table.GetStorage<C2>(Identity.None).AsMemory(0, table.Count);
                 var m3 = table.GetStorage<C3>(Identity.None).AsMemory(0, table.Count);
