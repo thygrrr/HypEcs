@@ -25,8 +25,8 @@
                 <li>intuitively relational</li>
                 <li>lithe and fast</li>
             </ul>
-            <p>This re-imagined fork of <a href="https://github.com/Byteron/HypEcs">HypEcs</a> <em>feels just right<a href="">*</a></em> for high performance game development in any modern C# engine. Including, of course, the fantastic <a href="https://godotengine.org">Godot</a>.</p>
-            <sub>*subjective experience may vary, terms & conditions apply</sub>
+            <p>This re-imagined fork of <a href="https://github.com/Byteron/HypEcs">HypEcs</a> <em>feels just right<a href="#subjective">*</a></em> for high performance game development in any modern C# engine. Including, of course, the fantastic <a href="https://godotengine.org">Godot</a>.</p>
+            <sub><a id="subjective">*subjective experiences may vary, terms & conditions apply</a></sub>
         </td>
     </tr>
 </table>
