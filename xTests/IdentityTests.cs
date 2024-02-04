@@ -38,11 +38,44 @@ public class IdentityTests(ITestOutputHelper output)
 
     }
 
+    // [Fact(Skip = "Computationally Expensive")]
+    // ReSharper disable once UnusedMember.Global
+    internal void Identity_HashCodes_are_Unique()
+    {
+        var ids = new Dictionary<int, Identity>(75_000_000);
+        
+        //Identities
+        for (var i = 0; i < 25_000; i++)
+        {
+            //Generations
+            for (ushort g = 1; g < 2_000; g++)
+            {
+                var identity = new Identity(i, g);
+                if (ids.ContainsKey(identity.GetHashCode()))
+                {
+                    Assert.Fail($"Collision of {identity} with {ids[identity.GetHashCode()]}, #{identity.GetHashCode()}");
+                }
+                else
+                {
+                    ids.Add(identity.GetHashCode(), identity);
+                }
+            }
+        }
+    }
+
     [Fact]
     public void Identity_Matches_Self_if_Same()
     {
-        var self = new Identity(12345, 6);
-        var other = new Identity(12345, 6);
-        Assert.Equal(self, other);
+        var random = new Random(420960);
+        for (var i = 0; i < 1_000; i++)
+        {
+            var id = random.Next();
+            var gen = (ushort) random.Next();
+            
+            var self = new Identity(id, gen);
+            var other = new Identity(id, gen);
+
+            Assert.Equal(self, other);
+        }
     }
 }

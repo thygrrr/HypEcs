@@ -20,8 +20,7 @@ public class Query<C1, C2, C3, C4>(Archetypes archetypes, Mask mask, List<Table>
             ref s3[meta.Row], ref s4[meta.Row]);
     }
 
-    #region Runners
-
+    #region Runner
      public void Run(QueryAction_CCCC<C1, C2, C3, C4> action)
     {
         Archetypes.Lock();

@@ -24,19 +24,17 @@ public readonly struct Identity(int id, ushort generation = 1) : IEquatable<Iden
         throw new InvalidCastException("Identity: Boxing equality comparisons disallowed. Use IEquatable<Identity>.Equals(Identity other) instead.");
         //return obj is Identity other && Equals(other); <-- second best option   
     }
-    
+
     public override int GetHashCode()
     {
-        unchecked // Allow arithmetic overflow, numbers will just "wrap around"
+        unchecked
         {
-            var hashcode = 1430287;
-            hashcode = hashcode * 7302013 ^ Id.GetHashCode();
-            hashcode = hashcode * 7302013 ^ Generation.GetHashCode();
-            return hashcode;
+            var low = (uint) Id;
+            var high = (uint) generation;
+            return (int) (0x811C9DC5u * low + 0x1000193u * high + 0xc4ceb9fe1a85ec53u);
         }
     }
 
-    
     public override string ToString()
     {
         return $"{Id}:{Generation}";

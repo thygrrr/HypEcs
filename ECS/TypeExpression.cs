@@ -2,9 +2,7 @@
 
 namespace ECS;
 
-public readonly struct TypeExpression : 
-    IComparable<TypeExpression>, 
-    IEquatable<TypeExpression>
+public readonly struct TypeExpression : IComparable<TypeExpression>, IEquatable<TypeExpression>
 {
     public required Type Type { get; init; }
     public required ulong Value { get; init; }
@@ -83,7 +81,7 @@ public static class TypeIdConverter
     
     public static ushort Type(ulong value)
     {
-        return (ushort)value;
+        return (ushort) value;
     }
 
     private class TypeIdAssigner

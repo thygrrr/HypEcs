@@ -29,35 +29,23 @@ public class Query(Archetypes archetypes, Mask mask, List<Table> tables)
 // ReSharper disable InconsistentNaming
 // ReSharper disable IdentifierTypo
 public delegate void QueryAction_C<C0>(ref C0 comp0);
-
 public delegate void QueryAction_CC<C0, C1>(ref C0 comp0, ref C1 comp1);
-
 public delegate void QueryAction_CCC<C0, C1, C2>(ref C0 comp0, ref C1 comp1, ref C2 comp2);
-
 public delegate void QueryAction_CCCC<C0, C1, C2, C3>(ref C0 c0, ref C1 c1, ref C2 c2, ref C3 c3);
-
 public delegate void QueryAction_CCCCC<C0, C1, C2, C3, C4>(ref C0 c0, ref C1 c1, ref C2 c2, ref C3 c3, ref C4 c4);
 
 
 public delegate void QueryAction_CU<C0, in U>(ref C0 comp0, U uniform);
-
 public delegate void QueryAction_CCU<C0, C1, in U>(ref C0 comp0, ref C1 comp1, U uniform);
-
 public delegate void QueryAction_CCCU<C0, C1, C2, in U>(ref C0 comp0, ref C1 comp1, ref C2 comp2, U uniform);
-
 public delegate void QueryAction_CCCCU<C0, C1, C2, C3, in U>(ref C0 c0, ref C1 c1, ref C2 c2, ref C3 c3, U uniform);
-
 public delegate void QueryAction_CCCCCU<C0, C1, C2, C3, C4, in U>(ref C0 c0, ref C1 c1, ref C2 c2, ref C3 c3, ref C4 c4, U uniform);
 
 
 public delegate void SpanAction_C<C0>(Span<C0> c0);
-
 public delegate void SpanAction_CC<C0, C1>(Span<C0> c0, Span<C1> c1);
-
 public delegate void SpanAction_CCC<C0, C1, C2>(Span<C0> c0, Span<C1> c1, Span<C2> c2);
-
 public delegate void SpanAction_CCCC<C0, C1, C2, C3>(Span<C0> c0, Span<C1> c1, Span<C2> c2, Span<C3> c3);
-
 public delegate void SpanAction_CCCCC<C0, C1, C2, C3, C4>(Span<C0> c0, Span<C1> c1, Span<C2> c2, Span<C3> c3, Span<C4> c4);
 
 // ReSharper enable IdentifierTypo
