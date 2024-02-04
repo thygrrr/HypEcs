@@ -76,6 +76,13 @@ public class IdentityTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void Any_and_None_are_Distinct()
+    {
+        Assert.NotEqual(Identity.Any, Identity.None);
+        Assert.NotEqual(Identity.Any.GetHashCode(), Identity.None.GetHashCode());
+    }
+
+    [Fact]
     public void Identity_Matches_Self_if_Same()
     {
         var random = new Random(420960);
