@@ -2,7 +2,7 @@
 
 namespace Benchmark;
 
-[MemoryDiagnoser(false)]
+[ShortRunJob]
 public class ECSBenchmarks
 {
     [Params(1_000, 1_000_000)] 
@@ -59,7 +59,7 @@ public class ECSBenchmarks
 
     
     
-    //[Benchmark]
+    [Benchmark]
     public void PerItemCopyParallel()
     {
         Parallel.For((long) 0, entityCount, i =>
@@ -68,7 +68,7 @@ public class ECSBenchmarks
         });
     }
 
-    //[Benchmark]
+    [Benchmark]
     public void LocalModulus()
     {
         for (var i = 0; i < entityCount; i++)

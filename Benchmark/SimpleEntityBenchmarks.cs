@@ -1,12 +1,11 @@
 ﻿using System.Numerics;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Jobs;
 using ECS;
 
 namespace Benchmark;
 
 
-[ShortRunJob(RuntimeMoniker.Net80)]
+[ShortRunJob]
 [ThreadingDiagnoser]
 [MemoryDiagnoser]
 public class SimpleEntityBenchmarks

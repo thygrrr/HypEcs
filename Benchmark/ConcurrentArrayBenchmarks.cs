@@ -24,7 +24,7 @@ public class ConcurrentArrayBenchmarks
         _list = [..randoms];
     }
 
-    //[Benchmark]
+    [Benchmark]
     public void TakeOneBag()
     {
         _bag.TryTake(out var x);
@@ -45,7 +45,7 @@ public class ConcurrentArrayBenchmarks
         while (!_bag.IsEmpty) _bag.TryTake(out var x);
     }
 
-    //[Benchmark]
+    [Benchmark]
     public void TakeAllList()
     {
         while (_list.Count > 0)

@@ -5,7 +5,7 @@ using BenchmarkDotNet.Jobs;
 namespace Benchmark;
 
 
-[ShortRunJob(RuntimeMoniker.Net80)]
+[ShortRunJob]
 [ThreadingDiagnoser]
 [MemoryDiagnoser]
 public class SyntheticSchedulerThroughputBenchmarks

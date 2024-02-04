@@ -3,6 +3,7 @@ using BenchmarkDotNet.Attributes;
 
 namespace Benchmark;
 
+[ShortRunJob]
 [MemoryDiagnoser(true)]
 public class V3Benchmarks
 {
@@ -23,7 +24,7 @@ public class V3Benchmarks
         _incrementDelegate = VectorIncrement;
     }
 
-    //[Benchmark]
+    [Benchmark]
     public void PerItemDot()
     {
         for (var i = 0; i < entityCount; i++)
@@ -116,6 +117,7 @@ public class V3Benchmarks
     }
 
 
+    [Benchmark]
     private void PerItemIncrementSpanDelegateImpl(VectorIncrementDelegate<Vector3> del)
     {
         var span = _input.AsSpan();
@@ -125,6 +127,7 @@ public class V3Benchmarks
         }
     }
 
+    [Benchmark]
     private void PerItemIncrementSpanDelegateImplIn(VectorIncrementDelegateIn del)
     {
         var span = _input.AsSpan();
@@ -134,11 +137,13 @@ public class V3Benchmarks
         }
     }
 
+    [Benchmark]
     public void PerItemDotParallel()
     {
         Parallel.For(0, entityCount, i => { _output[i] = Vector3.Dot(_input[i], new Vector3(1, 2, 3)); });
     }
 
+    [Benchmark]
     public void PerItemDotSpan()
     {
         var va = new Vector3(1, 2, 3);
