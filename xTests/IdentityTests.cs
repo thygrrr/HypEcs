@@ -38,19 +38,23 @@ public class IdentityTests(ITestOutputHelper output)
 
     }
 
-    // [Fact(Skip = "Computationally Expensive")]
-    // ReSharper disable once UnusedMember.Global
-    internal void Identity_HashCodes_are_Unique()
+    [Theory]
+    [InlineData(1500, 1500)]
+    internal void Identity_HashCodes_are_Unique(ushort idCount, ushort genCount)
     {
-        var ids = new Dictionary<int, Identity>(75_000_000);
-        
+        var ids = new Dictionary<int, Identity>((int) (idCount * genCount * 4f));
+
         //Identities
-        for (var i = 0; i < 25_000; i++)
+        for (var i = 0; i < idCount ; i++)
         {
             //Generations
-            for (ushort g = 1; g < 2_000; g++)
+            for (ushort g = 1; g < genCount; g++)
             {
                 var identity = new Identity(i, g);
+
+                Assert.NotEqual(identity, Identity.Any);
+                Assert.NotEqual(identity, Identity.None);
+
                 if (ids.ContainsKey(identity.GetHashCode()))
                 {
                     Assert.Fail($"Collision of {identity} with {ids[identity.GetHashCode()]}, #{identity.GetHashCode()}");
@@ -61,6 +65,14 @@ public class IdentityTests(ITestOutputHelper output)
                 }
             }
         }
+    }
+
+    [Fact]
+    public void Equals_Prevents_Boxing_as_InvalidCastException()
+    {
+        object o = "don't @ me";
+        var id = new Identity(69, 420);
+        Assert.Throws<InvalidCastException>(() => id.Equals(o));
     }
 
     [Fact]

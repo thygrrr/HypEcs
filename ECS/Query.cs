@@ -18,7 +18,6 @@ public class Query(Archetypes archetypes, Mask mask, List<Table> tables)
         var table = Archetypes.GetTable(meta.TableId);
         return Tables.Contains(table);
     }
-
     
     internal void AddTable(Table table)
     {
@@ -28,6 +27,7 @@ public class Query(Archetypes archetypes, Mask mask, List<Table> tables)
 
 // ReSharper disable InconsistentNaming
 // ReSharper disable IdentifierTypo
+
 public delegate void QueryAction_C<C0>(ref C0 comp0);
 public delegate void QueryAction_CC<C0, C1>(ref C0 comp0, ref C1 comp1);
 public delegate void QueryAction_CCC<C0, C1, C2>(ref C0 comp0, ref C1 comp1, ref C2 comp2);

@@ -9,13 +9,13 @@ public struct EntityMeta(Identity identity, int tableId, int row)
     public int Row = row;
 }
 
-public readonly struct Identity(int id, ushort generation = 1) : IEquatable<Identity>
+public readonly struct Identity(int id, ushort gen = 1) : IEquatable<Identity>
 {
-    public static Identity None = default;
-    public static Identity Any = new(int.MaxValue, 0);
+    public static readonly Identity None = default;
+    public static readonly Identity Any = new(int.MaxValue, 0);
 
     public readonly int Id = id;
-    public readonly ushort Generation = generation;
+    public readonly ushort Generation = gen;
 
     public bool Equals(Identity other) => Id == other.Id && Generation == other.Generation;
     
@@ -30,7 +30,7 @@ public readonly struct Identity(int id, ushort generation = 1) : IEquatable<Iden
         unchecked
         {
             var low = (uint) Id;
-            var high = (uint) generation;
+            var high = (uint) Generation;
             return (int) (0x811C9DC5u * low + 0x1000193u * high + 0xc4ceb9fe1a85ec53u);
         }
     }
