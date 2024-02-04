@@ -31,37 +31,42 @@
 </table>
 
 ## Quickstart: Let's go!
-At the basic level, all you need is a 🧩**component type**, a number of ~~small foxes~~ 🦊**entities**, and a query to ⚙️**iterate/modify** components, often using some uniform 💾**data**.
+📦`>` `dotnet add package fennECS`
+
+At the basic level, all you need is a 🧩**component type**, a number of ~~small foxes~~ 🦊**entities**, and a query to ⚙️**iterate and modify** components, occasionally passing in some uniform 💾**data**.
 
 ```csharp
 // Declare your own component types. (you can also use most existing value or reference types)
 using Position = System.Numerics.Vector3;
 
 // Create a world. (fyi, World implements IDisposable)
-var world = new World();
+var world = new ECS.World();
 
 // Spawn an entity into the world with a choice of components. (or add/remove them later)
-Entity entity = world.Spawn().Add<Position>().Id();
+var entity = world.Spawn().Add<Position>().Id();
 
 // Queries are cached, just build them right where you want to use them.
 var query = world.Query<Position>().Build();
 
-// Run code on all entities in the query. (omit chunksize to schedule partitioned by archetypes)
+// Run code on all entities in the query. (omit chunksize to parallelize only by archetype)
 query.RunParallel((ref Position position, in float dt) => {
     position.Y -= 9.81f * dt;
 }, uniform: Time.Delta, chunkSize: 2048);
 ```
 
-### ... when we said minimal boilerplate, <em>we foxing meant it.</em>
+### ‼️ ... when we said minimal boilerplate, <em>we foxing meant it.</em>
 
-Even using the strictest judgment, that's no more than 2 lines of boilerplate! Merely instantiating the world and building the query aren't directly moving parts of the actor/gravity feature we just built, and should be seen as "enablers" or "infrastructure".  The real magic is that none of this brevity compromises on performance.
+Even using the strictest judgment, that's no more than 2 lines of boilerplate! Merely instantiating the world and building the query aren't directly moving parts of the actor/gravity feature we just built, and should be seen as "enablers" or "infrastructure".
+
+The 💫*real magic*💫 is that none of this brevity compromises on performance.
 
 ## Features: What's in the box?
 **fennECS** is a tiny, tiny ECS with a focus on performance and simplicity. And it cares enough to provide a few things you might not expect. Our competition sure didn't.
 
+
 <details>
 
-<summary>ECS Comparison Matrix - choices are hard, foxes are soft</summary>
+<summary>🥇🥈🥉ECS Comparison Matrix<br/><b>Foxes are soft, choices are hard</b> - Unity dumb; .NET 8 really sharp.</summary>
 
 Here are some of the key properties where fennECS might be a better or worse choice than its peers. Our resident fennecs have worked with all of these ECSs, and we're happy to answer any questions you might have.
 
