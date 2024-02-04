@@ -21,6 +21,8 @@ public sealed class Mask : IEquatable<Mask>, IDisposable
     
     public void Any(TypeExpression type)
     {
+        if (type.Identity == Identity.Any) throw new InvalidOperationException("Mask.Any: Can't have Any type as Any");
+        if (type.Identity == Identity.None) throw new InvalidOperationException("Mask.Any: Can't have None type as Any");
         AnyTypes.Add(type);
     }
 

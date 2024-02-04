@@ -12,7 +12,7 @@ public sealed class TableEdge
 
 public sealed class Table
 {
-    private const int StartCapacity = 4;
+    private const int StartCapacity = 16;
 
     public readonly int Id;
 
@@ -67,38 +67,34 @@ public sealed class Table
     
     public void Remove(int row)
     {
-        if (row >= Count)
-            throw new ArgumentOutOfRangeException(nameof(row), "row cannot be greater or equal to count");
-
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(row, Count, nameof(row));
+        
         Count--;
 
+        // If removing not the last row, move the last row to the removed row
         if (row < Count)
         {
             _identities[row] = _identities[Count];
-
             foreach (var storage in _storages)
             {
                 Array.Copy(storage, Count, storage, row, 1);
             }
-
             _archetypes.GetEntityMeta(_identities[row]).Row = row;
         }
 
+        // Free the last row
         _identities[Count] = default;
-
-        foreach (var storage in _storages)
-        {
-            Array.Clear(storage, Count, 1);
-        }
+        
+        foreach (var storage in _storages) Array.Clear(storage, Count, 1);
     }
 
     
-    public TableEdge GetTableEdge(TypeExpression type_expression)
+    public TableEdge GetTableEdge(TypeExpression typeExpression)
     {
-        if (_edges.TryGetValue(type_expression, out var edge)) return edge;
+        if (_edges.TryGetValue(typeExpression, out var edge)) return edge;
 
         edge = new TableEdge();
-        _edges[type_expression] = edge;
+        _edges[typeExpression] = edge;
 
         return edge;
     }
@@ -111,9 +107,9 @@ public sealed class Table
     }
 
     
-    public Array GetStorage(TypeExpression type_expression)
+    public Array GetStorage(TypeExpression typeExpression)
     {
-        return _storages[_indices[type_expression]];
+        return _storages[_indices[typeExpression]];
     }
 
 

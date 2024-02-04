@@ -8,16 +8,16 @@ namespace ECS;
 
 public sealed class Archetypes
 {
-	internal EntityMeta[] Meta = new EntityMeta[512];
+	private EntityMeta[] _meta = new EntityMeta[512];
+	private readonly List<Table> _tables = [];
+	private readonly Dictionary<int, Query> _queries = new();
+	
+	
+	private readonly ConcurrentBag<Identity> _unusedIds = [];
+	private Table entityRoot => _tables[0];
+	private int _entityCount;
 
-	internal readonly ConcurrentBag<Identity> UnusedIds = [];
-
-	internal readonly List<Table> Tables = [];
-
-	internal readonly Dictionary<int, Query> Queries = new();
-
-	internal int EntityCount;
-
+	
 	private readonly ConcurrentQueue<DeferredOperation> _deferredOperations = new();
 	private readonly Dictionary<Type, Entity> _typeEntities = new();
 	private readonly Dictionary<TypeExpression, List<Table>> _tablesByType = new();
@@ -38,22 +38,21 @@ public sealed class Archetypes
 	
 	public Entity Spawn()
 	{
-		if (!UnusedIds.TryTake(out var identity))
+		if (!_unusedIds.TryTake(out var identity))
 		{
-			identity = new Identity(++EntityCount);
+			identity = new Identity(++_entityCount);
 		}
 
-		var table = Tables[0];
 
-		var row = table.Add(identity);
+		var row = entityRoot.Add(identity);
 
-		if (Meta.Length == EntityCount) Array.Resize(ref Meta, EntityCount * 2);
+		if (_meta.Length == _entityCount) Array.Resize(ref _meta, _entityCount * 2);
 
-		Meta[identity.Id] = new EntityMeta(identity, table.Id, row);
+		_meta[identity.Id] = new EntityMeta(identity, entityRoot.Id, row);
 
 		var entity = new Entity(identity);
 
-		var entityStorage = (Entity[])table.Storages[0];
+		var entityStorage = (Entity[])entityRoot.Storages[0];
 		entityStorage[row] = entity;
 
 		return entity;
@@ -70,23 +69,19 @@ public sealed class Archetypes
 			return;
 		}
 
-		ref var meta = ref Meta[identity.Id];
+		ref var meta = ref _meta[identity.Id];
 
-		var table = Tables[meta.TableId];
-
+		var table = _tables[meta.TableId];
 		table.Remove(meta.Row);
+		meta.Clear();
 
-		meta.Row = 0;
-		meta.Identity = Identity.None;
+		_unusedIds.Add(new Identity(identity.Id, (ushort) (identity.Generation + 1)));
 
-		UnusedIds.Add(new Identity(identity.Id, (ushort) (identity.Generation + 1)));
+		
+		// Find entity-entity relation reverse lookup (if applicable)
+		if (!_typesByRelationTarget.TryGetValue(identity, out var list)) return;
 
-		//Remove components from all entities that had a relation pointing to the despawned entity
-		if (!_typesByRelationTarget.TryGetValue(identity, out var list))
-		{
-			return;
-		}
-
+		//Remove components from all entities that had a relation
 		foreach (var type in list)
 		{
 			_targetsByRelationType[type].Remove(identity);
@@ -95,6 +90,7 @@ public sealed class Archetypes
 
 			foreach (var tableWithType in tablesWithType)
 			{
+				//TODO: There should be a bulk remove method instead.
 				for (var i = 0; i < tableWithType.Count; i++)
 				{
 					RemoveComponent(type, tableWithType.Identities[i]);
@@ -108,8 +104,8 @@ public sealed class Archetypes
 	{
 		AssertAlive(identity);
 
-		ref var meta = ref Meta[identity.Id];
-		var oldTable = Tables[meta.TableId];
+		ref var meta = ref _meta[identity.Id];
+		var oldTable = _tables[meta.TableId];
 
 		if (oldTable.Types.Contains(typeExpression))
 		{
@@ -159,9 +155,9 @@ public sealed class Archetypes
 		AssertAlive(identity);
 
 		var type = TypeExpression.Create<T>(target);
-		var meta = Meta[identity.Id];
+		var meta = _meta[identity.Id];
 		AssertEqual(meta.Identity, identity);
-		var table = Tables[meta.TableId];
+		var table = _tables[meta.TableId];
 		var storage = (T[])table.GetStorage(type);
 		return ref storage[meta.Row];
 	}
@@ -170,17 +166,17 @@ public sealed class Archetypes
 	
 	public bool HasComponent(TypeExpression typeExpression, Identity identity)
 	{
-		var meta = Meta[identity.Id];
+		var meta = _meta[identity.Id];
 		return meta.Identity != Identity.None
 			   && meta.Identity == identity
-			   && Tables[meta.TableId].Types.Contains(typeExpression);
+			   && _tables[meta.TableId].Types.Contains(typeExpression);
 	}
 
 	
 	public void RemoveComponent(TypeExpression typeExpression, Identity identity)
 	{
-		ref var meta = ref Meta[identity.Id];
-		var oldTable = Tables[meta.TableId];
+		ref var meta = ref _meta[identity.Id];
+		var oldTable = _tables[meta.TableId];
 
 		if (!oldTable.Types.Contains(typeExpression))
 		{
@@ -226,13 +222,13 @@ public sealed class Archetypes
 
 	public void DiscardQuery(Mask mask)
 	{
-		Queries.Remove(mask);
+		_queries.Remove(mask);
 		MaskPool.Add(mask);
 	}
 	
 	public Query GetQuery(Mask mask, Func<Archetypes, Mask, List<Table>, Query> createQuery)
 	{
-		if (Queries.TryGetValue(mask, out var query))
+		if (_queries.TryGetValue(mask, out var query))
 		{
 			MaskPool.Add(mask);
 			return query;
@@ -245,11 +241,13 @@ public sealed class Archetypes
 			_tablesByType[type] = typeTables;
 		}
 
-		var matchingTables = typeTables.Where(table => IsMaskCompatibleWith(mask, table)).ToList();
-
+		var matchingTables = typeTables
+			.Where(table => IsMaskCompatibleWith(mask, table))
+			.ToList();
+		
 		query = createQuery(this, mask, matchingTables);
 		
-		Queries.Add(mask, query);
+		_queries.Add(mask, query);
 		return query;
 	}
 
@@ -262,7 +260,6 @@ public sealed class Archetypes
 
 		var hasAnyTarget = ListPool<TypeExpression>.Get();
 		var notAnyTarget = ListPool<TypeExpression>.Get();
-		var anyAnyTarget = ListPool<TypeExpression>.Get();
 
 		foreach (var type in mask.HasTypes)
 		{
@@ -272,14 +269,15 @@ public sealed class Archetypes
 
 		foreach (var type in mask.NotTypes)
 		{
-			if (type.Identity == Identity.Any) notAnyTarget.Add(type);
-			else not.Add(type);
+			//if (type.Identity == Identity.Any) notAnyTarget.Add(type);
+			//else TODO: Find out if we can make "Not Any" actually a valid query. 
+			//This case then could go into a special function
+			not.Add(type);
 		}
 
 		foreach (var type in mask.AnyTypes)
 		{
-			if (type.Identity == Identity.Any) anyAnyTarget.Add(type);
-			else any.Add(type);
+			any.Add(type);
 		}
 
 		var matchesComponents = table.Types.IsSupersetOf(has);
@@ -305,7 +303,6 @@ public sealed class Archetypes
 		
 		ListPool<TypeExpression>.Add(hasAnyTarget);
 		ListPool<TypeExpression>.Add(notAnyTarget);
-		ListPool<TypeExpression>.Add(anyAnyTarget);
 
 		return matchesComponents && matchesRelation;
 	}
@@ -313,26 +310,26 @@ public sealed class Archetypes
 	
 	internal bool IsAlive(Identity identity)
 	{
-		return identity != Identity.None && Meta[identity.Id].Identity == identity;
+		return identity != Identity.None && _meta[identity.Id].Identity == identity;
 	}
 
 	
 	internal ref EntityMeta GetEntityMeta(Identity identity)
 	{
-		return ref Meta[identity.Id];
+		return ref _meta[identity.Id];
 	}
 
 	
 	internal Table GetTable(int tableId)
 	{
-		return Tables[tableId];
+		return _tables[tableId];
 	}
 
 	
 	internal Entity GetTarget(TypeExpression typeExpression, Identity identity)
 	{
-		var meta = Meta[identity.Id];
-		var table = Tables[meta.TableId];
+		var meta = _meta[identity.Id];
+		var table = _tables[meta.TableId];
 
 		foreach (var storageType in table.Types)
 		{
@@ -356,8 +353,8 @@ public sealed class Archetypes
 		AssertAlive(identity);
 
 		var list = ListPool<Entity>.Get();
-		var meta = Meta[identity.Id];
-		var table = Tables[meta.TableId];
+		var meta = _meta[identity.Id];
+		var table = _tables[meta.TableId];
 		foreach (var storageType in table.Types)
 		{
 			if (!storageType.IsRelation || storageType.TypeId != typeExpression.TypeId) continue;
@@ -377,8 +374,8 @@ public sealed class Archetypes
 
 		var list = ListPool<(TypeExpression, object)>.Get();
 
-		var meta = Meta[identity.Id];
-		var table = Tables[meta.TableId];
+		var meta = _meta[identity.Id];
+		var table = _tables[meta.TableId];
 
 
 		foreach (var type in table.Types)
@@ -395,8 +392,8 @@ public sealed class Archetypes
 	
 	private Table AddTable(SortedSet<TypeExpression> types)
 	{
-		var table = new Table(Tables.Count, this, types);
-		Tables.Add(table);
+		var table = new Table(_tables.Count, this, types);
+		_tables.Add(table);
 
 		foreach (var type in types)
 		{
@@ -427,7 +424,7 @@ public sealed class Archetypes
 			relationTypeSet.Add(type);
 		}
 
-		foreach (var query in Queries.Values.Where(query => IsMaskCompatibleWith(query.Mask, table)))
+		foreach (var query in _queries.Values.Where(query => IsMaskCompatibleWith(query.Mask, table)))
 		{
 			query.AddTable(table);
 		}

@@ -2,13 +2,6 @@
 
 namespace ECS;
 
-public struct EntityMeta(Identity identity, int tableId, int row)
-{
-    public Identity Identity = identity;
-    public int TableId = tableId;
-    public int Row = row;
-}
-
 public readonly struct Identity(int id, ushort gen = 1) : IEquatable<Identity>
 {
     public static readonly Identity None = default;
