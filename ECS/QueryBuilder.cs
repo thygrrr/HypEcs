@@ -2,19 +2,12 @@
 
 namespace ECS;
 
-public class QueryBuilder
+public class QueryBuilder(Archetypes archetypes)
 {
-    internal readonly Archetypes Archetypes;
-    protected readonly Mask Mask;
+    internal readonly Archetypes Archetypes = archetypes;
+    protected readonly Mask Mask = MaskPool.Get();
 
-    
-    public QueryBuilder(Archetypes archetypes)
-    {
-        Archetypes = archetypes;
-        Mask = MaskPool.Get();
-    }
 
-    
     public QueryBuilder Has<T>(Entity target = default)
     {
         var typeIndex = TypeExpression.Create<T>(target.Identity);

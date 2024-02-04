@@ -1,21 +1,21 @@
 // SPDX-License-Identifier: MIT
 
+using System.Collections.Concurrent;
+
 namespace ECS;
 
 public static class MaskPool
 {
-    private static readonly Stack<Mask> Stack = new();
-
+    private static readonly ConcurrentBag<Mask> Pool = [];
     
     public static Mask Get()
     {
-        return Stack.Count > 0 ? Stack.Pop() : new Mask();
+        return Pool.TryTake(out var mask) ? mask : new Mask();
     }
 
-    
-    public static void Add(Mask list)
+    public static void Add(Mask mask)
     {
-        list.Clear();
-        Stack.Push(list);
+        mask.Clear();
+        Pool.Add(mask);
     }
 }

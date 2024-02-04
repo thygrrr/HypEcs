@@ -13,16 +13,17 @@ public readonly struct Identity(int id, ushort generation = 1) : IEquatable<Iden
 {
     public static Identity None = default;
     public static Identity Any = new(int.MaxValue, 0);
-    
+
     public readonly int Id = id;
     public readonly ushort Generation = generation;
 
-
     public bool Equals(Identity other) => Id == other.Id && Generation == other.Generation;
-
-    //TODO: May be unnecessary
-    [Obsolete("Boxing equality comparisons removed.")]
-    public override bool Equals(object? obj) => obj is Identity other && Id == other.Id && Generation == other.Generation;
+    
+    public override bool Equals(object? obj)
+    {
+        throw new InvalidCastException("Identity: Boxing equality comparisons disallowed. Use IEquatable<Identity>.Equals(Identity other) instead.");
+        //return obj is Identity other && Equals(other); <-- second best option   
+    }
     
     public override int GetHashCode()
     {
@@ -38,7 +39,7 @@ public readonly struct Identity(int id, ushort generation = 1) : IEquatable<Iden
     
     public override string ToString()
     {
-        return $"{id}:{generation}";
+        return $"{Id}:{Generation}";
     }
 
 

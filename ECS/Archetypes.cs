@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 
 using System.Collections.Concurrent;
-
+// ReSharper disable ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
 // ReSharper disable ReturnTypeCanBeEnumerable.Global
 
 namespace ECS;
@@ -27,7 +27,8 @@ public sealed class Archetypes
 
 	private readonly object _modeChangeLock = new();
 	private int _lockCount;
-	private bool _isDeferredMode;
+
+	private Mode _mode = Mode.Immediate;
 
 	public Archetypes()
 	{
@@ -63,7 +64,7 @@ public sealed class Archetypes
 	{
 		if (!IsAlive(identity)) return;
 
-		if (_isDeferredMode)
+		if (_mode == Mode.Deferred)
 		{
 			_deferredOperations.Enqueue(new DeferredOperation { Operation = Deferred.Despawn, Identity = identity });
 			return;
@@ -115,7 +116,7 @@ public sealed class Archetypes
 			throw new ArgumentException($"Entity {identity} already has component of type {typeExpression}");
 		}
 
-		if (_isDeferredMode)
+		if (_mode == Mode.Deferred)
 		{
 			_deferredOperations.Enqueue(new DeferredOperation { Operation = Deferred.Add, Identity = identity, TypeExpression = typeExpression, Data = data! });
 			return;
@@ -186,7 +187,7 @@ public sealed class Archetypes
 			throw new ArgumentException($"cannot remove non-existent component {typeExpression.Type.Name} from entity {identity}");
 		}
 
-		if (_isDeferredMode)
+		if (_mode == Mode.Deferred)
 		{
 			_deferredOperations.Enqueue(new DeferredOperation { Operation = Deferred.Remove, Identity = identity, TypeExpression = typeExpression });
 			return;
@@ -223,18 +224,19 @@ public sealed class Archetypes
 		meta.TableId = newTable.Id;
 	}
 
+	public void DiscardQuery(Mask mask)
+	{
+		Queries.Remove(mask);
+		MaskPool.Add(mask);
+	}
 	
 	public Query GetQuery(Mask mask, Func<Archetypes, Mask, List<Table>, Query> createQuery)
 	{
-		var hash = mask.GetHashCode();
-
-		if (Queries.TryGetValue(hash, out var query))
+		if (Queries.TryGetValue(mask, out var query))
 		{
 			MaskPool.Add(mask);
 			return query;
 		}
-
-		var matchingTables = new List<Table>();
 
 		var type = mask.HasTypes[0];
 		if (!_tablesByType.TryGetValue(type, out var typeTables))
@@ -243,21 +245,16 @@ public sealed class Archetypes
 			_tablesByType[type] = typeTables;
 		}
 
-		foreach (var table in typeTables)
-		{
-			if (!IsMaskCompatibleWith(mask, table)) continue;
-
-			matchingTables.Add(table);
-		}
+		var matchingTables = typeTables.Where(table => IsMaskCompatibleWith(mask, table)).ToList();
 
 		query = createQuery(this, mask, matchingTables);
-		Queries.Add(hash, query);
-
+		
+		Queries.Add(mask, query);
 		return query;
 	}
 
-	
-	internal bool IsMaskCompatibleWith(Mask mask, Table table)
+
+	private bool IsMaskCompatibleWith(Mask mask, Table table)
 	{
 		var has = ListPool<TypeExpression>.Get();
 		var not = ListPool<TypeExpression>.Get();
@@ -305,6 +302,7 @@ public sealed class Archetypes
 		ListPool<TypeExpression>.Add(has);
 		ListPool<TypeExpression>.Add(not);
 		ListPool<TypeExpression>.Add(any);
+		
 		ListPool<TypeExpression>.Add(hasAnyTarget);
 		ListPool<TypeExpression>.Add(notAnyTarget);
 		ListPool<TypeExpression>.Add(anyAnyTarget);
@@ -480,8 +478,10 @@ public sealed class Archetypes
 	{
 		lock (_modeChangeLock)
 		{
+			if (_mode != Mode.Immediate) throw new InvalidOperationException("Archetypes: Lock called while not in immediate (default) mode");
+			
 			_lockCount++;
-			_isDeferredMode = _lockCount > 0;
+			_mode = Mode.Deferred;
 		}
 	}
 	
@@ -489,13 +489,24 @@ public sealed class Archetypes
 	{
 		lock (_modeChangeLock)
 		{
+			if (_mode != Mode.Deferred) throw new InvalidOperationException("Archetypes: Unlock called while not in deferred mode");
+			
 			_lockCount--;
-			_isDeferredMode = _lockCount > 0;
-
-			if (!_isDeferredMode) ApplyDeferredOperations();
+			
+			if (_lockCount != 0) return;
+			
+			_mode = Mode.Immediate;
+			ApplyDeferredOperations();
 		}
 	}
 
+	private enum Mode
+	{
+		Immediate = default,
+		Deferred,
+		//Bulk
+	}
+	
 	private struct DeferredOperation
 	{
 		public required Deferred Operation;
@@ -508,7 +519,7 @@ public sealed class Archetypes
 	{
 		Add,
 		Remove,
-		Despawn
+		Despawn,
 	}
 
 

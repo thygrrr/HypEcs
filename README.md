@@ -54,7 +54,7 @@ query.RunParallel((ref Position position, in float dt) => {
 }, uniform: Time.Delta, chunkSize: 2048);
 ```
 
-### ‼️ ... when we said minimal boilerplate, <em>we foxing meant it.</em>
+### 💢... when we said minimal boilerplate, <em>we foxing meant it.</em>
 
 Even using the strictest judgment, that's no more than 2 lines of boilerplate! Merely instantiating the world and building the query aren't directly moving parts of the actor/gravity feature we just built, and should be seen as "enablers" or "infrastructure".
 
@@ -73,23 +73,23 @@ Here are some of the key properties where fennECS might be a better or worse cho
 
 |                                                               |            fennECS            | HypEcs | Entitas |    Unity DOTS    | DefaultECS |
 |:--------------------------------------------------------------|:-----------------------------:|:------:|:-------:|:----------------:|:----------:|
-| Boilerplate-to-Feature Ratio                                  |            3-to-1             | 3-to-1 | 12-to-1 |    27-to-1 😱    |   5-to-1   |
+| Boilerplate-to-Feature Ratio                                  |            3-to-1             | 5-to-1 | 12-to-1 |    27-to-1 😱    |   7-to-1   |
 | Entity-Target Relations                                       |               ✅               |   ✅    |    ❌    |        ❌         |     ❌      |
 | Target Querying<br/>*(find all targets of relations of type)* |               ✅               |   ❌    |    ❌    |        ❌         |     ❌      |
 | Entity-Component Queries                                      |               ✅               |   ✅    |    ✅    |        ✅         |     ✅      |
-| Add Shared Components                                         |               ✅               |   🟨   |    ❌    |        🟨        |     ✅      | 
-| Change Shared Components                                      |               ✅               |   🟨   |    ❌    |        ❌         |     ✅      | 
+| Add Shared Components                                         |               ✅               |   ❌   |    ❌    |        🟨        |     ✅      | 
+| Change Shared Components                                      |               ✅               |   ❌   |    ❌    |        ❌         |     ✅      | 
 | Entity-Type-Relations                                         |               ❌               |   ✅    |    ❌    |        ❌         |     ❌      |
 | Entity-Target-Querying                                        |               ✅               |   ❌    |    ❌    |        ❌         |     ❌      |
 | Arbitrary Component Types                                     |               ✅               |   ✅    |    ❌    |        ❌         |     ✅      |
 | Structural Change Responders                                  |     🟨<br/>(coming soon)      |   ❌    |    ✅    |        ❌         |     ❌      |
-| Automatic Thread Scheduling                                   |  🟨<br/>(coming soon)  |    ❌   |      ❌  | ✅<br/>(highly static) |    ✅       |
+| Automatic Thread Scheduling                                   |  🟨<br/>(coming soon)  |   ❌    |      ❌  | ✅<br/>(highly static) |     ✅      |
 | No Code Generation Required                                   |               ✅               |   ✅    |    ❌    |        ❌         |     🟨     |
 | Enqueue Structural Changes at Any Time                        |               ✅               |   ✅    |    ✅    |        🟨        |     🟨     |
 | Apply Structural Changes at Any Time                          |               ❌               |   ❌    |    ✅    |        ❌         |     ❌      |
 | C# 12 support                                                 |               ✅               |   ❌    |    ❌    |        ❌         |     ❌      |
-| Parallel Processing                                           |              ⭐⭐               |   ⭐    |    ❌    |       ⭐⭐⭐        |     ⭐⭐  |
-| Singleton / Unique Components                                 |    🟨<br/>(ref types only)    |   ❌    |    ✅    |  🟨<br/>(per system)  |     ✅     |
+| Parallel Processing                                           |              ⭐⭐               |   ⭐    |    ❌    |       ⭐⭐⭐        |     ⭐⭐     |
+| Singleton / Unique Components                                 |    🟨<br/>(ref types only)    |   ❌    |    ✅    |  🟨<br/>(per system)  |     ✅      |
 | Journaling                                                    |               ❌               |   ❌    |   🟨    |        ✅         |     ❌      |
 
 

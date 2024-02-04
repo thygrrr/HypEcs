@@ -1,21 +1,21 @@
 // SPDX-License-Identifier: MIT
 
+using System.Collections.Concurrent;
+
 namespace ECS;
 
 public static class ListPool<T>
 {
-    private static readonly Stack<List<T>> Stack = new();
-
+    private static readonly ConcurrentBag<List<T>> Bag = [];
     
     public static List<T> Get()
     {
-        return Stack.TryPop(out var list) ? list : new List<T>();
+        return Bag.TryTake(out var list) ? list : [];
     }
-
     
     public static void Add(List<T> list)
     {
         list.Clear();
-        Stack.Push(list);
+        Bag.Add(list);
     }
 }
