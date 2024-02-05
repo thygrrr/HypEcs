@@ -8,9 +8,9 @@ public class QueryBuilder(Archetypes archetypes)
     protected readonly Mask Mask = MaskPool.Get();
 
 
-    public QueryBuilder Has<T>(Entity target = default)
+    public QueryBuilder Has<T>(Identity target = default)
     {
-        var typeIndex = TypeExpression.Create<T>(target.Identity);
+        var typeIndex = TypeExpression.Create<T>(target);
         Mask.Has(typeIndex);
         return this;
     }
@@ -25,9 +25,9 @@ public class QueryBuilder(Archetypes archetypes)
     }
 
     
-    public QueryBuilder Not<T>(Entity target = default)
+    public QueryBuilder Not<T>(Identity target = default)
     {
-        var typeIndex = TypeExpression.Create<T>(target.Identity);
+        var typeIndex = TypeExpression.Create<T>(target);
         Mask.Not(typeIndex);
         return this;
     }
@@ -42,9 +42,9 @@ public class QueryBuilder(Archetypes archetypes)
     }
 
     
-    public QueryBuilder Any<T>(Entity target = default)
+    public QueryBuilder Any<T>(Identity target = default)
     {
-        var typeIndex = TypeExpression.Create<T>(target.Identity);
+        var typeIndex = TypeExpression.Create<T>(target);
         Mask.Any(typeIndex);
         return this;
     }
@@ -72,7 +72,7 @@ public sealed class QueryBuilder<C> : QueryBuilder
     }
 
     
-    public new QueryBuilder<C> Has<T>(Entity target = default)
+    public new QueryBuilder<C> Has<T>(Identity target = default)
     {
         return (QueryBuilder<C>)base.Has<T>(target);
     }
@@ -84,7 +84,7 @@ public sealed class QueryBuilder<C> : QueryBuilder
     }
 
     
-    public new QueryBuilder<C> Not<T>(Entity target = default)
+    public new QueryBuilder<C> Not<T>(Identity target = default)
     {
         return (QueryBuilder<C>)base.Not<T>(target);
     }
@@ -96,7 +96,7 @@ public sealed class QueryBuilder<C> : QueryBuilder
     }
 
     
-    public new QueryBuilder<C> Any<T>(Entity target = default)
+    public new QueryBuilder<C> Any<T>(Identity target = default)
     {
         return (QueryBuilder<C>)base.Any<T>(target);
     }
@@ -128,7 +128,7 @@ public sealed class QueryBuilder<C1, C2> : QueryBuilder
     }
 
     
-    public new QueryBuilder<C1, C2> Has<T>(Entity target = default)
+    public new QueryBuilder<C1, C2> Has<T>(Identity target = default)
     {
         return (QueryBuilder<C1, C2>)base.Has<T>(target);
     }
@@ -140,7 +140,7 @@ public sealed class QueryBuilder<C1, C2> : QueryBuilder
     }
 
     
-    public new QueryBuilder<C1, C2> Not<T>(Entity target = default)
+    public new QueryBuilder<C1, C2> Not<T>(Identity target = default)
     {
         return (QueryBuilder<C1, C2>)base.Not<T>(target);
     }
@@ -152,7 +152,7 @@ public sealed class QueryBuilder<C1, C2> : QueryBuilder
     }
 
     
-    public new QueryBuilder<C1, C2> Any<T>(Entity target = default)
+    public new QueryBuilder<C1, C2> Any<T>(Identity target = default)
     {
         return (QueryBuilder<C1, C2>)base.Any<T>(target);
     }
@@ -185,7 +185,7 @@ public sealed class QueryBuilder<C1, C2, C3> : QueryBuilder
     }
 
     
-    public new QueryBuilder<C1, C2, C3> Has<T>(Entity target = default)
+    public new QueryBuilder<C1, C2, C3> Has<T>(Identity target = default)
     {
         return (QueryBuilder<C1, C2, C3>)base.Has<T>(target);
     }
@@ -197,7 +197,7 @@ public sealed class QueryBuilder<C1, C2, C3> : QueryBuilder
     }
 
     
-    public new QueryBuilder<C1, C2, C3> Not<T>(Entity target = default)
+    public new QueryBuilder<C1, C2, C3> Not<T>(Identity target = default)
     {
         return (QueryBuilder<C1, C2, C3>)base.Not<T>(target);
     }
@@ -209,7 +209,7 @@ public sealed class QueryBuilder<C1, C2, C3> : QueryBuilder
     }
 
     
-    public new QueryBuilder<C1, C2, C3> Any<T>(Entity target = default)
+    public new QueryBuilder<C1, C2, C3> Any<T>(Identity target = default)
     {
         return (QueryBuilder<C1, C2, C3>)base.Any<T>(target);
     }
@@ -243,7 +243,7 @@ public sealed class QueryBuilder<C1, C2, C3, C4> : QueryBuilder
     }
 
     
-    public new QueryBuilder<C1, C2, C3, C4> Has<T>(Entity target = default)
+    public new QueryBuilder<C1, C2, C3, C4> Has<T>(Identity target = default)
     {
         return (QueryBuilder<C1, C2, C3, C4>)base.Has<T>(target);
     }
@@ -255,7 +255,7 @@ public sealed class QueryBuilder<C1, C2, C3, C4> : QueryBuilder
     }
 
     
-    public new QueryBuilder<C1, C2, C3, C4> Not<T>(Entity target = default)
+    public new QueryBuilder<C1, C2, C3, C4> Not<T>(Identity target = default)
     {
         return (QueryBuilder<C1, C2, C3, C4>)base.Not<T>(target);
     }
@@ -267,7 +267,7 @@ public sealed class QueryBuilder<C1, C2, C3, C4> : QueryBuilder
     }
 
     
-    public new QueryBuilder<C1, C2, C3, C4> Any<T>(Entity target = default)
+    public new QueryBuilder<C1, C2, C3, C4> Any<T>(Identity target = default)
     {
         return (QueryBuilder<C1, C2, C3, C4>)base.Any<T>(target);
     }
@@ -302,7 +302,7 @@ public sealed class QueryBuilder<C1, C2, C3, C4, C5> : QueryBuilder
     }
 
     
-    public new QueryBuilder<C1, C2, C3, C4, C5> Has<T>(Entity target = default)
+    public new QueryBuilder<C1, C2, C3, C4, C5> Has<T>(Identity target = default)
     {
         return (QueryBuilder<C1, C2, C3, C4, C5>)base.Has<T>(target);
     }
@@ -314,7 +314,7 @@ public sealed class QueryBuilder<C1, C2, C3, C4, C5> : QueryBuilder
     }
 
     
-    public new QueryBuilder<C1, C2, C3, C4, C5> Not<T>(Entity target = default)
+    public new QueryBuilder<C1, C2, C3, C4, C5> Not<T>(Identity target = default)
     {
         return (QueryBuilder<C1, C2, C3, C4, C5>)base.Not<T>(target);
     }
@@ -326,7 +326,7 @@ public sealed class QueryBuilder<C1, C2, C3, C4, C5> : QueryBuilder
     }
 
     
-    public new QueryBuilder<C1, C2, C3, C4, C5> Any<T>(Entity target = default)
+    public new QueryBuilder<C1, C2, C3, C4, C5> Any<T>(Identity target = default)
     {
         return (QueryBuilder<C1, C2, C3, C4, C5>)base.Any<T>(target);
     }
@@ -363,7 +363,7 @@ public sealed class QueryBuilder<C1, C2, C3, C4, C5, C6> : QueryBuilder
     }
 
     
-    public new QueryBuilder<C1, C2, C3, C4, C5, C6> Has<T>(Entity target = default)
+    public new QueryBuilder<C1, C2, C3, C4, C5, C6> Has<T>(Identity target = default)
     {
         return (QueryBuilder<C1, C2, C3, C4, C5, C6>)base.Has<T>(target);
     }
@@ -375,7 +375,7 @@ public sealed class QueryBuilder<C1, C2, C3, C4, C5, C6> : QueryBuilder
     }
 
     
-    public new QueryBuilder<C1, C2, C3, C4, C5, C6> Not<T>(Entity target = default)
+    public new QueryBuilder<C1, C2, C3, C4, C5, C6> Not<T>(Identity target = default)
     {
         return (QueryBuilder<C1, C2, C3, C4, C5, C6>)base.Not<T>(target);
     }
@@ -387,7 +387,7 @@ public sealed class QueryBuilder<C1, C2, C3, C4, C5, C6> : QueryBuilder
     }
 
     
-    public new QueryBuilder<C1, C2, C3, C4, C5, C6> Any<T>(Entity target = default)
+    public new QueryBuilder<C1, C2, C3, C4, C5, C6> Any<T>(Identity target = default)
     {
         return (QueryBuilder<C1, C2, C3, C4, C5, C6>)base.Any<T>(target);
     }
@@ -424,7 +424,7 @@ public sealed class QueryBuilder<C1, C2, C3, C4, C5, C6, C7> : QueryBuilder
     }
 
     
-    public new QueryBuilder<C1, C2, C3, C4, C5, C6, C7> Has<T>(Entity target = default)
+    public new QueryBuilder<C1, C2, C3, C4, C5, C6, C7> Has<T>(Identity target = default)
     {
         return (QueryBuilder<C1, C2, C3, C4, C5, C6, C7>)base.Has<T>(target);
     }
@@ -436,7 +436,7 @@ public sealed class QueryBuilder<C1, C2, C3, C4, C5, C6, C7> : QueryBuilder
     }
 
     
-    public new QueryBuilder<C1, C2, C3, C4, C5, C6, C7> Not<T>(Entity target = default)
+    public new QueryBuilder<C1, C2, C3, C4, C5, C6, C7> Not<T>(Identity target = default)
     {
         return (QueryBuilder<C1, C2, C3, C4, C5, C6, C7>)base.Not<T>(target);
     }
@@ -448,7 +448,7 @@ public sealed class QueryBuilder<C1, C2, C3, C4, C5, C6, C7> : QueryBuilder
     }
 
     
-    public new QueryBuilder<C1, C2, C3, C4, C5, C6, C7> Any<T>(Entity target = default)
+    public new QueryBuilder<C1, C2, C3, C4, C5, C6, C7> Any<T>(Identity target = default)
     {
         return (QueryBuilder<C1, C2, C3, C4, C5, C6, C7>)base.Any<T>(target);
     }
@@ -486,7 +486,7 @@ public sealed class QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8> : QueryBuilder
     }
 
     
-    public new QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8> Has<T>(Entity target = default)
+    public new QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8> Has<T>(Identity target = default)
     {
         return (QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8>)base.Has<T>(target);
     }
@@ -498,7 +498,7 @@ public sealed class QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8> : QueryBuilder
     }
 
     
-    public new QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8> Not<T>(Entity target = default)
+    public new QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8> Not<T>(Identity target = default)
     {
         return (QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8>)base.Not<T>(target);
     }
@@ -510,7 +510,7 @@ public sealed class QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8> : QueryBuilder
     }
 
     
-    public new QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8> Any<T>(Entity target = default)
+    public new QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8> Any<T>(Identity target = default)
     {
         return (QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8>)base.Any<T>(target);
     }
@@ -549,7 +549,7 @@ public sealed class QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8, C9> : QueryBuil
     }
 
     
-    public new QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8, C9> Has<T>(Entity target = default)
+    public new QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8, C9> Has<T>(Identity target = default)
     {
         return (QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8, C9>)base.Has<T>(target);
     }
@@ -561,7 +561,7 @@ public sealed class QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8, C9> : QueryBuil
     }
 
     
-    public new QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8, C9> Not<T>(Entity target = default)
+    public new QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8, C9> Not<T>(Identity target = default)
     {
         return (QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8, C9>)base.Not<T>(target);
     }
@@ -573,7 +573,7 @@ public sealed class QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8, C9> : QueryBuil
     }
 
     
-    public new QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8, C9> Any<T>(Entity target = default)
+    public new QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8, C9> Any<T>(Identity target = default)
     {
         return (QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8, C9>)base.Any<T>(target);
     }

@@ -7,10 +7,7 @@ public readonly struct Entity(Identity identity)
     public static readonly Entity None = default;
     public static readonly Entity Any = new(Identity.Any);
 
-    public bool IsAny => Identity == Identity.Any;
-    public bool IsNone => Identity == default;
-
-    public Identity Identity { get; } = identity;
+    internal Identity Identity { get; } = identity;
 
 
     public override bool Equals(object? obj)
@@ -30,11 +27,19 @@ public readonly struct Entity(Identity identity)
         return $"🧩{Identity}";
     }
 
+    public static implicit operator Identity(Entity left) => left.Identity;
     
     public static bool operator ==(Entity left, Entity right) => left.Equals(right);
 
-    
     public static bool operator !=(Entity left, Entity right) => !left.Equals(right);
+
+    public static bool operator ==(Identity left, Entity right) => left.Equals(right.Identity);
+
+    public static bool operator !=(Identity left, Entity right) => !left.Equals(right);
+
+    public static bool operator ==(Entity left, Identity right) => left.Identity.Equals(right);
+
+    public static bool operator !=(Entity left, Identity right) => !left.Identity.Equals(right);
 }
 
 public readonly struct EntityBuilder(World world, Entity entity)
@@ -46,17 +51,12 @@ public readonly struct EntityBuilder(World world, Entity entity)
         return this;
     }
 
-    /*
-     I don't like these semantics, but they could be useful.
-     However, this strongly burdens the TypeExpression space.
-     
     public EntityBuilder Add<T>(Type type) where T : struct
     {
-        var typeEntity = World.GetTypeEntity(type);
-        World.AddComponent<T>(_entity, typeEntity);
+        var typeEntity = world.GetTypeEntity(type);
+        world.AddComponent<T>(entity, typeEntity);
         return this;
     }
-    */
 
     
     public EntityBuilder Add<T>(T data) where T : struct

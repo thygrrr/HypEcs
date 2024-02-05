@@ -5,40 +5,43 @@ using System.Runtime.InteropServices;
 
 namespace fennecs;
 
+public interface IRelationBacklink;
+
 [StructLayout(LayoutKind.Explicit)]
 internal struct TypeId : IEquatable<TypeId>, IComparable<TypeId>
 {
     //    This is a 64 bit union struct.
     //     Layout chart (little endian)
     // | LSB                          MSB |
-    // | 32 bits   |  16 bits   | 16 bits |
-    // | Id        | Generation |  TypeId |
+    // | 64 bits                          |
+    // | Value                            |
     // |-----------Equivalent-------------|
     // | 48 bits             |  16 bits   |
     // | Identity            | TypeNumber |
-    // |-----------Equivalent-------------|
-    // | 64 bits                          |
-    // | Value                            |
-
-
-    [FieldOffset(0)] public long Value;
+    
+    [FieldOffset(0)] public ulong Value;
+    
     [FieldOffset(0)] public required Identity Target;
-    [FieldOffset(6)] public required ushort TypeNumber;
-    public bool isRelation => Target != default;
+    
+    [FieldOffset(6)] public required short TypeNumber;
+
+    public bool isRelation => Target != Identity.None;
+    public bool isBacklink => TypeNumber < 0;
 
     public bool Matches(TypeId other)
     {
         if (TypeNumber != other.TypeNumber) return false;
 
-        // Most common case
+        // Most common case.
         if (Target == Identity.None) return other.Target == Identity.None;
         
-        // Any only matches other Relations, not None
+        // Any only matches other Relations, not None.
         if (Target == Identity.Any) return other.Target != Identity.None;
 
+        // Direct match.
         if (Target == other.Target) return true;
         
-        // For commutative matching only.
+        // For commutative matching only. (usually a TypeId from a Query is matched against one from a Table)
         return other.Target == Identity.Any;
     } 
 
@@ -48,9 +51,13 @@ internal struct TypeId : IEquatable<TypeId>, IComparable<TypeId>
 
     public override bool Equals(object? obj) => throw new InvalidCastException("Boxing Disallowed; use TypeId.Equals(TypeId) instead.");
 
-    public static TypeId Create<T>(Identity target = default)
+    public static TypeId Create<T>(Identity target = default) 
     {
-        var typeNumber = LanguageTypeSource<T>.Id;
+        var typeNumber = typeof(IRelationBacklink).IsAssignableFrom(typeof(T)) 
+            ? (short) -LanguageTypeSource<T>.Id 
+            : LanguageTypeSource<T>.Id;
+        
+        // ⚠️ Initialization order matters!
         var result = new TypeId
         {
             Target = target,
@@ -81,16 +88,16 @@ internal struct TypeId : IEquatable<TypeId>, IComparable<TypeId>
         return !(left == right);
     }
 
-    public static implicit operator long(TypeId self) => self.Value;
+    public static implicit operator ulong(TypeId self) => self.Value;
 
 
     [SetsRequiredMembers]
-    private TypeId(long value)
+    private TypeId(ulong value)
     {
         Value = value;   
     }
     
-    public static implicit operator TypeId(long other) => new(other);
+    public static implicit operator TypeId(ulong other) => new(other);
 
     public override string ToString()
     {
@@ -101,7 +108,7 @@ internal struct TypeId : IEquatable<TypeId>, IComparable<TypeId>
 internal class TypeSource
 {
     // ReSharper disable once StaticMemberInGenericType
-    protected static ushort Counter;
+    protected static short Counter;
 }
 
 // ReSharper disable once UnusedTypeParameter
@@ -109,11 +116,11 @@ internal class TypeSource
 internal class LanguageTypeSource<T> : TypeSource
 {
     // ReSharper disable once StaticMemberInGenericType
-    public static readonly ushort Id;
+    public static readonly short Id;
 
     static LanguageTypeSource()
     {
-        if (Counter >= ushort.MaxValue) throw new InvalidOperationException("Language Level TypeIds exhausted.");
+        if (Counter >= short.MaxValue) throw new InvalidOperationException("Language Level TypeIds exhausted.");
         Id = ++Counter;
     }
 }

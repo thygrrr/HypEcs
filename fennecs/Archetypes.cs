@@ -37,26 +37,30 @@ public sealed class Archetypes
     }
 
 
+    private readonly object _spawnLock = new();
+    
     public Entity Spawn()
     {
-        if (!_unusedIds.TryTake(out var identity))
+        lock (_spawnLock)
         {
-            identity = new Identity(++_entityCount);
+            if (!_unusedIds.TryTake(out var identity))
+            {
+                identity = new Identity(++_entityCount);
+            }
+            
+            var row = entityRoot.Add(identity);
+
+            if (_meta.Length == _entityCount) Array.Resize(ref _meta, _entityCount * 2);
+
+            _meta[identity.Id] = new EntityMeta(identity, entityRoot.Id, row);
+
+            var entity = new Entity(identity);
+
+            var entityStorage = (Entity[]) entityRoot.Storages[0];
+            entityStorage[row] = entity;
+
+            return entity;
         }
-
-
-        var row = entityRoot.Add(identity);
-
-        if (_meta.Length == _entityCount) Array.Resize(ref _meta, _entityCount * 2);
-
-        _meta[identity.Id] = new EntityMeta(identity, entityRoot.Id, row);
-
-        var entity = new Entity(identity);
-
-        var entityStorage = (Entity[]) entityRoot.Storages[0];
-        entityStorage[row] = entity;
-
-        return entity;
     }
 
 

@@ -10,6 +10,24 @@ public class TypeIdTests
 
     private struct Type2;
 
+    private struct Type3Backlink : IRelationBacklink;
+
+    [Fact]
+    public void BackLink_has_Distinct_Negative_TypeNumber()
+    {
+        var id = TypeId.Create<Type3Backlink>();
+        Assert.True(id.TypeNumber < 0);
+        Assert.True(id.isBacklink);
+    }
+
+    [Fact]
+    public void Non_BackLink_has_Positive_TypeNumber()
+    {
+        var id = TypeId.Create<Type2>();
+        Assert.False(id.isBacklink);
+        Assert.True(id.TypeNumber > 0);
+    }
+
     [Fact]
     public void TypeId_is_64_bits()
     {
@@ -22,6 +40,7 @@ public class TypeIdTests
         Assert.Equal(64 / 8, Marshal.SizeOf<Identity>());
     }
 
+    
 
     /*
     [Theory]
