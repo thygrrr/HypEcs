@@ -13,17 +13,17 @@ public class TypeIdTests
     private struct Type3Backlink : IRelationBacklink;
 
     [Fact]
-    public void BackLink_has_Distinct_Negative_TypeNumber()
+    public void BackLink_declarable()
     {
-        var id = TypeId.Create<Type3Backlink>();
+        var id = TypeId.Create<Type3Backlink>(new Identity(1234));
         Assert.True(id.TypeNumber < 0);
         Assert.True(id.isBacklink);
     }
 
     [Fact]
-    public void Non_BackLink_has_Positive_TypeNumber()
+    public void Non_BackLink_is_Default()
     {
-        var id = TypeId.Create<Type2>();
+        var id = TypeId.Create<Type2>(new Identity(1234));
         Assert.False(id.isBacklink);
         Assert.True(id.TypeNumber > 0);
     }
