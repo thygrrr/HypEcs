@@ -4,7 +4,6 @@ namespace fennecs.tests;
 
 public class TypeExpressionTests
 {
-
     private struct Type1;
 
     [Fact]

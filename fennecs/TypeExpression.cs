@@ -8,7 +8,7 @@ namespace fennecs;
 public interface IRelationBacklink;
 
 [StructLayout(LayoutKind.Explicit)]
-internal struct TypeId : IEquatable<TypeId>, IComparable<TypeId>
+internal readonly struct TypeId : IEquatable<TypeId>, IComparable<TypeId>
 {
     //    This is a 64 bit union struct.
     //     Layout chart (little endian)
@@ -19,11 +19,11 @@ internal struct TypeId : IEquatable<TypeId>, IComparable<TypeId>
     // | 48 bits             |  16 bits   |
     // | Identity            | TypeNumber |
     
-    [FieldOffset(0)] public ulong Value;
+    [FieldOffset(0)] public readonly ulong Value;
     
-    [FieldOffset(0)] public required Identity Target;
+    [FieldOffset(0)] public readonly Identity Target;
     
-    [FieldOffset(6)] public required short TypeNumber;
+    [FieldOffset(6)] public readonly short TypeNumber;
 
     public bool isRelation => Target != Identity.None;
     public bool isBacklink => TypeNumber < 0;
@@ -57,13 +57,7 @@ internal struct TypeId : IEquatable<TypeId>, IComparable<TypeId>
             ? (short) -LanguageTypeSource<T>.Id 
             : LanguageTypeSource<T>.Id;
         
-        // ⚠️ Initialization order matters!
-        var result = new TypeId
-        {
-            Target = target,
-            TypeNumber = typeNumber,
-        };
-        return result;
+        return new TypeId(target, typeNumber);
     }
 
     public override int GetHashCode()
@@ -94,9 +88,16 @@ internal struct TypeId : IEquatable<TypeId>, IComparable<TypeId>
     [SetsRequiredMembers]
     private TypeId(ulong value)
     {
-        Value = value;   
+        Value = value;
     }
-    
+
+    [SetsRequiredMembers]
+    private TypeId(Identity target, short typeNumber)
+    {
+        Target = target;
+        TypeNumber = typeNumber;
+    }
+
     public static implicit operator TypeId(ulong other) => new(other);
 
     public override string ToString()
