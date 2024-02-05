@@ -15,23 +15,23 @@ public class TypeIdTests
     [Fact]
     public void BackLink_declarable()
     {
-        var id = TypeId.Create<Type3Backlink>(new Identity(1234));
-        Assert.True(id.TypeNumber < 0);
+        var id = TypeExpression.Create<Type3Backlink>(new Identity(1234));
+        Assert.True(id.TypeId < 0);
         Assert.True(id.isBacklink);
     }
 
     [Fact]
     public void Non_BackLink_is_Default()
     {
-        var id = TypeId.Create<Type2>(new Identity(1234));
+        var id = TypeExpression.Create<Type2>(new Identity(1234));
         Assert.False(id.isBacklink);
-        Assert.True(id.TypeNumber > 0);
+        Assert.True(id.TypeId > 0);
     }
 
     [Fact]
-    public void TypeId_is_64_bits()
+    public void TypeId_is_128_bits()
     {
-        Assert.Equal(64 / 8, Marshal.SizeOf<TypeId>());
+        Assert.Equal(128 / 8, Marshal.SizeOf<TypeExpression>());
     }
 
     [Fact]
@@ -93,43 +93,43 @@ public class TypeIdTests
     public void TypeAssigner_Id_Unique()
     {
         Assert.NotEqual(
-            TypeIdConverter.TypeIdAssigner<int>.Id,
-            TypeIdConverter.TypeIdAssigner<string>.Id);
+            LanguageTypeSource<int>.Id,
+            LanguageTypeSource<string>.Id);
 
         Assert.NotEqual(
-            TypeIdConverter.TypeIdAssigner<ushort>.Id,
-            TypeIdConverter.TypeIdAssigner<short>.Id);
+            LanguageTypeSource<ushort>.Id,
+            LanguageTypeSource<short>.Id);
 
         Assert.NotEqual(
-            TypeIdConverter.TypeIdAssigner<Type1>.Id,
-            TypeIdConverter.TypeIdAssigner<Type2>.Id);
+            LanguageTypeSource<Type1>.Id,
+            LanguageTypeSource<Type2>.Id);
     }
 
     [Fact]
     public void TypeAssigner_Id_Same_For_Same_Type()
     {
         Assert.Equal(
-            TypeIdConverter.TypeIdAssigner<int>.Id,
-            TypeIdConverter.TypeIdAssigner<int>.Id);
+            LanguageTypeSource<int>.Id,
+            LanguageTypeSource<int>.Id);
 
         Assert.Equal(
-            TypeIdConverter.TypeIdAssigner<Type1>.Id,
-            TypeIdConverter.TypeIdAssigner<Type1>.Id);
+            LanguageTypeSource<Type1>.Id,
+            LanguageTypeSource<Type1>.Id);
 
         Assert.Equal(
-            TypeIdConverter.TypeIdAssigner<Type2>.Id,
-            TypeIdConverter.TypeIdAssigner<Type2>.Id);
+            LanguageTypeSource<Type2>.Id,
+            LanguageTypeSource<Type2>.Id);
 
         Assert.Equal(
-            TypeIdConverter.TypeIdAssigner<Dictionary<string, string>>.Id,
-            TypeIdConverter.TypeIdAssigner<Dictionary<string, string>>.Id);
+            LanguageTypeSource<Dictionary<string, string>>.Id,
+            LanguageTypeSource<Dictionary<string, string>>.Id);
     }
 
     [Fact]
     public void TypeAssigner_None_Matches_Identical()
     {
-        var id1 = TypeId.Create<int>();
-        var id2 = TypeId.Create<int>();
+        var id1 = TypeExpression.Create<int>();
+        var id2 = TypeExpression.Create<int>();
 
         Assert.True(id1.Matches(id2));
     }
@@ -137,11 +137,11 @@ public class TypeIdTests
     [Fact]
     public void TypeAssigner_None_Matches_Default()
     {
-        var id1 = TypeId.Create<int>();
+        var id1 = TypeExpression.Create<int>();
         // Keeping the default case to ensure it remains at default
         // ReSharper disable once RedundantArgumentDefaultValue
-        var id2 = TypeId.Create<int>(default);
-        var id3 = TypeId.Create<int>(Identity.None);
+        var id2 = TypeExpression.Create<int>(default);
+        var id3 = TypeExpression.Create<int>(Identity.None);
 
         Assert.True(id1.Matches(id2));
         Assert.True(id1.Matches(id3));
@@ -152,8 +152,8 @@ public class TypeIdTests
     [Fact]
     public void TypeAssigner_does_not_Match_Identical()
     {
-        var id1 = TypeId.Create<int>();
-        var id2 = TypeId.Create<float>();
+        var id1 = TypeExpression.Create<int>();
+        var id2 = TypeExpression.Create<float>();
 
         Assert.False(id1.Matches(id2));
     }
@@ -161,9 +161,9 @@ public class TypeIdTests
     [Fact]
     public void TypeAssigner_None_does_not_match_Any()
     {
-        var id1 = TypeId.Create<int>();
-        var id2 = TypeId.Create<int>(new Identity(123));
-        var id3 = TypeId.Create<int>(Identity.Any);
+        var id1 = TypeExpression.Create<int>();
+        var id2 = TypeExpression.Create<int>(new Identity(123));
+        var id3 = TypeExpression.Create<int>(Identity.Any);
 
         Assert.False(id1.Matches(id2));
         Assert.False(id1.Matches(id3));

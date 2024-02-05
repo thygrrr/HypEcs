@@ -23,7 +23,7 @@ public sealed class Archetypes
     private readonly Dictionary<Type, Entity> _typeEntities = new();
     private readonly Dictionary<TypeExpression, List<Table>> _tablesByType = new();
     private readonly Dictionary<Identity, HashSet<TypeExpression>> _typesByRelationTarget = new();
-    private readonly Dictionary<TypeFamily, HashSet<Entity>> _targetsByRelationType = new();
+    private readonly Dictionary<short, HashSet<Entity>> _targetsByRelationType = new();
     private readonly Dictionary<int, HashSet<TypeExpression>> _relationsByTypes = new();
 
     private readonly object _modeChangeLock = new();
@@ -89,7 +89,7 @@ public sealed class Archetypes
         //Remove components from all entities that had a relation
         foreach (var type in list)
         {
-            _targetsByRelationType[type].Remove(identity);
+            _targetsByRelationType[type.TypeId].Remove(identity);
 
             var tablesWithType = _tablesByType[type];
 
@@ -105,7 +105,7 @@ public sealed class Archetypes
     }
 
 
-    public void AddComponent<T>(TypeExpression typeExpression, Identity identity, T data, Entity target = default)
+    internal void AddComponent<T>(TypeExpression typeExpression, Identity identity, T data, Entity target = default)
     {
         AssertAlive(identity);
 
@@ -123,13 +123,8 @@ public sealed class Archetypes
             return;
         }
 
-        if (!_targetsByRelationType.ContainsKey(typeExpression))
-        {
-            _targetsByRelationType[typeExpression] = [];
-        }
-
-        _targetsByRelationType[typeExpression].Add(identity);
-
+        _targetsByRelationType.TryAdd(typeExpression.TypeId, []);
+        _targetsByRelationType[typeExpression.TypeId].Add(identity);
 
         var oldEdge = oldTable.GetTableEdge(typeExpression);
 
@@ -169,7 +164,7 @@ public sealed class Archetypes
     }
 
 
-    public bool HasComponent(TypeExpression typeExpression, Identity identity)
+    internal bool HasComponent(TypeExpression typeExpression, Identity identity)
     {
         var meta = _meta[identity.Id];
         return meta.Identity != Identity.None
@@ -178,14 +173,14 @@ public sealed class Archetypes
     }
 
 
-    public void RemoveComponent(TypeExpression typeExpression, Identity identity)
+    internal void RemoveComponent(TypeExpression typeExpression, Identity identity)
     {
         ref var meta = ref _meta[identity.Id];
         var oldTable = _tables[meta.TableId];
 
         if (!oldTable.Types.Contains(typeExpression))
         {
-            throw new ArgumentException($"cannot remove non-existent component {typeExpression.Type.Name} from entity {identity}");
+            throw new ArgumentException($"cannot remove non-existent component {typeExpression} from entity {identity}");
         }
 
         if (_mode == Mode.Deferred)
@@ -197,7 +192,7 @@ public sealed class Archetypes
 
         // could be _targetsByRelationType[type.Wildcard()].Remove(identity);
         //(with enough unit test coverage)
-        if (_targetsByRelationType.TryGetValue(typeExpression, out var targetSet))
+        if (_targetsByRelationType.TryGetValue(typeExpression.TypeId, out var targetSet))
         {
             targetSet.Remove(identity);
         }
@@ -339,7 +334,7 @@ public sealed class Archetypes
 
         foreach (var storageType in table.Types)
         {
-            if (!storageType.IsRelation || storageType.TypeId != typeExpression.TypeId) continue;
+            if (!storageType.isRelation || storageType.TypeId != typeExpression.TypeId) continue;
             return new Entity(storageType.Target);
         }
 
@@ -351,7 +346,7 @@ public sealed class Archetypes
     {
         if (identity == Identity.Any)
         {
-            return _targetsByRelationType.TryGetValue(typeExpression, out var entitySet)
+            return _targetsByRelationType.TryGetValue(typeExpression.TypeId, out var entitySet)
                 ? entitySet.ToArray()
                 : Array.Empty<Entity>();
         }
@@ -363,7 +358,7 @@ public sealed class Archetypes
         var table = _tables[meta.TableId];
         foreach (var storageType in table.Types)
         {
-            if (!storageType.IsRelation || storageType.TypeId != typeExpression.TypeId) continue;
+            if (!storageType.isRelation || storageType.TypeId != typeExpression.TypeId) continue;
             list.Add(new Entity(storageType.Target));
         }
 
@@ -411,7 +406,7 @@ public sealed class Archetypes
 
             tableList.Add(table);
 
-            if (!type.IsRelation) continue;
+            if (!type.isRelation) continue;
 
             if (!_typesByRelationTarget.TryGetValue(type.Target, out var typeList))
             {

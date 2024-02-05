@@ -1,22 +1,27 @@
 // SPDX-License-Identifier: MIT
 
+// ReSharper disable MemberCanBePrivate.Global
 namespace fennecs;
 
-public class QueryBuilder(Archetypes archetypes)
+public class QueryBuilder
 {
-    internal readonly Archetypes Archetypes = archetypes;
+    internal readonly Archetypes Archetypes;
     protected readonly Mask Mask = MaskPool.Get();
 
+    internal QueryBuilder(Archetypes archetypes)
+    {
+        Archetypes = archetypes;
+    }
 
-    public QueryBuilder Has<T>(Identity target = default)
+    protected QueryBuilder Has<T>(Identity target = default)
     {
         var typeIndex = TypeExpression.Create<T>(target);
         Mask.Has(typeIndex);
         return this;
     }
 
-    
-    public QueryBuilder Has<T>(Type type)
+
+    protected QueryBuilder Has<T>(Type type)
     {
         var entity = Archetypes.GetTypeEntity(type);
         var typeIndex = TypeExpression.Create<T>(entity.Identity);
@@ -24,16 +29,16 @@ public class QueryBuilder(Archetypes archetypes)
         return this;
     }
 
-    
-    public QueryBuilder Not<T>(Identity target = default)
+
+    protected QueryBuilder Not<T>(Identity target = default)
     {
         var typeIndex = TypeExpression.Create<T>(target);
         Mask.Not(typeIndex);
         return this;
     }
 
-    
-    public QueryBuilder Not<T>(Type type)
+
+    protected QueryBuilder Not<T>(Type type)
     {
         var entity = Archetypes.GetTypeEntity(type);
         var typeIndex = TypeExpression.Create<T>(entity.Identity);
@@ -41,16 +46,16 @@ public class QueryBuilder(Archetypes archetypes)
         return this;
     }
 
-    
-    public QueryBuilder Any<T>(Identity target = default)
+
+    protected QueryBuilder Any<T>(Identity target = default)
     {
         var typeIndex = TypeExpression.Create<T>(target);
         Mask.Any(typeIndex);
         return this;
     }
 
-    
-    public QueryBuilder Any<T>(Type type)
+
+    protected QueryBuilder Any<T>(Type type)
     {
         var entity = Archetypes.GetTypeEntity(type);
         var typeIndex = TypeExpression.Create<T>(entity.Identity);
@@ -65,8 +70,8 @@ public sealed class QueryBuilder<C> : QueryBuilder
     private static readonly Func<Archetypes, Mask, List<Table>, Query> CreateQuery =
         (archetypes, mask, matchingTables) => new Query<C>(archetypes, mask, matchingTables);
 
-    
-    public QueryBuilder(Archetypes archetypes) : base(archetypes)
+
+    internal QueryBuilder(Archetypes archetypes) : base(archetypes)
     {
         Has<C>();
     }

@@ -5,32 +5,33 @@ using System.Runtime.InteropServices;
 
 namespace fennecs;
 
-public interface IRelationBacklink;
-
 [StructLayout(LayoutKind.Explicit)]
-internal readonly struct TypeId : IEquatable<TypeId>, IComparable<TypeId>
+public readonly struct TypeExpression : IEquatable<TypeExpression>, IComparable<TypeExpression>
 {
-    //    This is a 64 bit union struct.
+    //    This is a 128 bit union struct.
     //     Layout chart (little endian)
-    // | LSB                          MSB |
-    // | 64 bits                          |
-    // | Value                            |
-    // |-----------Equivalent-------------|
-    // | 48 bits             |  16 bits   |
-    // | Identity            | TypeNumber |
+    // | LSB                                       MSB |
+    // | 64 bits              |                64 bits |
+    // | Value                |                   Type |
+    // |-----------------------------------------------|
+    // | 48 bits       |  16 bits   |          64 bits |
+    // | Identity      | TypeNumber |             Type |
     
     [FieldOffset(0)] public readonly ulong Value;
     
     [FieldOffset(0)] public readonly Identity Target;
-    
-    [FieldOffset(6)] public readonly short TypeNumber;
+
+    [FieldOffset(6)] public readonly short TypeId;
+
+    [FieldOffset(8)] public readonly Type Type;
 
     public bool isRelation => Target != Identity.None;
-    public bool isBacklink => TypeNumber < 0;
+    public bool isBacklink => TypeId < 0;
 
-    public bool Matches(TypeId other)
+
+    public bool Matches(TypeExpression other)
     {
-        if (TypeNumber != other.TypeNumber) return false;
+        if (TypeId != other.TypeId) return false;
 
         // Most common case.
         if (Target == Identity.None) return other.Target == Identity.None;
@@ -45,19 +46,19 @@ internal readonly struct TypeId : IEquatable<TypeId>, IComparable<TypeId>
         return other.Target == Identity.Any;
     } 
 
-    public bool Equals(TypeId other) => Value == other.Value;
+    public bool Equals(TypeExpression other) => Value == other.Value;
 
-    public int CompareTo(TypeId other) => Value.CompareTo(other.Value);
+    public int CompareTo(TypeExpression other) => Value.CompareTo(other.Value);
 
     public override bool Equals(object? obj) => throw new InvalidCastException("Boxing Disallowed; use TypeId.Equals(TypeId) instead.");
 
-    public static TypeId Create<T>(Identity target = default) 
+    public static TypeExpression Create<T>(Identity target = default) 
     {
-        var typeNumber = typeof(IRelationBacklink).IsAssignableFrom(typeof(T)) 
+        var key = typeof(IRelationBacklink).IsAssignableFrom(typeof(T)) 
             ? (short) -LanguageTypeSource<T>.Id 
             : LanguageTypeSource<T>.Id;
         
-        return new TypeId(target, typeNumber);
+        return new TypeExpression(target, key, typeof(T));
     }
 
     public override int GetHashCode()
@@ -71,40 +72,42 @@ internal readonly struct TypeId : IEquatable<TypeId>, IComparable<TypeId>
     }
 
 
-    public static bool operator ==(TypeId left, TypeId right)
+    public static bool operator ==(TypeExpression left, TypeExpression right)
     {
         return left.Equals(right);
     }
 
 
-    public static bool operator !=(TypeId left, TypeId right)
+    public static bool operator !=(TypeExpression left, TypeExpression right)
     {
         return !(left == right);
     }
 
-    public static implicit operator ulong(TypeId self) => self.Value;
+    public static implicit operator ulong(TypeExpression self) => self.Value;
 
 
     [SetsRequiredMembers]
-    private TypeId(ulong value)
+    private TypeExpression(ulong value, Type type)
     {
         Value = value;
+        Type = type;
     }
 
     [SetsRequiredMembers]
-    private TypeId(Identity target, short typeNumber)
+    private TypeExpression(Identity target, short typeId, Type type)
     {
         Target = target;
-        TypeNumber = typeNumber;
+        TypeId = typeId;
+        Type = type;
     }
-
-    public static implicit operator TypeId(ulong other) => new(other);
 
     public override string ToString()
     {
-        return $"{TypeNumber:x4}/{Target} == {Value:x16}#{GetHashCode()}";
+        return $"{TypeId:x4}/{Target} == {Value:x16}#{GetHashCode()}";
     }
 }
+
+public interface IRelationBacklink;
 
 internal class TypeSource
 {
@@ -123,110 +126,5 @@ internal class LanguageTypeSource<T> : TypeSource
     {
         if (Counter >= short.MaxValue) throw new InvalidOperationException("Language Level TypeIds exhausted.");
         Id = ++Counter;
-    }
-}
-
-public readonly struct TypeExpression : IComparable<TypeExpression>, IEquatable<TypeExpression>
-{
-    public required Type Type { get; init; }
-    public required ulong Value { get; init; }
-    public required bool IsRelation { get; init; }
-
-    public ushort TypeId => TypeIdConverter.Type(Value);
-
-    public Identity Target => TypeIdConverter.Identity(Value);
-
-
-    public static TypeExpression Create<T>(Identity identity = default) => new()
-    {
-        Type = typeof(T),
-        Value = TypeIdConverter.Value<T>(identity),
-        IsRelation = identity.Id > 0,
-    };
-
-
-    public int CompareTo(TypeExpression other)
-    {
-        return Value.CompareTo(other.Value);
-    }
-
-
-    public override bool Equals(object? obj)
-    {
-        return obj is TypeExpression other && Value == other.Value;
-    }
-
-
-    public bool Equals(TypeExpression other)
-    {
-        return Value == other.Value;
-    }
-
-
-    public override int GetHashCode()
-    {
-        return Value.GetHashCode();
-    }
-
-
-    public override string ToString()
-    {
-        return IsRelation ? $"{GetHashCode()} {Type.Name}::{Target}" : $"{GetHashCode()} {Type.Name}";
-    }
-
-    public static bool operator ==(TypeExpression left, TypeExpression right) => left.Equals(right);
-    public static bool operator !=(TypeExpression left, TypeExpression right) => !left.Equals(right);
-
-    public static implicit operator TypeFamily(TypeExpression left)
-    {
-        return new TypeFamily {Type = left.Type};
-    }
-
-    public static implicit operator Type(TypeExpression left)
-    {
-        return left.Type;
-    }
-}
-
-public static class TypeIdConverter
-{
-    public static ulong Value<T>(Identity identity)
-    {
-        return TypeIdAssigner<T>.Id | (ulong) identity.Generation << 16 | (ulong) identity.Id << 32;
-    }
-
-
-    public static Identity Identity(ulong value)
-    {
-        return new Identity((int) (value >> 32), (ushort) (value >> 16));
-    }
-
-
-    public static ushort Type(ulong value)
-    {
-        return (ushort) value;
-    }
-
-    internal class TypeIdAssigner
-    {
-        protected static ushort Counter;
-    }
-
-    // ReSharper disable once UnusedTypeParameter
-    // ReSharper disable once ClassNeverInstantiated.Global
-    internal class TypeIdAssigner<T> : TypeIdAssigner
-    {
-        // ReSharper disable once StaticMemberInGenericType
-        public static readonly ushort Id;
-
-        static TypeIdAssigner()
-        {
-            if (Counter >= ushort.MaxValue)
-            {
-                throw new InvalidOperationException("TypeIds exhausted.");
-            }
-
-            Id = ++Counter;
-        }
     }
 }

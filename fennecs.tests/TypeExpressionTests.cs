@@ -33,7 +33,7 @@ public class TypeExpressionTests
     [Fact]
     public void TypeExpression_implicitly_decays_to_Type()
     {
-        var t1 = TypeExpression.Create<Type1>();
+        var t1 = TypeExpression.Create<Type1>().Type;
         var t2 = typeof(Type1);
         Assert.Equal(t2, t1);
         Assert.Equal(t1, t2);
