@@ -2,7 +2,7 @@
 
 namespace fennecs.tests;
 
-public class MaskTests(ITestOutputHelper output)
+public class MaskTests
 {
     [Fact]
     public void Masks_are_distinct_from_default()

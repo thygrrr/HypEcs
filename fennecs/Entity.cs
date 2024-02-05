@@ -41,6 +41,7 @@ public readonly struct EntityBuilder(World world, Entity entity)
 {
     public EntityBuilder Add<T>(Entity target = default) where T : struct
     {
+        if (target.Identity == Identity.Any) throw new InvalidOperationException("EntityBuilder: Cannot relate to Identity.Any.");
         world.AddComponent<T>(entity, target);
         return this;
     }
@@ -67,6 +68,8 @@ public readonly struct EntityBuilder(World world, Entity entity)
     
     public EntityBuilder Add<T>(T data, Entity target) where T : struct
     {
+        if (target.Identity == Identity.Any) throw new InvalidOperationException("EntityBuilder: Cannot relate to Identity.Any.");
+        
         world.AddComponent(entity, data, target);
         return this;
     }

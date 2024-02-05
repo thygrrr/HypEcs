@@ -10,22 +10,17 @@ public sealed class Mask : IEquatable<Mask>, IDisposable
     
     public void Has(TypeExpression type)
     {
-        if (type.Identity == Identity.None) throw new InvalidOperationException("Mask.Any: Can't have Identity.None as Has");
         HasTypes.Add(type);
     }
     
     public void Not(TypeExpression type)
     {
-        if (type.Identity == Identity.Any) throw new InvalidOperationException("Mask.Any: Can't have Identity.Any as Not");
-        if (type.Identity == Identity.None) throw new InvalidOperationException("Mask.Any: Can't have Identity.None as Not");
         NotTypes.Add(type);
     }
 
     
     public void Any(TypeExpression type)
     {
-        if (type.Identity == Identity.Any) throw new InvalidOperationException("Mask.Any: Can't have Identity.Any as Any");
-        if (type.Identity == Identity.None) throw new InvalidOperationException("Mask.Any: Can't have Identity.None as Any");
         AnyTypes.Add(type);
     }
 

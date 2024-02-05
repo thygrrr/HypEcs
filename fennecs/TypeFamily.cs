@@ -12,7 +12,7 @@ public readonly struct TypeFamily :
 
     public int CompareTo(TypeExpression other)
     {
-        return other.Type == Type ? 0 : -1;
+        return GetHashCode().CompareTo(other.Type.GetHashCode());
     }
 
     public bool Equals(TypeExpression other)
@@ -22,7 +22,7 @@ public readonly struct TypeFamily :
 
     public int CompareTo(TypeFamily other)
     {
-        return other.Type == Type ? 0 : -1;
+        return GetHashCode().CompareTo(other.GetHashCode());
     }
 
     public bool Equals(TypeFamily other)

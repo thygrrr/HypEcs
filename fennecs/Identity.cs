@@ -4,12 +4,14 @@ namespace fennecs;
 
 public readonly struct Identity(int id, ushort gen = 1) : IEquatable<Identity>
 {
-    public static readonly Identity None = new(0, 0);
-    public static readonly Identity Any = new(int.MaxValue, 0);
-
     public readonly int Id = id;
     public readonly ushort Generation = gen;
-
+    
+    public long Value => (uint) Id | (long) Generation << 32;
+    
+    public static readonly Identity None = new(0, 0);
+    public static readonly Identity Any = new(int.MaxValue, ushort.MaxValue);
+    
     public bool Equals(Identity other) => Id == other.Id && Generation == other.Generation;
     
     public override bool Equals(object? obj)
@@ -30,7 +32,10 @@ public readonly struct Identity(int id, ushort gen = 1) : IEquatable<Identity>
 
     public override string ToString()
     {
-        return $"{Id}:{Generation}";
+        if (Equals(None)) return $"\u25c7none";
+        if (Equals(Any)) return $"\u2bc1any";
+        
+        return $"\u2756{Id:x4}:{Generation:D5}";
     }
 
 
