@@ -137,6 +137,8 @@ internal class TypeRegistry
     protected static ushort Counter;
     protected static readonly Dictionary<ushort, Type> Types = new();
     protected static readonly Dictionary<Type, ushort> Ids = new();
+    
+    protected static readonly object RegistryLock = new();
 }
 
 // ReSharper disable once UnusedTypeParameter
@@ -147,7 +149,7 @@ internal class LanguageType<T> : TypeRegistry
     public static readonly ushort Id;
     static LanguageType()
     {
-        lock (typeof(TypeRegistry))
+        lock (RegistryLock)
         {
             if (Counter >= ushort.MaxValue) throw new InvalidOperationException("Language Level TypeIds exhausted.");
             Id = ++Counter;
