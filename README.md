@@ -29,7 +29,7 @@
 </table>
 
 ## Quickstart: Let's go!
-📦`>` `dotnet add package fennECS`
+📦`>` `dotnet add package fennecs`
 
 At the basic level, all you need is a 🧩**component type**, a number of ~~small foxes~~ 🦊**entities**, and a query to ⚙️**iterate and modify** components, occasionally passing in some uniform 💾**data**.
 
@@ -59,9 +59,12 @@ Even using the strictest judgment, that's no more than 2 lines of boilerplate! M
 The 💫*real magic*💫 is that none of this brevity compromises on performance.
 
 ## Features: What's in the box?
+
 **fennECS** is a tiny, tiny ECS with a focus on performance and simplicity. And it cares enough to provide a few things you might not expect. Our competition sure didn't.
 
+## Pile it on: Comparison Matrix
 
+![Multiple colorful anthro fennecs in pixel art](Documentation/Logos/fennecs-group.png)
 <details>
 
 <summary>🥇🥈🥉ECS Comparison Matrix<br/><b>Foxes are soft, choices are hard</b> - Unity dumb; .NET 8 really sharp.</summary>
