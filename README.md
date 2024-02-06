@@ -17,14 +17,14 @@
         <td>
             <h2>What the fox!? Another ECS?</h2>
             <p>We know... oh, <em>we know.</em> 😩️</p>  
-            <h2>But in a nutshell, <a href="https://fennecs.tech"><span style="font-family: serif; font-size: larger">fennecs</span></a> is...</h2>
+            <h2>But in a nutshell, <a href="https://fennecs.tech"><span style="font-size: larger">fennecs</span></a> is...</h2>
             <ul style="list-style-type: '🐾 ';">
                 <li>zero codegen</li>
                 <li>minimal boilerplate</li>
                 <li>archetype-based</li>
                 <li>intuitively relational</li>
                 <li>lithe and fast</li>
-            </ul><p><span style="font-family: serif; font-size: larger">fennecs</span> is a re-imagining of <a href="https://github.com/Byteron/HypEcs">RelEcs/HypEcs</a> which <em>feels just right<a href="#quickstart-lets-go">*</a></em> for high performance game development in any modern C# engine. Including, of course, the fantastic <a href="https://godotengine.org">Godot</a>.</p>
+            </ul><p><span style="font-size: larger">fennecs</span> is a re-imagining of <a href="https://github.com/Byteron/HypEcs">RelEcs/HypEcs</a> which <em>feels just right<a href="#quickstart-lets-go">*</a></em> for high performance game development in any modern C# engine. Including, of course, the fantastic <a href="https://godotengine.org">Godot</a>.</p>
         </td>
     </tr>
 </table>
