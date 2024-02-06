@@ -66,7 +66,8 @@ The 💫*real magic*💫 is that none of this brevity compromises on performance
 
 ## Pile it on: Comparison Matrix
 
-![Multiple colorful anthro fennecs in pixel art](Documentation/Logos/fennecs-group.png)
+<img src="Documentation/Logos/fennecs-group.png" width="768px" alt="Multiple colorful anthro fennecs in pixel art" />
+
 <details>
 
 <summary>🥇🥈🥉ECS Comparison Matrix<br/><b>Foxes are soft, choices are hard</b> - Unity dumb; .NET 8 really sharp.</summary>
