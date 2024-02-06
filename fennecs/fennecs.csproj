@@ -4,16 +4,19 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <PackageId>fennecs</PackageId>
-        <Version>0.1.0</Version>
-        <Title>fennECS</Title>
-        <Authors>Tiger Blue, Aaron Winter </Authors>
+        <Version>0.0.1-pre</Version>
+        <Title>fennecs</Title>
+        <Product>fennecs Entity Component System</Product>
+        <Authors>Moritz Voss, Aaron Winter</Authors>
+        <Company>tiger.blue</Company>
         <Description>The lightweight entity component system with an effective feature set for making games. </Description>
-        <Copyright>2024 Tiger Blue, 2022 Aaron Winter</Copyright>
-        <PackageProjectUrl>https://github.com/thygrrr/fennECS</PackageProjectUrl>
-        <PackageLicenseUrl>https://raw.githubusercontent.com/thygrrr/fennECS/main/LICENSE</PackageLicenseUrl>
-        <RepositoryUrl>https://github.com/thygrrr/fennECS</RepositoryUrl>
+        <Copyright>2024 Moritz Voss, 2022 Aaron Winter</Copyright>
+        <PackageProjectUrl>https://github.com/thygrrr/fennecs</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/thygrrr/fennecs</RepositoryUrl>
         <RepositoryType>Github</RepositoryType>
-        <PackageTags>ecs, gamedev</PackageTags>
+        <PackageReadmeFile>./overview.md</PackageReadmeFile>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageTags>ecs, gamedev, entity, entity component system, game, gamedev, game development, godot, dots, defaultecs, hypecs, relecs, entt, flecs</PackageTags>
         <TargetFramework>net8.0</TargetFramework>
     </PropertyGroup>
 
@@ -31,4 +34,7 @@
       </AssemblyAttribute>
     </ItemGroup>
 
+    <ItemGroup>
+        <None Include="../Documentation/overview.md" Pack="true" PackagePath="\"/>
+    </ItemGroup>
 </Project>

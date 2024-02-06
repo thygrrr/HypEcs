@@ -9,6 +9,7 @@
         <AssemblyName>Benchmark</AssemblyName>
         <Configurations>Release;Debug</Configurations>
         <Platforms>AnyCPU</Platforms>
+        <IsPackable>false</IsPackable>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
