@@ -151,7 +151,7 @@ public sealed class Archetypes
     }
 
 
-    public ref T GetComponent<T>(Identity identity, Identity target)
+    public ref T GetComponent<T>(Identity identity, Identity target = default)
     {
         AssertAlive(identity);
 
@@ -242,7 +242,7 @@ public sealed class Archetypes
         }
 
         var matchingTables = typeTables
-            .Where(table => IsMaskCompatibleWith(mask, table))
+            .Where(table => table.Matches(mask))
             .ToList();
 
         query = createQuery(this, mask, matchingTables);
@@ -251,8 +251,9 @@ public sealed class Archetypes
         return query;
     }
 
-
-    private bool IsMaskCompatibleWith(Mask mask, Table table)
+    /*
+     TODO: Remove this comment, function is now in Table and much simpler.
+    private bool IsMaskCompatibleWith_old(Mask mask, Table table)
     {
         var has = ListPool<TypeExpression>.Get();
         var not = ListPool<TypeExpression>.Get();
@@ -307,7 +308,7 @@ public sealed class Archetypes
 
         return matchesComponents && matchesRelation;
     }
-
+*/
 
     internal bool IsAlive(Identity identity)
     {
@@ -425,7 +426,7 @@ public sealed class Archetypes
             relationTypeSet.Add(type);
         }
 
-        foreach (var query in _queries.Values.Where(query => IsMaskCompatibleWith(query.Mask, table)))
+        foreach (var query in _queries.Values.Where(query => Matches(query.Mask, table)))
         {
             query.AddTable(table);
         }

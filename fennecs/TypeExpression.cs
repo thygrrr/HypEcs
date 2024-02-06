@@ -8,14 +8,14 @@ namespace fennecs;
 [StructLayout(LayoutKind.Explicit)]
 public readonly struct TypeExpression : IEquatable<TypeExpression>, IComparable<TypeExpression>
 {
-    //    This is a 128 bit union struct.
-    //     Layout chart (little endian)
-    // | LSB                                       MSB |
-    // | 64 bits              |                64 bits |
-    // | Value                |                   Type |
-    // |-----------------------------------------------|
-    // | 48 bits       |  16 bits   |          64 bits |
-    // | Identity      | TypeNumber |             Type |
+    //            This is a 128 bit union struct.
+    //             Layout chart (little endian)
+    //   | LSB                                       MSB |
+    //   | Value                |            System.Type |
+    //   | 64 bits              |                64 bits |
+    //   |-----------------------------------------------|
+    //   | Identity      | TypeNumber |      System.Type |
+    //   | 48 bits       |  16 bits   |          64 bits |
     
     [FieldOffset(0)] public readonly ulong Value;
     
@@ -29,8 +29,15 @@ public readonly struct TypeExpression : IEquatable<TypeExpression>, IComparable<
     public bool isBacklink => TypeId < 0;
 
 
+    public bool Matches(IEnumerable<TypeExpression> other)
+    {
+        var self = this;
+        return other.Any(type => self.Matches(type));
+    }
+    
     public bool Matches(TypeExpression other)
     {
+        // Reject if Type completely incompatible 
         if (TypeId != other.TypeId) return false;
 
         // Most common case.
@@ -87,13 +94,6 @@ public readonly struct TypeExpression : IEquatable<TypeExpression>, IComparable<
 
 
     [SetsRequiredMembers]
-    private TypeExpression(ulong value, Type type)
-    {
-        Value = value;
-        Type = type;
-    }
-
-    [SetsRequiredMembers]
     private TypeExpression(Identity target, short typeId, Type type)
     {
         Target = target;
@@ -103,7 +103,7 @@ public readonly struct TypeExpression : IEquatable<TypeExpression>, IComparable<
 
     public override string ToString()
     {
-        return $"{TypeId:x4}/{Target} == {Value:x16}#{GetHashCode()}";
+        return $"{TypeId:x4}/{Target} {Type.Name}";
     }
 }
 

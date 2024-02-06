@@ -57,6 +57,17 @@ public sealed class Table
     }
 
     
+    internal bool Matches(Mask mask)
+    {
+        var matchesHas = mask.HasTypes.All(t => t.Matches(Types));
+        var matchesNot = !mask.NotTypes.Any(t => t.Matches(Types));
+        var matchesAny = mask.AnyTypes.Count == 0;
+        matchesAny |= mask.AnyTypes.Any(t => t.Matches(Types));
+
+        return matchesHas && matchesAny && matchesNot;
+    }
+
+    
     public int Add(Identity identity)
     {
         EnsureCapacity(Count + 1);

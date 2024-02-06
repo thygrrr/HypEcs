@@ -42,17 +42,22 @@ public sealed class World : IDisposable
         return _archetypes.IsAlive(entity.Identity);
     }
 
-    
+
     public ref T GetComponent<T>(Entity entity) where T : struct
     {
-        return ref _archetypes.GetComponent<T>(entity.Identity, Identity.None);
+        return ref _archetypes.GetComponent<T>(entity);
+    }
+
+    public ref T GetComponent<T>(Entity entity, Identity target) where T : struct
+    {
+        return ref _archetypes.GetComponent<T>(entity, target);
     }
 
     
     public bool HasComponent<T>(Entity entity) where T : struct
     {
         var type = TypeExpression.Create<T>(Identity.None);
-        return _archetypes.HasComponent(type, entity.Identity);
+        return _archetypes.HasComponent(type, entity);
     }
 
     
