@@ -59,12 +59,19 @@ public sealed class Table
     
     internal bool Matches(Mask mask)
     {
-        var matchesHas = mask.HasTypes.All(t => t.Matches(Types));
+        //Not overrides both Any and Has.
         var matchesNot = !mask.NotTypes.Any(t => t.Matches(Types));
+        if (!matchesNot) return false;
+        
+        //If already matching, no need to check any further. 
+        var matchesHas = mask.HasTypes.All(t => t.Matches(Types));
+        if (!matchesHas) return false;
+        
+        //Short circuit to avoid enumerating all AnyTypes if already matching; or if none present.
         var matchesAny = mask.AnyTypes.Count == 0;
         matchesAny |= mask.AnyTypes.Any(t => t.Matches(Types));
 
-        return matchesHas && matchesAny && matchesNot;
+        return matchesHas && matchesNot && matchesAny;
     }
 
     

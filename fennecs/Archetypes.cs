@@ -426,7 +426,7 @@ public sealed class Archetypes
             relationTypeSet.Add(type);
         }
 
-        foreach (var query in _queries.Values.Where(query => Matches(query.Mask, table)))
+        foreach (var query in _queries.Values.Where(query => table.Matches(query.Mask)))
         {
             query.AddTable(table);
         }
