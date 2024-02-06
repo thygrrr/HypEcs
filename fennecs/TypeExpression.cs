@@ -147,9 +147,12 @@ internal class LanguageType<T> : TypeRegistry
     public static readonly ushort Id;
     static LanguageType()
     {
-        if (Counter >= ushort.MaxValue) throw new InvalidOperationException("Language Level TypeIds exhausted.");
-        Id = ++Counter;
-        Types.Add(Id, typeof(T));
-        Ids.Add(typeof(T), Id);
+        lock (typeof(TypeRegistry))
+        {
+            if (Counter >= ushort.MaxValue) throw new InvalidOperationException("Language Level TypeIds exhausted.");
+            Id = ++Counter;
+            Types.Add(Id, typeof(T));
+            Ids.Add(typeof(T), Id);
+        }
     }
 }
