@@ -21,8 +21,8 @@ jobs:
       with:
         dotnet-version: 8.0.x
     - name: Restore dependencies
-      run: dotnet restore xTests/xTests.csproj
+      run: dotnet restore fennecs.tests/fennecs.tests.csproj
     - name: Build
-      run: dotnet build --no-restore xTests/xTests.csproj
+      run: dotnet build --no-restore fennecs.tests/fennecs.tests.csproj
     - name: Test
-      run: dotnet test --no-build --verbosity normal xTests/xTests.csproj
+      run: dotnet test --no-build --verbosity normal fennecs.tests/fennecs.tests.csproj

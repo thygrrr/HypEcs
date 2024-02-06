@@ -6,7 +6,7 @@
 <table style="border: none; border-collapse: collapse; width: 90%">
     <tr>
         <td>
-            <img src="Documentation/Logos/fennecs-640.png" alt="a box of fennecs, 8-color pixel art" style="min-width: 320px"/>
+            <img src="Documentation/Logos/fennecs.png" alt="a box of fennecs, 8-color pixel art" style="min-width: 320px"/>
             <p>
                 <img alt="GitHub top language" src="https://img.shields.io/github/languages/top/thygrrr/fennECS">
                 <a href="https://github.com/thygrrr/fennECS?tab=MIT-1-ov-file#readme"><img alt="License: MIT" src="https://img.shields.io/github/license/thygrrr/fennECS?color=blue"></a>
@@ -24,7 +24,7 @@
                 <li>archetype-based</li>
                 <li>intuitively relational</li>
                 <li>lithe and fast</li>
-            </ul><p><span style="font-size: larger">fennecs</span> is a re-imagining of <a href="https://github.com/Byteron/HypEcs">RelEcs/HypEcs</a> which <em>feels just right<a href="#quickstart-lets-go">*</a></em> for high performance game development in any modern C# engine. Including, of course, the fantastic <a href="https://godotengine.org">Godot</a>.</p>
+            </ul><p><b>fennecs</b> is a re-imagining of <a href="https://github.com/Byteron/HypEcs">RelEcs/HypEcs</a> which <em>feels just right<a href="#quickstart-lets-go">*</a></em> for high performance game development in any modern C# engine. Including, of course, the fantastic <a href="https://godotengine.org">Godot</a>.</p>
         </td>
     </tr>
 </table>
