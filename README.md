@@ -1,18 +1,10 @@
+### ... the tiny, tiny, high-energy Entity Component System!
 
-# 🚧 Repo, Code, and Docs under construction 🚧
 
-## ... the tiny, tiny, high-energy Entity Component System!
-
-<table style="border: none; border-collapse: collapse; width: 90%">
+<table style="border: none; border-collapse: collapse; width: 80%">
     <tr>
-        <td>
+        <td style="width: fit-content">
             <img src="Documentation/Logos/fennecs.png" alt="a box of fennecs, 8-color pixel art" style="min-width: 320px"/>
-            <p style="justify-content: center">
-                <img alt="GitHub top language" src="https://img.shields.io/github/languages/top/thygrrr/fennECS">
-                <a href="https://github.com/thygrrr/fennECS/issues"><img alt="Open issues" src="https://img.shields.io/github/issues-raw/thygrrr/fennECS"></a>
-                <a href="https://github.com/thygrrr/fennECS?tab=MIT-1-ov-file#readme"><img alt="License: MIT" src="https://img.shields.io/github/license/thygrrr/fennECS?color=blue"></a>
-                <a href="https://github.com/thygrrr/fennECS/actions"><img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/thygrrr/fennECS/xUnit.yml"></a>
-            </p>
         </td>
         <td>
             <h2>What the fox!? Another ECS?</h2>
@@ -29,6 +21,11 @@
             </ul>
         </td>
     </tr>
+<tr><td><sub>recommended by 10 out of 10 fennecs</sub></td><td><img alt="GitHub top language" src="https://img.shields.io/github/languages/top/thygrrr/fennECS">
+<a href="https://github.com/thygrrr/fennECS?tab=MIT-1-ov-file#readme"><img alt="License: MIT" src="https://img.shields.io/github/license/thygrrr/fennECS?color=blue"></a>
+<a href="https://github.com/thygrrr/fennECS/issues"><img alt="Open issues" src="https://img.shields.io/github/issues-raw/thygrrr/fennECS"></a>
+<a href="https://github.com/thygrrr/fennECS/actions"><img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/thygrrr/fennECS/xUnit.yml"></a>
+</td></tr>
 </table>
 
 ## Quickstart: Let's go!
