@@ -9,13 +9,15 @@ public readonly struct Entity(Identity identity)
 
     internal Identity Identity { get; } = identity;
 
+    public bool IsType => Identity.IsType();
 
     public override bool Equals(object? obj)
     {
         return obj is Entity entity && Identity.Equals(entity.Identity);
     }
 
-    
+    public Type Type => Identity.Type;
+
     public override int GetHashCode()
     {
         return Identity.GetHashCode();
@@ -24,7 +26,7 @@ public readonly struct Entity(Identity identity)
     
     public override string ToString()
     {
-        return $"🧩{Identity}";
+        return Identity.ToString();
     }
 
     public static implicit operator Identity(Entity left) => left.Identity;

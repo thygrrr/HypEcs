@@ -13,11 +13,13 @@ public class TypeIdTests
     private struct Type3Backlink : IRelationBacklink;
 
     [Fact]
-    public void BackLink_declarable()
+    public void BackLink_Correctly_Declarable()
     {
-        var id = TypeExpression.Create<Type3Backlink>(new Identity(1234));
-        Assert.True(id.TypeId < 0);
-        Assert.True(id.isBacklink);
+        var id1 = TypeExpression.Create<Type3Backlink>(new Identity(1234));
+        Assert.True(id1.isBacklink);
+        
+        var id2 = TypeExpression.Create<Type2>(new Identity(1234));
+        Assert.False(id2.isBacklink);
     }
 
     [Fact]
@@ -29,9 +31,9 @@ public class TypeIdTests
     }
 
     [Fact]
-    public void TypeId_is_128_bits()
+    public void TypeId_is_64_bits()
     {
-        Assert.Equal(128 / 8, Marshal.SizeOf<TypeExpression>());
+        Assert.Equal(64 / 8, Marshal.SizeOf<TypeExpression>());
     }
 
     [Fact]
@@ -93,36 +95,36 @@ public class TypeIdTests
     public void TypeAssigner_Id_Unique()
     {
         Assert.NotEqual(
-            LanguageTypeSource<int>.Id,
-            LanguageTypeSource<string>.Id);
+            LanguageType<int>.Id,
+            LanguageType<string>.Id);
 
         Assert.NotEqual(
-            LanguageTypeSource<ushort>.Id,
-            LanguageTypeSource<short>.Id);
+            LanguageType<ushort>.Id,
+            LanguageType<short>.Id);
 
         Assert.NotEqual(
-            LanguageTypeSource<Type1>.Id,
-            LanguageTypeSource<Type2>.Id);
+            LanguageType<Type1>.Id,
+            LanguageType<Type2>.Id);
     }
 
     [Fact]
     public void TypeAssigner_Id_Same_For_Same_Type()
     {
         Assert.Equal(
-            LanguageTypeSource<int>.Id,
-            LanguageTypeSource<int>.Id);
+            LanguageType<int>.Id,
+            LanguageType<int>.Id);
 
         Assert.Equal(
-            LanguageTypeSource<Type1>.Id,
-            LanguageTypeSource<Type1>.Id);
+            LanguageType<Type1>.Id,
+            LanguageType<Type1>.Id);
 
         Assert.Equal(
-            LanguageTypeSource<Type2>.Id,
-            LanguageTypeSource<Type2>.Id);
+            LanguageType<Type2>.Id,
+            LanguageType<Type2>.Id);
 
         Assert.Equal(
-            LanguageTypeSource<Dictionary<string, string>>.Id,
-            LanguageTypeSource<Dictionary<string, string>>.Id);
+            LanguageType<Dictionary<string, string>>.Id,
+            LanguageType<Dictionary<string, string>>.Id);
     }
 
     [Fact]

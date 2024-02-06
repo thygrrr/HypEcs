@@ -23,7 +23,7 @@ public sealed class Archetypes
     private readonly Dictionary<Type, Entity> _typeEntities = new();
     private readonly Dictionary<TypeExpression, List<Table>> _tablesByType = new();
     private readonly Dictionary<Identity, HashSet<TypeExpression>> _typesByRelationTarget = new();
-    private readonly Dictionary<short, HashSet<Entity>> _targetsByRelationType = new();
+    private readonly Dictionary<ushort, HashSet<Entity>> _targetsByRelationType = new();
     private readonly Dictionary<int, HashSet<TypeExpression>> _relationsByTypes = new();
 
     private readonly object _modeChangeLock = new();
@@ -38,8 +38,8 @@ public sealed class Archetypes
 
 
     private readonly object _spawnLock = new();
-    
-    public Entity Spawn()
+
+    public Entity Spawn(Type? type = default)
     {
         lock (_spawnLock)
         {
@@ -47,7 +47,14 @@ public sealed class Archetypes
             {
                 identity = new Identity(++_entityCount);
             }
-            
+
+            //Rebuild entity if it's a type entity
+            if (type != null)
+            {
+                //TODO: Unify this with the TypeId system
+                //identity = new Identity(identity.Id, TypeRegistry.Resolve(type));
+            }
+
             var row = entityRoot.Add(identity);
 
             if (_meta.Length == _entityCount) Array.Resize(ref _meta, _entityCount * 2);
@@ -80,7 +87,7 @@ public sealed class Archetypes
         table.Remove(meta.Row);
         meta.Clear();
 
-        _unusedIds.Add(new Identity(identity.Id, (ushort) (identity.Generation + 1)));
+        _unusedIds.Add(identity.Successor);
 
 
         // Find entity-entity relation reverse lookup (if applicable)
@@ -437,11 +444,10 @@ public sealed class Archetypes
 
     internal Entity GetTypeEntity(Type type)
     {
-        if (!_typeEntities.TryGetValue(type, out var entity))
-        {
-            entity = Spawn();
-            _typeEntities.Add(type, entity);
-        }
+        if (_typeEntities.TryGetValue(type, out var entity)) return entity;
+        
+        entity = Spawn();
+        _typeEntities.Add(type, entity);
 
         return entity;
     }

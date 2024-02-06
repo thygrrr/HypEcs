@@ -7,7 +7,7 @@ public class TypeExpressionTests
     private struct Type1;
 
     [Fact]
-    public void TypeExpression_is_Comparable()
+    public void Id_is_Comparable()
     {
         var t1 = TypeExpression.Create<Type1>();
         var t2 = TypeExpression.Create<Type1>();
@@ -15,7 +15,7 @@ public class TypeExpressionTests
     }
 
     [Fact]
-    public void TypeExpression_is_Comparable_for_BaseTypes()
+    public void Id_is_Comparable_for_BaseTypes()
     {
         var t1 = TypeExpression.Create<double>();
         var t2 = TypeExpression.Create<double>();
@@ -23,7 +23,7 @@ public class TypeExpressionTests
     }
 
     [Fact]
-    public void TypeExpression_is_Distinct()
+    public void Id_is_Distinct()
     {
         var t1 = TypeExpression.Create<int>();
         var t2 = TypeExpression.Create<ushort>();
@@ -31,7 +31,7 @@ public class TypeExpressionTests
     }
     
     [Fact]
-    public void TypeExpression_implicitly_decays_to_Type()
+    public void Id_implicitly_decays_to_Type()
     {
         var t1 = TypeExpression.Create<Type1>().Type;
         var t2 = typeof(Type1);

@@ -8,27 +8,51 @@ namespace fennecs;
 [StructLayout(LayoutKind.Explicit)]
 public readonly struct TypeExpression : IEquatable<TypeExpression>, IComparable<TypeExpression>
 {
-    //            This is a 128 bit union struct.
-    //             Layout chart (little endian)
-    //   | LSB                                       MSB |
-    //   | Value                |            System.Type |
-    //   | 64 bits              |                64 bits |
-    //   |-----------------------------------------------|
-    //   | Identity      | TypeNumber |      System.Type |
-    //   | 48 bits       |  16 bits   |          64 bits |
+    //             This is a 64 bit union struct.
+    //                 Layout: (little endian)
+    //   | LSB                                   MSB |
+    //   |-------------------------------------------|
+    //   | Value                                     |
+    //   | 64 bits                                   |
+    //   |-------------------------------------------|
+    //   | Id              | Generation | TypeNumber |
+    //   | 32 bits         |  16 bits   |  16 bits   |
+    //   |-------------------------------------------|
+    //   | Identity                     | TypeNumber |
+    //   | 48 bits                      |  16 bits   |
     
+    //Union Backing Store
     [FieldOffset(0)] public readonly ulong Value;
+
+    //Identity Components
+    [FieldOffset(0)] public readonly int Id;
+    [FieldOffset(4)] public readonly ushort Generation;
+    [FieldOffset(6)] public readonly ushort TypeId;
+
+    public Identity Target => new(Value);
+
+    private struct Any;
+    private struct None;
     
-    [FieldOffset(0)] public readonly Identity Target;
+    public bool isRelation => TypeId != 0 && Target != Identity.None;
+    public bool isBacklink => typeof(IRelationBacklink).IsAssignableFrom(Type);
+    public bool isEntity => TypeId == 0;
 
-    [FieldOffset(6)] public readonly short TypeId;
-
-    [FieldOffset(8)] public readonly Type Type;
-
-    public bool isRelation => Target != Identity.None;
-    public bool isBacklink => TypeId < 0;
-
-
+    public Type Type
+    {
+        get
+        {
+            return (TypeId, Id) switch
+            {
+                (0, int.MaxValue) => typeof(Any),
+                (0, 0) => typeof(None),
+                (0, _) => typeof(Entity),
+                _ => TypeRegistry.Resolve(TypeId),
+            };
+        }
+    }
+    
+    
     public bool Matches(IEnumerable<TypeExpression> other)
     {
         var self = this;
@@ -61,11 +85,7 @@ public readonly struct TypeExpression : IEquatable<TypeExpression>, IComparable<
 
     public static TypeExpression Create<T>(Identity target = default) 
     {
-        var key = typeof(IRelationBacklink).IsAssignableFrom(typeof(T)) 
-            ? (short) -LanguageTypeSource<T>.Id 
-            : LanguageTypeSource<T>.Id;
-        
-        return new TypeExpression(target, key, typeof(T));
+        return new TypeExpression(target, LanguageType<T>.Id);
     }
 
     public override int GetHashCode()
@@ -94,37 +114,42 @@ public readonly struct TypeExpression : IEquatable<TypeExpression>, IComparable<
 
 
     [SetsRequiredMembers]
-    private TypeExpression(Identity target, short typeId, Type type)
+    private TypeExpression(Identity target, ushort typeId)
     {
-        Target = target;
+        Value = target.Value;
         TypeId = typeId;
-        Type = type;
     }
 
     public override string ToString()
     {
-        return $"{TypeId:x4}/{Target} {Type.Name}";
+        return $"{TypeId:x4}/{Target} {TypeRegistry.Resolve(TypeId).Name}";
     }
 }
 
 public interface IRelationBacklink;
 
-internal class TypeSource
+internal class TypeRegistry
 {
+    protected internal static Type Resolve(ushort id) => Types[id];
+    protected internal static ushort Resolve(Type type) => Ids[type];
+    
     // ReSharper disable once StaticMemberInGenericType
-    protected static short Counter;
+    protected static ushort Counter;
+    protected static readonly Dictionary<ushort, Type> Types = new();
+    protected static readonly Dictionary<Type, ushort> Ids = new();
 }
 
 // ReSharper disable once UnusedTypeParameter
 // ReSharper disable once ClassNeverInstantiated.Global
-internal class LanguageTypeSource<T> : TypeSource
+internal class LanguageType<T> : TypeRegistry
 {
     // ReSharper disable once StaticMemberInGenericType
-    public static readonly short Id;
-
-    static LanguageTypeSource()
+    public static readonly ushort Id;
+    static LanguageType()
     {
-        if (Counter >= short.MaxValue) throw new InvalidOperationException("Language Level TypeIds exhausted.");
+        if (Counter >= ushort.MaxValue) throw new InvalidOperationException("Language Level TypeIds exhausted.");
         Id = ++Counter;
+        Types.Add(Id, typeof(T));
+        Ids.Add(typeof(T), Id);
     }
 }

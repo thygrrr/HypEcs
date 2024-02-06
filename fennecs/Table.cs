@@ -120,7 +120,7 @@ public sealed class Table
     
     public T[] GetStorage<T>(Identity target)
     {
-        var type = TypeExpression.Create<T>(target);
+        var type = fennecs.TypeExpression.Create<T>(target);
         return (T[])GetStorage(type);
     }
 
