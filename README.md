@@ -66,7 +66,7 @@ The 💫*real magic*💫 is that none of this brevity compromises on performance
 
 ## Pile it on: Comparison Matrix
 
-<img src="Documentation/Logos/fennecs-group.png" width="768px" alt="Multiple colorful anthro fennecs in pixel art" />
+<!--<img src="Documentation/Logos/fennecs-group.png" width="768px" alt="Multiple colorful anthro fennecs in pixel art" />-->
 
 <details>
 
