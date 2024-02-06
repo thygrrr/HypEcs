@@ -21,7 +21,7 @@
             which <em>feels just right<a href="#quickstart-lets-go">*</a></em> for high performance game development in any modern C# engine. Including, of course, the fantastic <a href="https://godotengine.org">Godot</a>.</p>
         </td>
     </tr>
-<tr><td><sub>recommended by 10/10 fennecs</sub></td><td><img alt="GitHub top language" src="https://img.shields.io/github/languages/top/thygrrr/fennECS">
+<tr><td><i>9/10 fennecs recommend fennecs!</i></td><td><img alt="GitHub top language" src="https://img.shields.io/github/languages/top/thygrrr/fennECS">
 <a href="https://github.com/thygrrr/fennECS?tab=MIT-1-ov-file#readme"><img alt="License: MIT" src="https://img.shields.io/github/license/thygrrr/fennECS?color=blue"></a>
 <a href="https://github.com/thygrrr/fennECS/issues"><img alt="Open issues" src="https://img.shields.io/github/issues-raw/thygrrr/fennECS"></a>
 <a href="https://github.com/thygrrr/fennECS/actions"><img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/thygrrr/fennECS/xUnit.yml"></a>
