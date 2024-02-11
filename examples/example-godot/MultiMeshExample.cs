@@ -6,7 +6,8 @@ namespace examples.godot;
 
 public partial class MultiMeshExample : MultiMeshInstance3D
 {
-	private const int EntityCount = 40_000;
+	[Export]
+	public int EntityCount = 40_000;
 	private readonly Vector3 _amplitude = new(200f, 70f, 200f);
 	private const float TimeScale = 0.05f;
 	
