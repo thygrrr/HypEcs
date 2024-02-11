@@ -1,17 +1,17 @@
 using System;
-using Godot;
 using fennecs;
+using Godot;
 
-namespace Examples;
+namespace examples.godot;
 
 public partial class MultiMeshExample : MultiMeshInstance3D
 {
-	private const int EntityCount = 20_000;
+	private const int EntityCount = 40_000;
 	private readonly Vector3 _amplitude = new(200f, 70f, 200f);
 	private const float TimeScale = 0.05f;
 	
-	private readonly World _world = new World();
-	private double _time = 0;
+	private readonly World _world = new();
+	private double _time;
 	 
 	public override void _Ready()
 	{
@@ -43,8 +43,8 @@ public partial class MultiMeshExample : MultiMeshInstance3D
 			var phase3 = index * 3.14f / 370f;
 
 			var scale1 = 3f;
-			var scale2 = 7f;
-			var scale3 = 9f;
+			var scale2 = 5f;
+			var scale3 = 4f;
 			
 			var vector = new Vector3{
 				X = (float)Math.Sin(phase1 + _time * scale1), 
