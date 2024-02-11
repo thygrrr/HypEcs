@@ -8,7 +8,7 @@ public partial class MultiMeshExample : MultiMeshInstance3D
 {
 	[Export]
 	public int EntityCount = 40_000;
-	private readonly Vector3 _amplitude = new(200f, 70f, 200f);
+	private readonly Vector3 _amplitude = new(120f, 90f, 120f);
 	private const float TimeScale = 0.05f;
 	
 	private readonly World _world = new();

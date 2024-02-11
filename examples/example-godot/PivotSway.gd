@@ -7,11 +7,19 @@ func coroutine():
 		tween = create_tween()
 		tween.set_ease(Tween.EASE_IN_OUT)
 		tween.set_trans(Tween.TRANS_QUART)
-		tween.tween_property(self, "global_rotation_degrees", 
+		tween.parallel().tween_property(self, "global_rotation_degrees", 
 		Vector3(
 			randf_range(-180, 180),
 			randf_range(-180, 180),
 			randf_range(-180, 180))
+		, 7)
+		tween.set_ease(Tween.EASE_IN_OUT)
+		tween.set_trans(Tween.TRANS_BACK)
+		tween.parallel().tween_property(self, "global_scale", 
+		Vector3(
+			randf_range(0.2, 1.2),
+			randf_range(0.2, 1.2),
+			randf_range(0.2, 1.2))
 		, 7)
 		await tween.finished
 		
