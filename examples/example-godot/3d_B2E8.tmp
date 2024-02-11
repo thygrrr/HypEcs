@@ -45,12 +45,12 @@ script = ExtResource("2_jkm84")
 
 [node name="Button" type="Button" parent="Control/VBoxContainer"]
 layout_mode = 2
-text = "add 1000  entities"
+text = "add 5k entities"
 
 [node name="Camera Pivot" type="Node3D" parent="."]
 script = ExtResource("3_eq74q")
 
 [node name="Camera3D" type="Camera3D" parent="Camera Pivot"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 500)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
 [connection signal="pressed" from="Control/VBoxContainer/Button" to="ECS" method="_on_button_pressed"]

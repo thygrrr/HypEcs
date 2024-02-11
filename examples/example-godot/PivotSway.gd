@@ -15,11 +15,9 @@ func coroutine():
 		, 7)
 		tween.set_ease(Tween.EASE_IN_OUT)
 		tween.set_trans(Tween.TRANS_BACK)
-		tween.parallel().tween_property(self, "global_scale", 
+		tween.parallel().tween_property($Camera3D, "position", 
 		Vector3(
-			randf_range(0.2, 1.2),
-			randf_range(0.2, 1.2),
-			randf_range(0.2, 1.2))
+			randf_range(-50, 50), randf_range(-50, 50), randf_range(100, 400))
 		, 7)
 		await tween.finished
 		
