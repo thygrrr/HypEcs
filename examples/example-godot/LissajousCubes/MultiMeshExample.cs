@@ -2,7 +2,7 @@ using System;
 using fennecs;
 using Godot;
 
-namespace examples.godot;
+namespace examples.godot.LissajousCubes;
 
 
 
