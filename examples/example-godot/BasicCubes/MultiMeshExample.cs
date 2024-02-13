@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Runtime.InteropServices;
 using fennecs;
 using Godot;
@@ -23,22 +24,6 @@ public struct Matrix4X3
 	public float M21;
 	public float M22;
 	public float M23;
-
-	public Matrix4X3(float m00, float m01, float m02, float m03, float m10, float m11, float m12, float m13, float m20, float m21, float m22, float m23)
-	{
-		M00 = m00;
-		M01 = m01;
-		M02 = m02;
-		M03 = m03;
-		M10 = m10;
-		M11 = m11;
-		M12 = m12;
-		M13 = m13;
-		M20 = m20;
-		M21 = m21;
-		M22 = m22;
-		M23 = m23;
-	}
 
 	public Matrix4X3()
 	{
@@ -72,6 +57,22 @@ public struct Matrix4X3
 		M23 = origin.Z;
 	}
 
+	public Matrix4X3(Vector3 bX, Vector3 bY, Vector3 bZ, Vector3 origin)
+	{
+		M00 = bX.X;
+		M01 = bX.Y;
+		M02 = bX.Z;
+		M03 = origin.X;
+		M10 = bY.X;
+		M11 = bY.Y;
+		M12 = bY.Z;
+		M13 = origin.Y;
+		M20 = bZ.X;
+		M21 = bZ.Y;
+		M22 = bZ.Z;
+		M23 = origin.Z;
+	}
+
 	public override string ToString()
 	{
 		return $"Matrix4X3({M00}, {M01}, {M02}, {M03}, {M10}, {M11}, {M12}, {M13}, {M20}, {M21}, {M22}, {M23})";
@@ -82,12 +83,14 @@ public struct Matrix4X3
 [GlobalClass]
 public partial class MultiMeshExample : Node
 {
+	private ArrayPool<float> _arrayPool = ArrayPool<float>.Create();
+	
 	[Export] public int SpawnCount = 10_000;
 	[Export] public MultiMeshInstance3D MeshInstance;
 	public int InstanceCount => MeshInstance.Multimesh.InstanceCount;
 
 	private readonly Vector3 _amplitude = new(120f, 90f, 120f);
-	private const float TimeScale = 0.003f;
+	private const float TimeScale = 0.001f;
 
 	private readonly World _world = new();
 	private double _time;
@@ -117,6 +120,8 @@ public partial class MultiMeshExample : Node
 		SpawnWave(SpawnCount * 5);
 	}
 
+	private float[] submissionArray = Array.Empty<float>();
+	
 	public override void _Process(double delta)
 	{
 		var query = _world.Query<int, Matrix4X3>().Build();
@@ -150,18 +155,25 @@ public partial class MultiMeshExample : Node
 				Y = (float)Math.Sin(value2 + _time * scale2),
 				Z = (float)Math.Sin(value3 + _time * scale3),
 			};
-			
+
 			transform = new Matrix4X3(vector * _amplitude);
 		}, chunkSize: 4096);
-
+		
 		// Write transforms into Multimesh
 		query.Run((_, transforms) =>
 		{
-			unsafe
-			{
-				var floatSpan = MemoryMarshal.Cast<Matrix4X3, float>(transforms)[..(transforms.Length * sizeof(Matrix4X3) / sizeof(float))];
-				RenderingServer.MultimeshSetBuffer(MeshInstance.Multimesh.GetRid(), floatSpan.ToArray());
-			}
+			var floatSpan = MemoryMarshal.Cast<Matrix4X3, float>(transforms);
+			
+			// The .ToArray is a very expensive allocation; waiting for Godot to expose the Span<float> overloads.
+			// RenderingServer.MultimeshSetBuffer(MeshInstance.Multimesh.GetRid(), floatSpan.ToArray());
+			
+			// Ideal way:
+			// RenderingServer.MultimeshSetBuffer(MeshInstance.Multimesh.GetRid(), floatSpan);
+			
+			//Instead, we must copy the data manually once, into a pooled array.
+			if (submissionArray.Length != floatSpan.Length) Array.Resize(ref submissionArray, floatSpan.Length);
+			floatSpan.CopyTo(submissionArray);
+			RenderingServer.MultimeshSetBuffer(MeshInstance.Multimesh.GetRid(), submissionArray);
 		});
 	}
 

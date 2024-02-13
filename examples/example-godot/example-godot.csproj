@@ -8,6 +8,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\fennecs\fennecs.csproj" />
+    <ProjectReference Include="..\..\fennecs\fennecs.csproj"/>
+    <ProjectReference Include="P:\godot\modules\mono\glue\GodotSharp\GodotSharp\GodotSharp.csproj"/>
   </ItemGroup>
 </Project>

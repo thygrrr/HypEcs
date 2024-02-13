@@ -10,6 +10,7 @@
         <Configurations>Release;Debug</Configurations>
         <Platforms>AnyCPU</Platforms>
         <IsPackable>false</IsPackable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">

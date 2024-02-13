@@ -12,4 +12,5 @@ func _ready():
 func _process(delta):
 	if (delta > 0):
 		smoothed = smoothed * 0.95 + 0.05 * delta
-		self.text = "%d fps" % (1.0 / smoothed) + "\n" + "%d entities" % ECS.InstanceCount
+		var fps := roundi(1.0 / smoothed)
+		self.text = "%d fps" % fps + "\n" + "%d entities" % ECS.InstanceCount
