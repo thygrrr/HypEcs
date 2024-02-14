@@ -1,5 +1,4 @@
 using System;
-using System.Buffers;
 using System.Runtime.InteropServices;
 using fennecs;
 using Godot;
@@ -83,11 +82,10 @@ public struct Matrix4X3
 [GlobalClass]
 public partial class MultiMeshExample : Node
 {
-	private ArrayPool<float> _arrayPool = ArrayPool<float>.Create();
-	
 	[Export] public int SpawnCount = 10_000;
 	[Export] public MultiMeshInstance3D MeshInstance;
-	public int InstanceCount => MeshInstance.Multimesh.InstanceCount;
+
+	private int InstanceCount => MeshInstance.Multimesh.InstanceCount;
 
 	private readonly Vector3 _amplitude = new(120f, 90f, 120f);
 	private const float TimeScale = 0.001f;
@@ -95,7 +93,7 @@ public partial class MultiMeshExample : Node
 	private readonly World _world = new();
 	private double _time;
 
-	public void SpawnWave(int spawnCount)
+	private void SpawnWave(int spawnCount)
 	{
 		for (var i = 0; i < spawnCount; i++)
 		{
@@ -120,14 +118,12 @@ public partial class MultiMeshExample : Node
 		SpawnWave(SpawnCount * 5);
 	}
 
-	private float[] submissionArray = Array.Empty<float>();
-	
+	private float[] _submissionArray = Array.Empty<float>();
+
 	public override void _Process(double delta)
 	{
 		var query = _world.Query<int, Matrix4X3>().Build();
 		_time += delta * TimeScale;
-
-		var count = (float) InstanceCount;
 
 		//Update positions
 		query.RunParallel((ref int index, ref Matrix4X3 transform) =>
@@ -158,22 +154,25 @@ public partial class MultiMeshExample : Node
 
 			transform = new Matrix4X3(vector * _amplitude);
 		}, chunkSize: 4096);
-		
+
 		// Write transforms into Multimesh
 		query.Run((_, transforms) =>
 		{
 			var floatSpan = MemoryMarshal.Cast<Matrix4X3, float>(transforms);
-			
+			Console.WriteLine(floatSpan.Length);
+
+			//We must copy the data manually once, into a pooled array.
+			if (_submissionArray.Length != floatSpan.Length) _submissionArray = new float[floatSpan.Length];
+			//Array.Resize(ref _submissionArray, floatSpan.Length);
+			floatSpan.CopyTo(_submissionArray);
+			RenderingServer.MultimeshSetBuffer(MeshInstance.Multimesh.GetRid(), _submissionArray);
+
+			// This saves 1 line of code, but is not faster, and allocates a huge array, leading to lockups:
 			// The .ToArray is a very expensive allocation; waiting for Godot to expose the Span<float> overloads.
 			// RenderingServer.MultimeshSetBuffer(MeshInstance.Multimesh.GetRid(), floatSpan.ToArray());
-			
-			// Ideal way:
-			// RenderingServer.MultimeshSetBuffer(MeshInstance.Multimesh.GetRid(), floatSpan);
-			
-			//Instead, we must copy the data manually once, into a pooled array.
-			if (submissionArray.Length != floatSpan.Length) Array.Resize(ref submissionArray, floatSpan.Length);
-			floatSpan.CopyTo(submissionArray);
-			RenderingServer.MultimeshSetBuffer(MeshInstance.Multimesh.GetRid(), submissionArray);
+
+			// Ideal way - raw query to pass Memory<T>, Godot overload not available.
+			// query.Raw((_, transforms) => RenderingServer.MultimeshSetBuffer(MeshInstance.Multimesh.GetRid(), transforms));
 		});
 	}
 
