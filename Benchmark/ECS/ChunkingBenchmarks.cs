@@ -4,7 +4,6 @@ using fennecs;
 
 namespace Benchmark.ECS;
 
-
 [ShortRunJob]
 [ThreadingDiagnoser]
 [MemoryDiagnoser]
@@ -12,10 +11,8 @@ namespace Benchmark.ECS;
 public class ChunkingBenchmarks
 {
     // ReSharper disable once UnusedAutoPropertyAccessor.Global
-    [Params(1_000, 10_000, 100_000, 1_000_000)]
-    public int entityCount { get; set; }
-
-    [Params(128, 512, 1024, 2048, 4096, 8192, 16384, 32768)] public int chunkSize { get; set; }
+    [Params(10_000, 100_000, 1_000_000)] public int entityCount { get; set; } = 1_000_000;
+    [Params(4096, 16384, 32768, 65536)] public int chunkSize { get; set; } = 16384;
 
     private static readonly Random random = new(1337);
 
@@ -27,6 +24,16 @@ public class ChunkingBenchmarks
     [GlobalSetup]
     public void Setup()
     {
+        ThreadPool.SetMaxThreads(20, 20);
+        using var countdown = new CountdownEvent(1000);
+        for (var i = 0; i < 1000; i++)
+        {
+            // ReSharper disable once AccessToDisposedClosure
+            ThreadPool.QueueUserWorkItem(_ => { countdown.Signal();});
+        }
+        countdown.Wait();
+        Thread.Yield();
+
         _world = new World();
         _queryV3 = _world.Query<Vector3>().Build();
         _vectorsRaw = new Vector3[entityCount];
@@ -52,15 +59,34 @@ public class ChunkingBenchmarks
                     break;
             }
         }
+        _queryV3.InitJobs();
     }
 
+    [GlobalCleanup]
+    public void Cleanup()
+    {
+        _queryV3.Dispose();
+        _world.Dispose();
+    }
+
+
     private static readonly Vector3 UniformConstantVector = new(3, 4, 5);
-    private static readonly ParallelOptions options = new() {MaxDegreeOfParallelism = 12};
+
+    //[Benchmark]
+    public void CrossProduct_Run()
+    {
+        _queryV3.Run(delegate(ref Vector3 v) { v = Vector3.Cross(v, UniformConstantVector); });
+    }
 
     [Benchmark]
-    //Work parallelized by Archetype, passed into delegate as ref Vector3.
-    public void CrossProduct_Parallel_ECS_Delegate_Chunk()
+    public void CrossProduct_RunParallel()
     {
         _queryV3.RunParallel(delegate(ref Vector3 v) { v = Vector3.Cross(v, UniformConstantVector); }, chunkSize);
+    }
+
+    [Benchmark]
+    public void CrossProduct_Job()
+    {
+        _queryV3.Job(delegate(ref Vector3 v) { v = Vector3.Cross(v, UniformConstantVector); }, chunkSize);
     }
 }
