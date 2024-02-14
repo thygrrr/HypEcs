@@ -19,7 +19,7 @@ public class Query<C> : Query
         for (var i = 0; i < 8192; i++) _workloads.Add(new Workload<C>());
     }
 
-    private class Workload<C1> : IJob
+    private sealed class Workload<C1> : IJob
     {
         public CountdownEvent Countdown { get; set; }
         public Memory<C1> Memory { get; set; }

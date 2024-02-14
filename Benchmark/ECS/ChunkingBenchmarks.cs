@@ -4,15 +4,15 @@ using fennecs;
 
 namespace Benchmark.ECS;
 
-[ShortRunJob]
+[SimpleJob]
 [ThreadingDiagnoser]
 [MemoryDiagnoser]
 [Orderer(BenchmarkDotNet.Order.SummaryOrderPolicy.FastestToSlowest)]
 public class ChunkingBenchmarks
 {
     // ReSharper disable once UnusedAutoPropertyAccessor.Global
-    [Params(10_000, 100_000, 1_000_000)] public int entityCount { get; set; } = 1_000_000;
-    [Params(4096, 16384, 32768, 65536)] public int chunkSize { get; set; } = 16384;
+    [Params(1_000_000)] public int entityCount { get; set; } = 1_000_000;
+    [Params(4096, 16384)] public int chunkSize { get; set; } = 16384;
 
     private static readonly Random random = new(1337);
 
@@ -24,7 +24,7 @@ public class ChunkingBenchmarks
     [GlobalSetup]
     public void Setup()
     {
-        ThreadPool.SetMaxThreads(20, 20);
+        ThreadPool.SetMaxThreads(48, 24);
         using var countdown = new CountdownEvent(1000);
         for (var i = 0; i < 1000; i++)
         {
@@ -59,7 +59,6 @@ public class ChunkingBenchmarks
                     break;
             }
         }
-        _queryV3.InitJobs();
     }
 
     [GlobalCleanup]

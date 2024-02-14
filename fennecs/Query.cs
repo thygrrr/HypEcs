@@ -11,14 +11,9 @@ public abstract class Query(Archetypes archetypes, Mask mask, List<Table> tables
     private protected readonly List<Table> Tables = tables;
     private protected readonly Archetypes Archetypes = archetypes;
 
-    protected readonly List<IJobParallelFor> Jobs = new(8);
-    
     protected internal readonly Mask Mask = mask;
     
-    
     protected readonly JobScheduler Scheduler = new(new JobScheduler.Config {ThreadPrefixName = "fennecs.Query"});
-
-    protected virtual IJobParallelFor CreateJob() => null!;
     
     public bool Has(Entity entity)
     {
@@ -33,14 +28,6 @@ public abstract class Query(Archetypes archetypes, Mask mask, List<Table> tables
     }
 
     
-    public void InitJobs()
-    {
-        while (Tables.Count > Jobs.Count)
-        {
-            var job = CreateJob();
-            Jobs.Add(job);
-        }
-    }
     public int Count => Tables.Sum(t => t.Count);
 
     public void Dispose()
