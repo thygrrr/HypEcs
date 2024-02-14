@@ -66,7 +66,7 @@ public class Query<C>(Archetypes archetypes, Mask mask, List<Table> tables) : Qu
             }
         }
 
-        while (queued > 0) Thread.SpinWait(SpinTimeout);
+        while (queued > 0) Thread.Yield();
         Archetypes.Unlock();
     }
     

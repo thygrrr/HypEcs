@@ -159,20 +159,20 @@ public partial class MultiMeshExample : Node
 		query.Run((_, transforms) =>
 		{
 			var floatSpan = MemoryMarshal.Cast<Matrix4X3, float>(transforms);
-			Console.WriteLine(floatSpan.Length);
 
 			//We must copy the data manually once, into a pooled array.
-			if (_submissionArray.Length != floatSpan.Length) _submissionArray = new float[floatSpan.Length];
-			//Array.Resize(ref _submissionArray, floatSpan.Length);
+			Array.Resize(ref _submissionArray, floatSpan.Length);
 			floatSpan.CopyTo(_submissionArray);
 			RenderingServer.MultimeshSetBuffer(MeshInstance.Multimesh.GetRid(), _submissionArray);
 
-			// This saves 1 line of code, but is not faster, and allocates a huge array, leading to lockups:
-			// The .ToArray is a very expensive allocation; waiting for Godot to expose the Span<float> overloads.
-			// RenderingServer.MultimeshSetBuffer(MeshInstance.Multimesh.GetRid(), floatSpan.ToArray());
-
-			// Ideal way - raw query to pass Memory<T>, Godot overload not available.
+			// Ideal way - raw query to pass Memory<T>, Godot Memory<TY overload not yet available.
 			// query.Raw((_, transforms) => RenderingServer.MultimeshSetBuffer(MeshInstance.Multimesh.GetRid(), transforms));
+			
+			// This variant is also fast, but it doesn't work with the Godot API as that expects an array.
+			// We're waiting on a change to the Godot API to expose the Span<float> overloads, which actually
+			// match the internal API 1:1 (the System.Array parameter is the odd one out).
+			// Calling Span.ToArray() makes an expensive allocation; and is unusable for this purpose.
+			// RenderingServer.MultimeshSetBuffer(MeshInstance.Multimesh.GetRid(), floatSpan);
 		});
 	}
 

@@ -75,7 +75,7 @@ public class Query<C1, C2>(Archetypes archetypes, Mask mask, List<Table> tables)
             }
         }
 
-        while (queued > 0) Thread.SpinWait(SpinTimeout);
+        while (queued > 0) Thread.Yield();
         Archetypes.Unlock();
     }
     
@@ -138,7 +138,7 @@ public class Query<C1, C2>(Archetypes archetypes, Mask mask, List<Table> tables)
             }
         }
 
-        while (queued > 0) Thread.SpinWait(SpinTimeout);
+        while (queued > 0) Thread.Yield();
         Archetypes.Unlock();
 
     }
