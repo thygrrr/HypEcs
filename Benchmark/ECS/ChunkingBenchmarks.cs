@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Diagnosers;
 using fennecs;
 
 namespace Benchmark.ECS;
@@ -7,12 +8,13 @@ namespace Benchmark.ECS;
 [ShortRunJob]
 [ThreadingDiagnoser]
 [MemoryDiagnoser]
+[HardwareCounters(HardwareCounter.CacheMisses)]
 [Orderer(BenchmarkDotNet.Order.SummaryOrderPolicy.FastestToSlowest)]
 public class ChunkingBenchmarks
 {
     // ReSharper disable once UnusedAutoPropertyAccessor.Global
     [Params(1_000_000)] public int entityCount { get; set; } = 1_000_000;
-    [Params(4096, 16384, 32768, 65536)] public int chunkSize { get; set; } = 16384;
+    [Params(4096, 16384, 32768)] public int chunkSize { get; set; } = 16384;
 
     private static readonly Random random = new(1337);
 
@@ -24,7 +26,7 @@ public class ChunkingBenchmarks
     [GlobalSetup]
     public void Setup()
     {
-        ThreadPool.SetMaxThreads(48, 24);
+        //ThreadPool.SetMaxThreads(24, 24);
         using var countdown = new CountdownEvent(500);
         for (var i = 0; i < 500; i++)
         {
@@ -77,10 +79,16 @@ public class ChunkingBenchmarks
 
     private static readonly Vector3 UniformConstantVector = new(3, 4, 5);
 
-    //[Benchmark]
+    [Benchmark]
     public void CrossProduct_Run()
     {
         _queryV3.Run(delegate(ref Vector3 v) { v = Vector3.Cross(v, UniformConstantVector); });
+    }
+
+    [Benchmark]
+    public void CrossProduct_RunParallel()
+    {
+        _queryV3.Job(delegate(ref Vector3 v) { v = Vector3.Cross(v, UniformConstantVector); }, chunkSize);
     }
 
     [Benchmark]
@@ -88,5 +96,10 @@ public class ChunkingBenchmarks
     {
         _queryV3.Job(delegate(ref Vector3 v) { v = Vector3.Cross(v, UniformConstantVector); }, chunkSize);
     }
-    
+
+    [Benchmark]
+    public void CrossProduct_JobU()
+    {
+        _queryV3.Job(delegate(ref Vector3 v, Vector3 uniform) { v = Vector3.Cross(v, uniform); }, UniformConstantVector, chunkSize);
+    }
 }

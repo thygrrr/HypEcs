@@ -4,7 +4,7 @@ using System.Collections.Concurrent;
 
 namespace fennecs;
 
-public static class JobPool<T> where T : new()
+public static class JobPool<T> where T : class, new()
 {
     private static readonly ConcurrentBag<T> Pool = [];
     
@@ -20,12 +20,18 @@ public static class JobPool<T> where T : new()
     
     static JobPool()
     {
-        for (var i = 0; i < 512; i++) Pool.Add(new T());
+        for (var i = 0; i < 32; i++) Pool.Add(new T());
     }
 
     public static void Return(List<T> jobs)
     {
         foreach (var job in jobs) Return(job);
+        jobs.Clear();
+    }
+
+    public static void Return(List<IThreadPoolWorkItem> jobs)
+    {
+        foreach (var job in jobs) Return((T) job);
         jobs.Clear();
     }
 }

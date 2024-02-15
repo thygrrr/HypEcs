@@ -43,11 +43,27 @@ public delegate void RefAction_CCCCU<C0, C1, C2, C3, in U>(ref C0 c0, ref C1 c1,
 public delegate void RefAction_CCCCCU<C0, C1, C2, C3, C4, in U>(ref C0 c0, ref C1 c1, ref C2 c2, ref C3 c3, ref C4 c4, U uniform);
 
 
+public delegate void MemoryAction_C<C0>(Memory<C0> c0);
+
+public delegate void MemoryAction_CC<C0, C1>(Memory<C0> c0, Memory<C1> c1);
+
+public delegate void MemoryAction_CCC<C0, C1, C2>(Memory<C0> c0, Memory<C1> c1, Memory<C2> c2);
+
+public delegate void MemoryAction_CCCC<C0, C1, C2, C3>(Memory<C0> c0, Memory<C1> c1, Memory<C2> c2, Memory<C3> c3);
+
+public delegate void MemoryAction_CCCCC<C0, C1, C2, C3, C4>(Memory<C0> c0, Memory<C1> c1, Memory<C2> c2, Memory<C3> c3, Memory<C4> c4);
+
+
 public delegate void SpanAction_C<C0>(Span<C0> c0);
+
 public delegate void SpanAction_CC<C0, C1>(Span<C0> c0, Span<C1> c1);
+
 public delegate void SpanAction_CCC<C0, C1, C2>(Span<C0> c0, Span<C1> c1, Span<C2> c2);
+
 public delegate void SpanAction_CCCC<C0, C1, C2, C3>(Span<C0> c0, Span<C1> c1, Span<C2> c2, Span<C3> c3);
+
 public delegate void SpanAction_CCCCC<C0, C1, C2, C3, C4>(Span<C0> c0, Span<C1> c1, Span<C2> c2, Span<C3> c3, Span<C4> c4);
+
 
 // ReSharper enable IdentifierTypo
 // ReSharper enable InconsistentNaming
