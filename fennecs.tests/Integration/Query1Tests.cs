@@ -93,7 +93,7 @@ public class Query1Tests
         var query = world.Query<int>().Build();
 
         var processed = 0;
-        query.RunParallel((ref int index, float _) =>
+        query.Job((ref int index, float _) =>
         {
             Interlocked.Increment(ref processed);
             index = 123;
@@ -101,7 +101,7 @@ public class Query1Tests
 
         Assert.Equal(count, processed);
 
-        query.RunParallel((ref int index, float _) =>
+        query.Job((ref int index, float _) =>
         {
             ArgumentOutOfRangeException.ThrowIfNegative(index);
             Assert.Equal(123, index);

@@ -5,15 +5,14 @@ using fennecs;
 namespace Benchmark.ECS;
 
 [ShortRunJob]
-//[ThreadingDiagnoser]
+[ThreadingDiagnoser]
 [MemoryDiagnoser]
-//[InliningDiagnoser(true, null)]
-//[Orderer(BenchmarkDotNet.Order.SummaryOrderPolicy.FastestToSlowest)]
+[Orderer(BenchmarkDotNet.Order.SummaryOrderPolicy.FastestToSlowest)]
 public class ChunkingBenchmarks
 {
     // ReSharper disable once UnusedAutoPropertyAccessor.Global
     [Params(1_000_000)] public int entityCount { get; set; } = 1_000_000;
-    [Params(1024, 2048, 4096, 16384)] public int chunkSize { get; set; } = 16384;
+    [Params(4096, 16384, 32768, 65536)] public int chunkSize { get; set; } = 16384;
 
     private static readonly Random random = new(1337);
 
@@ -84,20 +83,6 @@ public class ChunkingBenchmarks
         _queryV3.Run(delegate(ref Vector3 v) { v = Vector3.Cross(v, UniformConstantVector); });
     }
 
-    [Benchmark]
-    public void CrossProduct_Callback()
-    {
-        _queryV3.RunParallel(delegate(ref Vector3 v) { v = Vector3.Cross(v, UniformConstantVector); }, chunkSize);
-    }
-
-    /*
-    [Benchmark]
-    public void CrossProduct_Closure()
-    {
-        _queryV3.RunParallel(delegate(ref Vector3 v, Vector3 uniform) { v = Vector3.Cross(v, uniform); }, UniformConstantVector, chunkSize);
-    }
-    */
-    
     [Benchmark]
     public void CrossProduct_Job()
     {

@@ -1,5 +1,4 @@
-﻿using Benchmark.ECS;
-using BenchmarkDotNet.Running;
+﻿using BenchmarkDotNet.Running;
 
 /*
 var summary = new ChunkingBenchmarks();

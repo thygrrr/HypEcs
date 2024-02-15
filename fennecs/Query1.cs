@@ -8,23 +8,6 @@ public class Query<C>(Archetypes archetypes, Mask mask, List<Table> tables) : Qu
     
     private readonly CountdownEvent _countdown = new(1);
     
-    private class Work<C1> : IThreadPoolWorkItem
-    {
-        public Memory<C1> Memory = null!;
-        public RefAction_C<C1> Action = null!;
-        public CountdownEvent CountDown = null!;
-        public WaitCallback WaitCallback => Execute;
-
-        private void Execute(object? state) => Execute();
-
-        public void Execute()
-        {
-            using var _ = Memory.Pin();
-            foreach (ref var c in Memory.Span) Action(ref c);
-            CountDown.Signal();
-        }
-    }
-
     public ref C Get(Entity entity)
     {
         var meta = Archetypes.GetEntityMeta(entity.Identity);
@@ -134,7 +117,7 @@ public class Query<C>(Archetypes archetypes, Mask mask, List<Table> tables) : Qu
     }
 
 
-    public void RunParallel<U>(RefAction_CU<C, U> action, U uniform, int chunkSize = int.MaxValue)
+    public void Job<U>(RefAction_CU<C, U> action, U uniform, int chunkSize = int.MaxValue)
     {
         Archetypes.Lock();
         _countdown.Reset();
@@ -152,7 +135,7 @@ public class Query<C>(Archetypes archetypes, Mask mask, List<Table> tables) : Qu
                 var start = chunk * chunkSize;
                 var length = Math.Min(chunkSize, memory.Length - start);
 
-                var workload = new WorkloadU<C,U>
+                var workload = new Work<C,U>
                 {
                     Action = action,
                     Uniform = uniform,
