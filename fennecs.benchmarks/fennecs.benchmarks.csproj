@@ -9,7 +9,7 @@
         <Configurations>Release;Debug</Configurations>
         <Platforms>AnyCPU</Platforms>
         <IsPackable>false</IsPackable>
-        <PackageId>fennecs.benchmark</PackageId>
+        <PackageId>fennecs.benchmarks</PackageId>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
