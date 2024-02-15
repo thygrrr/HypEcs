@@ -13,7 +13,7 @@ namespace Benchmark.ECS;
 public class ChunkingBenchmarks
 {
     // ReSharper disable once UnusedAutoPropertyAccessor.Global
-    [Params(1_000_000)] public int entityCount { get; set; } = 1_000_000;
+    [Params(10_000, 1_000_000)] public int entityCount { get; set; } = 1_000_000;
     [Params(4096, 16384, 32768)] public int chunkSize { get; set; } = 16384;
 
     private static readonly Random random = new(1337);
@@ -83,12 +83,6 @@ public class ChunkingBenchmarks
     public void CrossProduct_Run()
     {
         _queryV3.Run(delegate(ref Vector3 v) { v = Vector3.Cross(v, UniformConstantVector); });
-    }
-
-    [Benchmark]
-    public void CrossProduct_RunParallel()
-    {
-        _queryV3.Job(delegate(ref Vector3 v) { v = Vector3.Cross(v, UniformConstantVector); }, chunkSize);
     }
 
     [Benchmark]
