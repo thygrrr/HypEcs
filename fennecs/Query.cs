@@ -1,10 +1,8 @@
 // SPDX-License-Identifier: MIT
 
-using Schedulers;
-
 namespace fennecs;
 
-public abstract class Query(Archetypes archetypes, Mask mask, List<Table> tables) : IDisposable
+public class Query(Archetypes archetypes, Mask mask, List<Table> tables) : IDisposable
 {
     protected readonly ParallelOptions Options = new() {MaxDegreeOfParallelism = 24};
 
@@ -12,8 +10,6 @@ public abstract class Query(Archetypes archetypes, Mask mask, List<Table> tables
     private protected readonly Archetypes Archetypes = archetypes;
 
     protected internal readonly Mask Mask = mask;
-    
-    protected readonly JobScheduler Scheduler = new(new JobScheduler.Config {ThreadPrefixName = "fennecs.Query"});
     
     public bool Has(Entity entity)
     {
@@ -33,7 +29,6 @@ public abstract class Query(Archetypes archetypes, Mask mask, List<Table> tables
     public void Dispose()
     {
         Mask.Dispose();
-        Scheduler.Dispose();
     }
 
     ~Query()

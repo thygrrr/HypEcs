@@ -1,49 +1,16 @@
 ﻿// SPDX-License-Identifier: MIT
 
-using Schedulers;
-
 namespace fennecs;
 
-public class Query<C> : Query
+public class Query<C>(Archetypes archetypes, Mask mask, List<Table> tables) : Query(archetypes, mask, tables)
 {
-    private readonly List<JobHandle> _handles;
-    private readonly List<Workload<C>> _workloads;
-    private readonly CountdownEvent _countdown;
+    //private readonly List<JobHandle> _handles;
+    //private readonly List<Workload<C>> _workloads = new(8192);
+    private readonly CountdownEvent _countdown = new(1);
 
 
-    public Query(Archetypes archetypes, Mask mask, List<Table> tables) : base(archetypes, mask, tables)
-    {
-        _countdown = new CountdownEvent(1);
-        _handles = new List<JobHandle>(8192);
-        _workloads = new List<Workload<C>>(8192);
-        for (var i = 0; i < 8192; i++) _workloads.Add(new Workload<C>());
-    }
+    //for (var i = 0; i < 8192; i++) _workloads.Add(new Workload<C>(_countdown));
 
-    private sealed class Workload<C1> : IJob
-    {
-        public CountdownEvent Countdown { get; set; }
-        public Memory<C1> Memory { get; set; }
-        public RefAction_C<C1> Action { get; set; }
-
-        public void Execute()
-        {
-            foreach (ref var c in Memory.Span) Action(ref c);
-        }
-
-        public readonly WaitCallback WaitCallback;
-
-        public Workload()
-        {
-            WaitCallback = CallBack;
-        }
-
-        private void CallBack(object? state)
-        {
-            Execute();
-            Countdown.Signal();
-        }
-    }
-    
     public ref C Get(Entity entity)
     {
         var meta = Archetypes.GetEntityMeta(entity.Identity);
@@ -68,78 +35,27 @@ public class Query<C> : Query
         Archetypes.Unlock();
     }
 
-    private void Work(Span<C> storage, RefAction_C<C> action, ref CountdownEvent countdown)
-    {
-        foreach (ref var c in storage) action(ref c);
-        countdown.Signal();
-    }
-
-    public void Job(RefAction_C<C> action, int chunkSize = int.MaxValue)
-    {
-        Archetypes.Lock();
-        _handles.Clear();
-        var load = 0;
-        
-        foreach (var table in Tables)
-        {
-            if (table.IsEmpty) continue;
-            var storage = table.GetStorage<C>(Identity.None);
-            var length = table.Count;
-
-            var partitions = Math.Max(length / chunkSize, 1);
-            var partitionSize = length / partitions;
-
-            for (var partition = 0; partition < partitions; partition++)
-            {
-                var workload = _workloads[load++];
-                workload.Action = action;
-                workload.Memory = storage.AsMemory(partition * partitionSize, partitionSize);
-                _handles.Add(Scheduler.Schedule(workload));
-            }
-        }
-
-        Scheduler.Flush();
-        JobHandle.CompleteAll(_handles);
-        Archetypes.Unlock();
-    }
-
-
     public void RunParallel(RefAction_C<C> action, int chunkSize = int.MaxValue)
     {
         Archetypes.Lock();
         _countdown.Reset();
-        var load = 0;
-        
+
         foreach (var table in Tables)
         {
             if (table.IsEmpty) continue;
-            var storage = table.GetStorage<C>(Identity.None);
-            var items = table.Count;
+            var memory = table.Memory<C>(Identity.None);
+            var partitions = memory.Length / chunkSize + Math.Sign(memory.Length % chunkSize);
 
-            var partitions = items / chunkSize + items % chunkSize != 0 ? 1 : 0;
-            var partitionSize = items / partitions;
-
-            for (var partition = 0; partition < partitions; partition++)
+            for (var chunk = 0; chunk < partitions; chunk++)
             {
                 _countdown.AddCount();
-                
-                var workload = _workloads[load++];
-                workload.Action = action;
-                var start = partition * partitionSize;
-                var length = Math.Min(partitionSize, storage.Length - start);
-                workload.Memory = storage.AsMemory(start, length);
-                workload.Countdown = _countdown;
+
+                var start = chunk * chunkSize;
+                var length = Math.Min(chunkSize, memory.Length - start);
+
+                var workload = new Workload<C>(memory.Slice(start, length), action, _countdown);
                 ThreadPool.QueueUserWorkItem(workload.WaitCallback);
             }
-
-            /*
-            for (var partition = 0; partition < partitions; partition++)
-            {
-                _countdown.AddCount();
-                var memory = storage.AsMemory(partition * partitionSize, partitionSize);
-                ThreadPool.QueueUserWorkItem(delegate { Work(memory.Span, action, ref _countdown); });
-            }
-            */
         }
 
         _countdown.Signal();
@@ -170,12 +86,48 @@ public class Query<C> : Query
         foreach (var table in Tables)
         {
             if (table.IsEmpty) continue;
+            var memory = table.Memory<C>(Identity.None);
+            var partitions = memory.Length / chunkSize + Math.Sign(memory.Length % chunkSize);
+
+            for (var chunk = 0; chunk < partitions; chunk++)
+            {
+                _countdown.AddCount();
+
+                var start = chunk * chunkSize;
+                var length = Math.Min(chunkSize, memory.Length - start);
+
+                var workload = new WorkloadU<C,U>
+                {
+                    Action = action,
+                    Uniform = uniform,
+                    CountDown = _countdown,
+                    Memory = memory.Slice(start, length),
+                };
+                
+                ThreadPool.QueueUserWorkItem(workload.WaitCallback);
+            }
+        }
+
+        _countdown.Signal();
+        _countdown.Wait();
+        Archetypes.Unlock();
+    }
+
+
+    public void RunParallel2Old<U>(RefAction_CU<C, U> action, U uniform, int chunkSize = int.MaxValue)
+    {
+        Archetypes.Lock();
+        _countdown.Reset();
+
+        foreach (var table in Tables)
+        {
+            if (table.IsEmpty) continue;
             var storage = table.GetStorage<C>(Identity.None);
 
-            var length = table.Count;
+            var items = table.Count;
 
-            var partitions = Math.Max(length / chunkSize, 1);
-            var partitionSize = length / partitions;
+            var partitions = items / chunkSize + items % chunkSize == 0 ? 0 : 1;
+            var partitionSize = items / partitions;
 
             for (var partition = 0; partition < partitions; partition++)
             {
@@ -183,7 +135,9 @@ public class Query<C> : Query
 
                 ThreadPool.QueueUserWorkItem(delegate(int part)
                 {
-                    foreach (ref var c in storage.AsSpan(part * partitionSize, partitionSize))
+                    var start = part * partitionSize;
+                    var length = Math.Min(partitionSize, items - start);
+                    foreach (ref var c in storage.AsSpan(part * partitionSize, length))
                     {
                         action(ref c, uniform);
                     }
@@ -192,14 +146,6 @@ public class Query<C> : Query
                     _countdown.Signal();
                 }, partition, preferLocal: true);
             }
-
-            /*
-            //Optimization: Also process one partition right here on the calling thread.
-            foreach (ref var c in storage.AsSpan(0, partitionSize))
-            {
-                action(ref c, uniform);
-            }
-            */
         }
 
         _countdown.Signal();

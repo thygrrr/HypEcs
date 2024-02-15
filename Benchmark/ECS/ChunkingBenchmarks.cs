@@ -4,15 +4,15 @@ using fennecs;
 
 namespace Benchmark.ECS;
 
-[SimpleJob]
+[ShortRunJob]
 [ThreadingDiagnoser]
 [MemoryDiagnoser]
-[Orderer(BenchmarkDotNet.Order.SummaryOrderPolicy.FastestToSlowest)]
+//[Orderer(BenchmarkDotNet.Order.SummaryOrderPolicy.FastestToSlowest)]
 public class ChunkingBenchmarks
 {
     // ReSharper disable once UnusedAutoPropertyAccessor.Global
     [Params(1_000_000)] public int entityCount { get; set; } = 1_000_000;
-    [Params(4096, 16384)] public int chunkSize { get; set; } = 16384;
+    [Params(1024, 2048, 4096, 16384)] public int chunkSize { get; set; } = 16384;
 
     private static readonly Random random = new(1337);
 
@@ -25,11 +25,16 @@ public class ChunkingBenchmarks
     public void Setup()
     {
         ThreadPool.SetMaxThreads(48, 24);
-        using var countdown = new CountdownEvent(1000);
-        for (var i = 0; i < 1000; i++)
+        using var countdown = new CountdownEvent(500);
+        for (var i = 0; i < 500; i++)
         {
             // ReSharper disable once AccessToDisposedClosure
-            ThreadPool.QueueUserWorkItem(_ => { countdown.Signal();});
+            var i1 = i;
+            ThreadPool.QueueUserWorkItem(_ =>
+            {
+                Thread.Sleep(1);
+                countdown.Signal();
+            });
         }
         countdown.Wait();
         Thread.Yield();
@@ -65,7 +70,9 @@ public class ChunkingBenchmarks
     public void Cleanup()
     {
         _queryV3.Dispose();
+        _queryV3 = null!;
         _world.Dispose();
+        _world = null!;
     }
 
 
@@ -78,14 +85,22 @@ public class ChunkingBenchmarks
     }
 
     [Benchmark]
-    public void CrossProduct_RunParallel()
+    public void CrossProduct_Callback()
     {
         _queryV3.RunParallel(delegate(ref Vector3 v) { v = Vector3.Cross(v, UniformConstantVector); }, chunkSize);
     }
 
     [Benchmark]
+    public void CrossProduct_Closure()
+    {
+        _queryV3.RunParallel(delegate(ref Vector3 v, float _) { v = Vector3.Cross(v, UniformConstantVector); }, 0, chunkSize);
+    }
+
+    /*
+    [Benchmark]
     public void CrossProduct_Job()
     {
         _queryV3.Job(delegate(ref Vector3 v) { v = Vector3.Cross(v, UniformConstantVector); }, chunkSize);
     }
+    */
 }

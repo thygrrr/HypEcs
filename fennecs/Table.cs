@@ -122,14 +122,22 @@ public sealed class Table
         return edge;
     }
 
-    
+
     public T[] GetStorage<T>(Identity target)
     {
         var type = TypeExpression.Create<T>(target);
-        return (T[])GetStorage(type);
+        return (T[]) GetStorage(type);
     }
 
-    
+
+    public Memory<T> Memory<T>(Identity target)
+    {
+        var type = TypeExpression.Create<T>(target);
+        var storage = GetStorage(type);
+        return new Memory<T>((T[]) storage, 0, Count);
+    }
+
+
     public Array GetStorage(TypeExpression typeExpression)
     {
         return _storages[_indices[typeExpression]];
