@@ -19,7 +19,8 @@ public sealed class Table
     public readonly SortedSet<TypeExpression> Types;
 
     public Identity[] Identities => _identities;
-    public Array[] Storages => _storages;
+    
+    internal Array[] Storages => _storages;
 
     public int Count { get; private set; }
     public bool IsEmpty => Count == 0;
@@ -133,8 +134,8 @@ public sealed class Table
     public Memory<T> Memory<T>(Identity target)
     {
         var type = TypeExpression.Create<T>(target);
-        var storage = GetStorage(type);
-        return new Memory<T>((T[]) storage, 0, Count);
+        var storage = (T[]) GetStorage(type);
+        return storage.AsMemory(0, Count);
     }
 
 

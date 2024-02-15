@@ -1,12 +1,42 @@
 ﻿// SPDX-License-Identifier: MIT
 
+using Schedulers;
+
 namespace fennecs;
 
 public class Query<C>(Archetypes archetypes, Mask mask, List<Table> tables) : Query(archetypes, mask, tables)
 {
-    //private readonly List<JobHandle> _handles;
-    //private readonly List<Workload<C>> _workloads = new(8192);
+    private readonly List<JobHandle> _handles = new(512);
+    private readonly List<Work<C>> _jobs = new(512);
+    
     private readonly CountdownEvent _countdown = new(1);
+    
+    private class Work<C1> : IThreadPoolWorkItem
+    {
+        public Memory<C1> Memory = null!;
+        public RefAction_C<C1> Action = null!;
+        public CountdownEvent CountDown = null!;
+        public WaitCallback WaitCallback => Execute;
+
+        private void Execute(object? state) => Execute();
+
+        public void Execute()
+        {
+            foreach (ref var c in Memory.Span) Action(ref c);
+            CountDown.Signal();
+        }
+    }
+
+
+    private class WorkJob<C1> : IJob
+    {
+        public Memory<C1> Memory;
+        public RefAction_C<C1>? Action;
+        public void Execute()
+        {
+            foreach (ref var c in Memory.Span) Action!(ref c);
+        }
+    }
 
 
     //for (var i = 0; i < 8192; i++) _workloads.Add(new Workload<C>(_countdown));
@@ -43,24 +73,105 @@ public class Query<C>(Archetypes archetypes, Mask mask, List<Table> tables) : Qu
         foreach (var table in Tables)
         {
             if (table.IsEmpty) continue;
-            var memory = table.Memory<C>(Identity.None);
-            var partitions = memory.Length / chunkSize + Math.Sign(memory.Length % chunkSize);
+            var storage = table.GetStorage<C>(Identity.None);
+
+            var count = table.Count; // storage.Length is the capacity, not the count.
+            var partitions = count / chunkSize + Math.Sign(count % chunkSize);
 
             for (var chunk = 0; chunk < partitions; chunk++)
             {
                 _countdown.AddCount();
 
                 var start = chunk * chunkSize;
-                var length = Math.Min(chunkSize, memory.Length - start);
+                var length = Math.Min(chunkSize, count - start);
 
-                var workload = new Workload<C>(memory.Slice(start, length), action, _countdown);
-                ThreadPool.QueueUserWorkItem(workload.WaitCallback);
+                var job = JobPool<Work<C>>.Rent();
+                job.Memory = storage.AsMemory(start, length);
+                job.Action = action;
+                job.CountDown = _countdown;
+                _jobs.Add(job);
+                ThreadPool.QueueUserWorkItem(job.WaitCallback);
             }
         }
 
         _countdown.Signal();
         _countdown.Wait();
+        JobPool<Work<C>>.Return(_jobs);
         Archetypes.Unlock();
+    }
+
+    public void RunParallelUnsafe(RefAction_C<C> action, int chunkSize = int.MaxValue)
+    {
+        Archetypes.Lock();
+        _countdown.Reset();
+
+        foreach (var table in Tables)
+        {
+            if (table.IsEmpty) continue;
+            var storage = table.GetStorage<C>(Identity.None);
+
+            var count = table.Count; // storage.Length is the capacity, not the count.
+            var partitions = count / chunkSize + Math.Sign(count % chunkSize);
+
+            for (var chunk = 0; chunk < partitions; chunk++)
+            {
+                _countdown.AddCount();
+
+                var start = chunk * chunkSize;
+                var length = Math.Min(chunkSize, count - start);
+
+                var job = JobPool<Work<C>>.Rent();
+                job.Memory = storage.AsMemory(start, length);
+                job.Action = action;
+                job.CountDown = _countdown;
+                _jobs.Add(job);
+                ThreadPool.UnsafeQueueUserWorkItem(job, true);
+            }
+        }
+
+        _countdown.Signal();
+        _countdown.Wait();
+        JobPool<Work<C>>.Return(_jobs);
+        Archetypes.Unlock();
+    }
+
+    public void Job(RefAction_C<C> action, int chunkSize = int.MaxValue)
+    {
+        /*
+        Archetypes.Lock();
+        _handles.Clear();
+        
+        foreach (var table in Tables)
+        {
+            if (table.IsEmpty) continue;
+            var storage = table.GetStorage<C>(Identity.None);
+
+            var count = table.Count; // storage.Length is the capacity, not the count.
+            var partitions = count / chunkSize + Math.Sign(count % chunkSize);
+
+            for (var chunk = 0; chunk < partitions; chunk++)
+            {
+                _countdown.AddCount();
+
+                var start = chunk * chunkSize;
+                var length = Math.Min(chunkSize, count - start);
+
+                var job = JobPool<WorkJob<C>>.Rent();
+                job.Memory = storage.AsMemory(start, length);
+                job.Action = action;
+                _jobs.Add(job);
+                
+                var handle =Scheduler.Schedule(job);
+                _handles.Add(handle);
+            }
+        }
+        
+        Scheduler.Flush();
+        JobHandle.CompleteAll(_handles);
+        JobPool<WorkJob<C>>.Return(_jobs);
+
+        Archetypes.Unlock();
+        */
     }
 
     public void Run<U>(RefAction_CU<C, U> action, U uniform)
@@ -112,47 +223,6 @@ public class Query<C>(Archetypes archetypes, Mask mask, List<Table> tables) : Qu
         _countdown.Wait();
         Archetypes.Unlock();
     }
-
-
-    public void RunParallel2Old<U>(RefAction_CU<C, U> action, U uniform, int chunkSize = int.MaxValue)
-    {
-        Archetypes.Lock();
-        _countdown.Reset();
-
-        foreach (var table in Tables)
-        {
-            if (table.IsEmpty) continue;
-            var storage = table.GetStorage<C>(Identity.None);
-
-            var items = table.Count;
-
-            var partitions = items / chunkSize + items % chunkSize == 0 ? 0 : 1;
-            var partitionSize = items / partitions;
-
-            for (var partition = 0; partition < partitions; partition++)
-            {
-                _countdown.AddCount();
-
-                ThreadPool.QueueUserWorkItem(delegate(int part)
-                {
-                    var start = part * partitionSize;
-                    var length = Math.Min(partitionSize, items - start);
-                    foreach (ref var c in storage.AsSpan(part * partitionSize, length))
-                    {
-                        action(ref c, uniform);
-                    }
-
-                    // ReSharper disable once AccessToDisposedClosure
-                    _countdown.Signal();
-                }, partition, preferLocal: true);
-            }
-        }
-
-        _countdown.Signal();
-        _countdown.Wait();
-        Archetypes.Unlock();
-    }
-
 
     public void Run(SpanAction_C<C> action)
     {

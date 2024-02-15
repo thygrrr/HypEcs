@@ -5,8 +5,9 @@ using fennecs;
 namespace Benchmark.ECS;
 
 [ShortRunJob]
-[ThreadingDiagnoser]
+//[ThreadingDiagnoser]
 [MemoryDiagnoser]
+//[InliningDiagnoser(true, null)]
 //[Orderer(BenchmarkDotNet.Order.SummaryOrderPolicy.FastestToSlowest)]
 public class ChunkingBenchmarks
 {
@@ -28,13 +29,13 @@ public class ChunkingBenchmarks
         using var countdown = new CountdownEvent(500);
         for (var i = 0; i < 500; i++)
         {
-            // ReSharper disable once AccessToDisposedClosure
-            var i1 = i;
-            ThreadPool.QueueUserWorkItem(_ =>
+            ThreadPool.UnsafeQueueUserWorkItem
+            (_ =>
             {
                 Thread.Sleep(1);
+                // ReSharper disable once AccessToDisposedClosure
                 countdown.Signal();
-            });
+            }, true);
         }
         countdown.Wait();
         Thread.Yield();
@@ -91,16 +92,23 @@ public class ChunkingBenchmarks
     }
 
     [Benchmark]
-    public void CrossProduct_Closure()
+    public void CrossProduct_Unsafe()
     {
-        _queryV3.RunParallel(delegate(ref Vector3 v, float _) { v = Vector3.Cross(v, UniformConstantVector); }, 0, chunkSize);
+        _queryV3.RunParallelUnsafe(delegate(ref Vector3 v) { v = Vector3.Cross(v, UniformConstantVector); }, chunkSize);
     }
 
     /*
     [Benchmark]
+    public void CrossProduct_Closure()
+    {
+        _queryV3.RunParallel(delegate(ref Vector3 v, Vector3 uniform) { v = Vector3.Cross(v, uniform); }, UniformConstantVector, chunkSize);
+    }
+    */
+    
+    //[Benchmark]
     public void CrossProduct_Job()
     {
         _queryV3.Job(delegate(ref Vector3 v) { v = Vector3.Cross(v, UniformConstantVector); }, chunkSize);
     }
-    */
+    
 }
