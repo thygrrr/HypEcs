@@ -1,10 +1,8 @@
 // SPDX-License-Identifier: MIT
 
-using Schedulers;
-
 namespace fennecs;
 
-public class Query(Archetypes archetypes, Mask mask, List<Table> tables) : IDisposable
+public class Query(Archetypes archetypes, Mask mask, List<Table> tables)
 {
     protected readonly ParallelOptions Options = new() {MaxDegreeOfParallelism = 24};
 
@@ -12,12 +10,7 @@ public class Query(Archetypes archetypes, Mask mask, List<Table> tables) : IDisp
     private protected readonly Archetypes Archetypes = archetypes;
 
     protected internal readonly Mask Mask = mask;
-    
-    /*protected readonly JobScheduler Scheduler = new(new JobScheduler.Config
-    {
-        ThreadPrefixName = "fennecs.Query",
-    });*/
-    
+
     public bool Has(Entity entity)
     {
         var meta = Archetypes.GetEntityMeta(entity.Identity);
@@ -30,19 +23,7 @@ public class Query(Archetypes archetypes, Mask mask, List<Table> tables) : IDisp
         Tables.Add(table);
     }
 
-    
     public int Count => Tables.Sum(t => t.Count);
-
-    public void Dispose()
-    {
-        //Scheduler.Dispose();
-        Mask.Dispose();
-    }
-
-    ~Query()
-    {
-        Dispose();
-    }
 }
 
 // ReSharper disable InconsistentNaming

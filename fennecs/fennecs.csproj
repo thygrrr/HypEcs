@@ -38,8 +38,4 @@
     <ItemGroup>
         <None Include="../docs/overview.md" Pack="true" PackagePath="\" />
     </ItemGroup>
-
-    <ItemGroup>
-      <PackageReference Include="ZeroAllocJobScheduler" Version="1.1.*" />
-    </ItemGroup>
 </Project>

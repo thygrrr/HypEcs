@@ -3,7 +3,7 @@
 // ReSharper disable once ClassNeverInstantiated.Global
 public class Query1Tests
 {
-    [Theory(Skip = "Currently removed library")]
+    [Theory]
     [InlineData(1_000, 100)] //fits
     [InlineData(10_000, 10_000)] //exact
     [InlineData(15_383, 1024)] //typical
@@ -136,7 +136,7 @@ public class Query1Tests
         }
     }
 
-    [Fact(Skip = "Currently removed library")]
+    [Fact]
     private void Job_Visits_All_Entities_Chunked_Switched()
     {
         // There were issues with confusing storage.Length and table.Count.
@@ -183,7 +183,7 @@ public class Query1Tests
         });
     }
 
-    [Theory(Skip = "Currently removed library")]
+    [Theory]
     [InlineData(134_41)]
     [InlineData(100_000)]
     [InlineData(151_189)]

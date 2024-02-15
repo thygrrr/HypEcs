@@ -70,7 +70,6 @@ public class ChunkingBenchmarks
     [GlobalCleanup]
     public void Cleanup()
     {
-        _queryV3.Dispose();
         _queryV3 = null!;
         _world.Dispose();
         _world = null!;
@@ -91,12 +90,6 @@ public class ChunkingBenchmarks
         _queryV3.RunParallel(delegate(ref Vector3 v) { v = Vector3.Cross(v, UniformConstantVector); }, chunkSize);
     }
 
-    [Benchmark]
-    public void CrossProduct_Unsafe()
-    {
-        _queryV3.RunParallelUnsafe(delegate(ref Vector3 v) { v = Vector3.Cross(v, UniformConstantVector); }, chunkSize);
-    }
-
     /*
     [Benchmark]
     public void CrossProduct_Closure()
@@ -105,7 +98,7 @@ public class ChunkingBenchmarks
     }
     */
     
-    //[Benchmark]
+    [Benchmark]
     public void CrossProduct_Job()
     {
         _queryV3.Job(delegate(ref Vector3 v) { v = Vector3.Cross(v, UniformConstantVector); }, chunkSize);
