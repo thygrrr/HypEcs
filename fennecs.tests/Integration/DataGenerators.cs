@@ -31,14 +31,17 @@ public class QueryChunkGenerator : IEnumerable<object[]>
         {
             for (var j = 1; j <= 10; j++)
             {
-                yield return [i, j];                
+                yield return [i, j];
             }
         }
+
         
         yield return [100, 10]; //fits
+        yield return [100, 1_000]; //undersized
         yield return [1_000, 1_000]; //exact
 
         yield return [15_383, 1024]; //typical
+        yield return [69_420, 2048]; //typical
         yield return [214_363, 4096]; //typical
 
         yield return [433, 149]; // prime numbers
