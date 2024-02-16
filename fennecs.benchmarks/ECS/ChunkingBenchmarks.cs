@@ -26,8 +26,8 @@ public class ChunkingBenchmarks
     [GlobalSetup]
     public void Setup()
     {
-        ListPool<Work<Vector3>>.Return(ListPool<Work<Vector3>>.Rent());
-        ListPool<UniformWork<Vector3, Vector3>>.Return(ListPool<UniformWork<Vector3, Vector3>>.Rent());
+        PooledList<Work<Vector3>>.Rent().Dispose();
+        PooledList<UniformWork<Vector3, Vector3>>.Rent().Dispose();
         
         //ThreadPool.SetMaxThreads(24, 24);
         using var countdown = new CountdownEvent(500);

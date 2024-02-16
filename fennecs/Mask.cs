@@ -17,7 +17,6 @@ public sealed class Mask : IEquatable<Mask>, IDisposable
     {
         NotTypes.Add(type);
     }
-
     
     public void Any(TypeExpression type)
     {

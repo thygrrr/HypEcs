@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 
 namespace fennecs;
 
+[Obsolete("Use PooledList<T>")]
 public static class ListPool<T>
 {
     private static readonly ConcurrentBag<List<T>> Bag = [];

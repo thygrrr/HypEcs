@@ -9,11 +9,11 @@ public class Query<C1>(Archetypes archetypes, Mask mask, List<Table> tables) : Q
     public ref C1 this[Entity entity] => ref Ref(entity);
 
     /// <summary>
-    /// Gets a reference to the component of type <typeparamref name="C"/> for the entity.
+    /// Gets a reference to the component of type <typeparamref name="C1"/> for the entity.
     /// </summary>
     /// <param name="entity">The entity to get the component from.</param>
-    /// <typeparam name="C">The type of the component to get.</typeparam>
-    /// <returns>A reference to the component of type <typeparamref name="C"/> for the entity.</returns>
+    /// <typeparam name="C1">The type of the component to get.</typeparam>
+    /// <returns>A reference to the component of type <typeparamref name="C1"/> for the entity.</returns>
     /// <exception cref="InvalidOperationException">Thrown when trying to get a reference to
     /// <see cref="Entity"/> itself, because its immutability is crucial for the integrity of the tables.</exception>
     public ref C1 Ref(Entity entity)
@@ -84,7 +84,7 @@ public class Query<C1>(Archetypes archetypes, Mask mask, List<Table> tables) : Q
         Archetypes.Lock();
         _countdown.Reset();
 
-        var jobs = ListPool<Work<C1>>.Rent();
+        using var jobs = PooledList<Work<C1>>.Rent();
 
         foreach (var table in Tables)
         {
@@ -115,7 +115,6 @@ public class Query<C1>(Archetypes archetypes, Mask mask, List<Table> tables) : Q
         _countdown.Wait();
 
         JobPool<Work<C1>>.Return(jobs);
-        ListPool<Work<C1>>.Return(jobs);
 
         Archetypes.Unlock();
     }
@@ -125,7 +124,7 @@ public class Query<C1>(Archetypes archetypes, Mask mask, List<Table> tables) : Q
         Archetypes.Lock();
         _countdown.Reset();
 
-        var jobs = ListPool<UniformWork<C1, U>>.Rent();
+        using var jobs = PooledList<UniformWork<C1, U>>.Rent();
 
         foreach (var table in Tables)
         {
@@ -156,7 +155,6 @@ public class Query<C1>(Archetypes archetypes, Mask mask, List<Table> tables) : Q
         _countdown.Wait();
 
         JobPool<UniformWork<C1, U>>.Return(jobs);
-        ListPool<UniformWork<C1, U>>.Return(jobs);
 
         Archetypes.Unlock();
     }

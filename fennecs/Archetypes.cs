@@ -290,7 +290,7 @@ public sealed class Archetypes : IEnumerable<Table>
     {
         AssertAlive(identity);
 
-        var list = ListPool<(TypeExpression, object)>.Rent();
+        using var list = PooledList<(TypeExpression, object)>.Rent();
 
         var meta = _meta[identity.Id];
         var table = _tables[meta.TableId];
@@ -303,7 +303,6 @@ public sealed class Archetypes : IEnumerable<Table>
         }
 
         var array = list.ToArray();
-        ListPool<(TypeExpression, object)>.Return(list);
         return array;
     }
 
