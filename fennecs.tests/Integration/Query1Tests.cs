@@ -432,7 +432,7 @@ public class Query1Tests
 
         if (createEmptyTable)
         {
-            var dead = world.Spawn().Add<int>().Add("will be removed").Id();
+            var dead = world.Spawn().Add<long>().Add("will be removed").Id();
             world.Despawn(dead);
         }
 
