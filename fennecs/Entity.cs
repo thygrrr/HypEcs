@@ -2,7 +2,7 @@
 
 namespace fennecs;
 
-public readonly struct Entity(Identity identity)
+public readonly struct Entity(Identity identity) : IComparable<Entity>
 {
     public static readonly Entity None = default;
     public static readonly Entity Any = new(Identity.Any);
@@ -10,6 +10,11 @@ public readonly struct Entity(Identity identity)
     internal Identity Identity { get; } = identity;
 
     public bool IsType => Identity.IsType;
+
+    public int CompareTo(Entity other)
+    {
+        return Identity.CompareTo(other.Identity);
+    }
 
     public override bool Equals(object? obj)
     {

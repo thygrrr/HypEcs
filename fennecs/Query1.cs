@@ -5,20 +5,39 @@ namespace fennecs;
 public class Query<C1>(Archetypes archetypes, Mask mask, List<Table> tables) : Query(archetypes, mask, tables)
 {
     private readonly CountdownEvent _countdown = new(1);
-
-    public ref C1 this[Entity entity] => ref Get(entity);
     
-    public ref C1 Get(Entity entity)
+    public ref C1 this[Entity entity] => ref Ref(entity);
+
+    /// <summary>
+    /// Gets a reference to the component of type <typeparamref name="C"/> for the entity.
+    /// </summary>
+    /// <param name="entity">The entity to get the component from.</param>
+    /// <typeparam name="C">The type of the component to get.</typeparam>
+    /// <returns>A reference to the component of type <typeparamref name="C"/> for the entity.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when trying to get a reference to
+    /// <see cref="Entity"/> itself, because its immutability is crucial for the integrity of the tables.</exception>
+    public ref C1 Ref(Entity entity)
     {
+        if (typeof(C1) == typeof(Entity))
+        {
+            throw new TypeAccessException("Can't request a mutable ref to type <Entity>.");
+        }
+
+        if (!Archetypes.IsAlive(entity))
+        {
+            throw new ArgumentException("Entity is not alive.");
+        }
+
         var meta = Archetypes.GetEntityMeta(entity.Identity);
         var table = Archetypes.GetTable(meta.TableId);
         var storage = table.GetStorage<C1>(Identity.None);
         return ref storage[meta.Row];
     }
 
+
     #region Runners
 
-    public void Run(RefAction_C<C1> action)
+    public void ForEach(RefAction_C<C1> action)
     {
         Archetypes.Lock();
 
@@ -32,7 +51,7 @@ public class Query<C1>(Archetypes archetypes, Mask mask, List<Table> tables) : Q
         Archetypes.Unlock();
     }
 
-    public void Run<U>(RefAction_CU<C1, U> action, U uniform)
+    public void ForEach<U>(RefAction_CU<C1, U> action, U uniform)
     {
         Archetypes.Lock();
 

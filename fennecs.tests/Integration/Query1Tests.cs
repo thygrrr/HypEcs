@@ -1,14 +1,59 @@
-﻿namespace fennecs.tests.Integration;
+﻿using Xunit.Sdk;
+
+namespace fennecs.tests.Integration;
 
 // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Local
 // ReSharper disable once ClassNeverInstantiated.Global
 public class Query1Tests
 {
-    [Theory]
-    [ClassData(typeof(QueryCountGenerator))]
-    private void Query_Count_Accurate(int count)
+    [Fact]
+    private void Indexer_disallows_Component_Type_Entity()
     {
         using var world = new World();
+        var entity = world.Spawn().Id();
+        var query = world.Query<Entity>().Build();
+
+        Assert.Throws<TypeAccessException>(() => query[entity]);
+    }
+
+    [Fact]
+    private void Indexer_disallows_Dead_Entity()
+    {
+        using var world = new World();
+        var entity = world.Spawn().Add<int>().Id();
+        world.Despawn(entity);
+        Assert.False(world.IsAlive(entity));
+
+        var query = world.Query<int>().Build();
+        Assert.Throws<ArgumentException>(() => query[entity]);
+    }
+
+    [Fact]
+    private void Indexer_gets_Mutable_Component()
+    {
+        using var world = new World();
+        var entity = world.Spawn().Add(23).Id();
+        var query = world.Query<int>().Build();
+
+        ref var gotten = ref query.Ref(entity);
+        Assert.Equal(23, gotten);
+
+        // Entity can't be a ref (is readonly - make sure!)
+        gotten = 42;
+        Assert.Equal(42, query.Ref(entity));
+    }
+
+    [Theory]
+    [ClassData(typeof(QueryCountGenerator))]
+    private void Query_Count_Accurate(int count, bool createEmptyTable)
+    {
+        using var world = new World();
+
+        if (createEmptyTable)
+        {
+            var dead = world.Spawn().Add<byte>().Add("nope").Id();
+            world.Despawn(dead);
+        }
 
         List<Entity> entities = new(count);
 
@@ -45,9 +90,15 @@ public class Query1Tests
 
     [Theory]
     [ClassData(typeof(QueryCountGenerator))]
-    private void Query_Raw_Count_Accurate(int count)
+    private void Query_Raw_Count_Accurate(int count, bool createEmptyTable)
     {
         using var world = new World();
+
+        if (createEmptyTable)
+        {
+            var dead = world.Spawn().Add<byte>().Add("nope").Id();
+            world.Despawn(dead);
+        }
 
         List<Entity> entities = new(count);
 
@@ -88,9 +139,15 @@ public class Query1Tests
 
     [Theory]
     [ClassData(typeof(QueryCountGenerator))]
-    private void Query_Run_Count_Accurate(int count)
+    private void Query_Run_Count_Accurate(int count, bool createEmptyTable)
     {
         using var world = new World();
+
+        if (createEmptyTable)
+        {
+            var dead = world.Spawn().Add<byte>().Add("nope").Id();
+            world.Despawn(dead);
+        }
 
         List<Entity> entities = new(count);
 
@@ -131,9 +188,15 @@ public class Query1Tests
 
     [Theory]
     [ClassData(typeof(QueryCountGenerator))]
-    private void Query_Job_Count_Accurate(int count)
+    private void Query_Job_Count_Accurate(int count, bool createEmptyTable)
     {
         using var world = new World();
+
+        if (createEmptyTable)
+        {
+            var dead = world.Spawn().Add<byte>().Add("nope").Id();
+            world.Despawn(dead);
+        }
 
         List<Entity> entities = new(count);
 
@@ -174,9 +237,15 @@ public class Query1Tests
 
     [Theory]
     [ClassData(typeof(QueryChunkGenerator))]
-    private void Job_Visits_All_Entities_Chunked(int count, int chunk)
+    private void Job_Visits_All_Entities_Chunked(int count, int chunk, bool createEmptyTable)
     {
         using var world = new World();
+
+        if (createEmptyTable)
+        {
+            var dead = world.Spawn().Add<byte>().Add("nope").Id();
+            world.Despawn(dead);
+        }
 
         for (var index = 0; index < count; index++)
         {
@@ -205,40 +274,15 @@ public class Query1Tests
 
     [Theory]
     [ClassData(typeof(QueryChunkGenerator))]
-    private void Parallel_Visits_All_Entities_Chunked(int count, int chunk)
+    private void Job_Uniform_Visits_All_Entities_Chunked(int count, int chunk, bool createEmptyTable)
     {
         using var world = new World();
 
-        for (var index = 0; index < count; index++)
+        if (createEmptyTable)
         {
-            world.Spawn()
-                .Add(index)
-                .Id();
+            var dead = world.Spawn().Add<byte>().Add("nope").Id();
+            world.Despawn(dead);
         }
-
-        var query = world.Query<int>().Build();
-
-        var processed = 0;
-        query.Job((ref int index) =>
-        {
-            Interlocked.Increment(ref processed);
-            index = 123;
-        }, chunkSize: chunk);
-
-        Assert.Equal(count, processed);
-
-        query.Job((ref int index) =>
-        {
-            ArgumentOutOfRangeException.ThrowIfNegative(index);
-            Assert.Equal(123, index);
-        }, chunkSize: chunk);
-    }
-
-    [Theory]
-    [ClassData(typeof(QueryChunkGenerator))]
-    private void Parallel_Uniform_Visits_All_Entities_Chunked(int count, int chunk)
-    {
-        using var world = new World();
 
         for (var index = 0; index < count; index++)
         {
@@ -267,9 +311,15 @@ public class Query1Tests
 
     [Theory]
     [ClassData(typeof(QueryCountGenerator))]
-    private void Parallel_Visits_All_Entities(int count)
+    private void Parallel_Visits_All_Entities(int count, bool createEmptyTable) 
     {
         using var world = new World();
+
+        if (createEmptyTable)
+        {
+            var dead = world.Spawn().Add<byte>().Add("nope").Id();
+            world.Despawn(dead);
+        }
 
         for (var index = 0; index < count; index++)
         {
@@ -298,10 +348,16 @@ public class Query1Tests
 
     [Theory]
     [ClassData(typeof(QueryCountGenerator))]
-    private void Job_Visits_All_Entities(int count)
+    private void Job_Visits_All_Entities(int count, bool createEmptyTable)
     {
         using var world = new World();
 
+        if (createEmptyTable)
+        {
+            var dead = world.Spawn().Add<byte>().Add("nope").Id();
+            world.Despawn(dead);
+        }
+        
         for (var index = 0; index < count; index++)
         {
             world.Spawn()
@@ -329,10 +385,16 @@ public class Query1Tests
 
     [Theory]
     [ClassData(typeof(QueryCountGenerator))]
-    private static void Raw_Visits_All_Entities(int count)
+    private static void Raw_Visits_All_Entities(int count, bool createEmptyTable)
     {
         using var world = new World();
 
+        if (createEmptyTable)
+        {
+            var dead = world.Spawn().Add<byte>().Add("nope").Id();
+            world.Despawn(dead);
+        }
+        
         for (var c = 0; c < count; c++)
         {
             world.Spawn()
@@ -366,9 +428,15 @@ public class Query1Tests
 
     [Theory]
     [ClassData(typeof(QueryCountGenerator))]
-    private void Run_Visits_All_Entities_in_Order(int count)
+    private void Run_Visits_All_Entities_in_Order(int count, bool createEmptyTable)
     {
         using var world = new World();
+
+        if (createEmptyTable)
+        {
+            var dead = world.Spawn().Add<byte>().Add("nope").Id();
+            world.Despawn(dead);
+        }
 
         for (var c = 0; c < count; c++)
         {
@@ -396,5 +464,12 @@ public class Query1Tests
                 Assert.Equal(i, longs[i]);
             }
         });
+
+        var index = 0;
+        query.ForEach((ref long value) => { Assert.Equal(index++, value); });
+
+        var index2 = 0;
+        query.ForEach((ref long value, int _) => { Assert.Equal(index2++, value); },
+            1337);
     }
 }

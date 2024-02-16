@@ -25,6 +25,8 @@ public sealed class Table
     public int Count { get; private set; }
     public bool IsEmpty => Count == 0;
 
+    internal int Version => Volatile.Read(ref _version);
+
     private readonly Archetypes _archetypes;
 
     private Identity[] _identities;
@@ -33,7 +35,10 @@ public sealed class Table
     private readonly Dictionary<TypeExpression, TableEdge> _edges = new();
     private readonly Dictionary<TypeExpression, int> _indices = new();
 
-    
+    // Used by Queries to check if the table has been modified while enumerating.
+    private int _version;
+
+
     public Table(int id, Archetypes archetypes, SortedSet<TypeExpression> types)
     {
         _archetypes = archetypes;
@@ -83,6 +88,8 @@ public sealed class Table
     
     public int Add(Identity identity)
     {
+        Interlocked.Increment(ref _version);
+        
         EnsureCapacity(Count + 1);
         _identities[Count] = identity;
         return Count++;
@@ -91,6 +98,8 @@ public sealed class Table
     
     public void Remove(int row)
     {
+        Interlocked.Increment(ref _version);
+        
         ArgumentOutOfRangeException.ThrowIfGreaterThan(row, Count, nameof(row));
         
         Count--;
