@@ -8,6 +8,11 @@ public static class JobPool<T> where T : class, new()
 {
     private static readonly ConcurrentBag<T> Pool = [];
     
+    public static void Rent(out T destination)
+    {
+        destination = Rent();
+    }
+    
     public static T Rent()
     {
         return Pool.TryTake(out var job) ? job : new T();

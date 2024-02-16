@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 
+using System.Collections;
 using System.Collections.Concurrent;
 
 // ReSharper disable ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
@@ -7,7 +8,7 @@ using System.Collections.Concurrent;
 
 namespace fennecs;
 
-public sealed class Archetypes
+public sealed class Archetypes : IEnumerable<Table>
 {
     private EntityMeta[] _meta = new EntityMeta[65536];
     private readonly List<Table> _tables = [];
@@ -129,7 +130,6 @@ public sealed class Archetypes
             }
         }
     }
-
 
     internal void AddComponent<T>(TypeExpression typeExpression, Identity identity, T data, Entity target = default)
     {
@@ -278,13 +278,13 @@ public sealed class Archetypes
     {
         return ref _meta[identity.Id];
     }
-
+    
+    public Table this[int tableId] => _tables[tableId];
 
     internal Table GetTable(int tableId)
     {
         return _tables[tableId];
     }
-    
     
     internal (TypeExpression, object)[] GetComponents(Identity identity)
     {
@@ -445,4 +445,12 @@ public sealed class Archetypes
     }
 
     #endregion
+
+    #region Enumerators
+    public IEnumerator<Table> GetEnumerator() => _tables.GetEnumerator();
+    
+    IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable) _tables).GetEnumerator();
+
+    #endregion
+
 }

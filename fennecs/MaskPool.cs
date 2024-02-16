@@ -6,8 +6,13 @@ namespace fennecs;
 
 public static class MaskPool
 {
-    private static readonly ConcurrentBag<Mask> Pool = [];
+    internal static readonly ConcurrentBag<Mask> Pool = [];
     
+    public static void Rent(out Mask destination)
+    {
+        destination = Rent();
+    }
+
     public static Mask Rent()
     {
         return Pool.TryTake(out var mask) ? mask : new Mask();

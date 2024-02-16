@@ -26,6 +26,7 @@ public sealed class Table
     public bool IsEmpty => Count == 0;
 
     internal int Version => Volatile.Read(ref _version);
+    public int Capacity => _identities.Length;
 
     private readonly Archetypes _archetypes;
 
@@ -156,18 +157,18 @@ public sealed class Table
 
     private void EnsureCapacity(int capacity)
     {
-        if (capacity <= 0) throw new ArgumentOutOfRangeException(nameof(capacity), "minCapacity must be positive");
+        ArgumentOutOfRangeException.ThrowIfNegative(capacity, nameof(capacity));
+        
         if (capacity <= _identities.Length) return;
 
         Resize(Math.Max(capacity, StartCapacity) * 2);
     }
 
 
-    private void Resize(int length)
+    internal void Resize(int length)
     {
-        if (length < 0) throw new ArgumentOutOfRangeException(nameof(length), "length cannot be negative");
-        if (length < Count)
-            throw new ArgumentOutOfRangeException(nameof(length), "length cannot be smaller than Count");
+        ArgumentOutOfRangeException.ThrowIfNegative(length, nameof(length));
+        ArgumentOutOfRangeException.ThrowIfLessThan(length, Count, nameof(length));
 
         Array.Resize(ref _identities, length);
 

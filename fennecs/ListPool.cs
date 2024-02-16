@@ -8,7 +8,12 @@ public static class ListPool<T>
 {
     private static readonly ConcurrentBag<List<T>> Bag = [];
     private const int Capacity = 32;
-    
+
+    public static void Rent(out List<T> destination)
+    {
+        destination = Rent();
+    }
+
     public static List<T> Rent()
     {
         return Bag.TryTake(out var list) ? list : new List<T>(Capacity);
