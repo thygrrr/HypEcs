@@ -23,7 +23,7 @@ public class Query1Tests
         Assert.False(world.IsAlive(entity));
 
         var query = world.Query<int>().Build();
-        Assert.Throws<ArgumentException>(() => query[entity]);
+        Assert.Throws<ObjectDisposedException>(() => query[entity]);
     }
 
     [Fact]
