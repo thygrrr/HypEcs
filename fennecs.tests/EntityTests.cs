@@ -1,5 +1,6 @@
 ﻿// SPDX-License-Identifier: MIT
 
+using System.Data;
 using System.Numerics;
 
 namespace fennecs.tests;
@@ -72,6 +73,30 @@ public class EntityTests
         Assert.True(world.HasComponent<T>(entity));
         var components = world.GetComponents(entity);
         Assert.True(components.Count() == 2);
+    }
+
+    [Theory]
+    [ClassData(typeof(ComponentDataSource))]
+    private void Entity_cannot_Get_Component_from_Dead<T>(T t1) where T : struct
+    {
+        using var world = new World();
+        var entity = world.Spawn().Add(t1).Id();
+        world.Despawn(entity);
+
+        Assert.Throws<ObjectDisposedException>(() => world.GetComponent<T>(entity));
+    }
+
+    [Theory]
+    [ClassData(typeof(ComponentDataSource))]
+    private void Entity_cannot_Get_Component_from_Successor<T>(T t1) where T : struct
+    {
+        using var world = new World();
+        var entity1 = world.Spawn().Add(t1).Id();
+        world.Despawn(entity1);
+        var entity2 = world.Spawn().Add(t1).Id();
+
+        Assert.Equal(entity1.Identity.Id, entity2.Identity.Id);
+        Assert.Throws<ObjectDisposedException>(() => world.GetComponent<T>(entity1));
     }
 
     [Theory]

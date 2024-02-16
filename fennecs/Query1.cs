@@ -22,16 +22,7 @@ public class Query<C1>(Archetypes archetypes, Mask mask, List<Table> tables) : Q
         {
             throw new TypeAccessException("Can't request a mutable ref to type <Entity>.");
         }
-
-        if (!Archetypes.IsAlive(entity))
-        {
-            throw new ArgumentException("Entity is not alive.");
-        }
-
-        var meta = Archetypes.GetEntityMeta(entity.Identity);
-        var table = Archetypes.GetTable(meta.TableId);
-        var storage = table.GetStorage<C1>(Identity.None);
-        return ref storage[meta.Row];
+        return ref archetypes.GetComponent<C1>(entity);
     }
 
 

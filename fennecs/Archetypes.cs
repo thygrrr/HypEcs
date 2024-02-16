@@ -2,6 +2,8 @@
 
 using System.Collections;
 using System.Collections.Concurrent;
+using System.Data;
+using System.Runtime.CompilerServices;
 
 // ReSharper disable ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
 // ReSharper disable ReturnTypeCanBeEnumerable.Global
@@ -96,7 +98,7 @@ public sealed class Archetypes : IEnumerable<Table>
 
     public void Despawn(Identity identity)
     {
-        if (!IsAlive(identity)) return;
+        AssertAlive(identity);
 
         if (_mode == Mode.Deferred)
         {
@@ -180,7 +182,6 @@ public sealed class Archetypes : IEnumerable<Table>
 
         var type = TypeExpression.Create<T>(target);
         var meta = _meta[identity.Id];
-        AssertEqual(meta.Identity, identity);
         var table = _tables[meta.TableId];
         var storage = (T[]) table.GetStorage(type);
         return ref storage[meta.Row];
@@ -270,7 +271,7 @@ public sealed class Archetypes : IEnumerable<Table>
 
     internal bool IsAlive(Identity identity)
     {
-        return identity != Identity.None && _meta[identity.Id].Identity == identity;
+        return identity.IsEntity && _meta[identity.Id].Identity == identity;
     }
 
 
@@ -423,26 +424,16 @@ public sealed class Archetypes : IEnumerable<Table>
         Despawn,
     }
 
-
     #region Assert Helpers
 
-    private void AssertAlive(Identity identity)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal void AssertAlive(Identity identity)
     {
-        if (!IsAlive(identity))
-        {
-            throw new Exception($"Entity {identity} is not alive.");
-        }
+        if (IsAlive(identity)) return;
+        
+        throw new ObjectDisposedException($"Entity {identity} is no longer alive.");
     }
-
-
-    private static void AssertEqual(Identity metaIdentity, Identity identity)
-    {
-        if (metaIdentity != identity)
-        {
-            throw new Exception($"Entity {identity} meta/generation mismatch.");
-        }
-    }
-
+    
     #endregion
 
     #region Enumerators
