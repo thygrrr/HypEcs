@@ -1,14 +1,179 @@
 ﻿namespace fennecs.tests.Integration;
 
+// ReSharper disable ParameterOnlyUsedForPreconditionCheck.Local
 // ReSharper disable once ClassNeverInstantiated.Global
 public class Query1Tests
 {
     [Theory]
-    [InlineData(1_000, 100)] //fits
-    [InlineData(10_000, 10_000)] //exact
-    [InlineData(15_383, 1024)] //typical
-    [InlineData(214_363, 4096)] //typical
-    [InlineData(151_189, 13_441)] // prime numbers
+    [ClassData(typeof(QueryCountGenerator))]
+    private void Query_Count_Accurate(int count)
+    {
+        using var world = new World();
+
+        List<Entity> entities = new(count);
+
+        var query = world.Query<int>().Build();
+        Assert.Equal(0, query.Count);
+
+        for (var index = 0; index < count; index++)
+        {
+            Assert.Equal(index, query.Count);
+
+            entities.Add(
+                world.Spawn()
+                    .Add(index)
+                    .Id()
+            );
+        }
+
+        Assert.Equal(count, query.Count);
+
+        var random = new Random(69 + count);
+
+        for (var i = count; i > 0; i--)
+        {
+            Assert.Equal(i, query.Count);
+            var removalIndex = random.Next(entities.Count);
+            var removalEntity = entities[removalIndex];
+            entities.RemoveAt(removalIndex);
+            world.Despawn(removalEntity);
+        }
+
+        Assert.Equal(0, query.Count);
+    }
+
+
+    [Theory]
+    [ClassData(typeof(QueryCountGenerator))]
+    private void Query_Raw_Count_Accurate(int count)
+    {
+        using var world = new World();
+
+        List<Entity> entities = new(count);
+
+        var query = world.Query<int>().Build();
+
+        query.Raw(integers => { Assert.Equal(0, integers.Length); });
+
+        for (var index = 0; index < count; index++)
+        {
+            var captured = index;
+            query.Raw(integers => { Assert.Equal(captured, integers.Length); });
+
+            entities.Add(
+                world.Spawn()
+                    .Add(index)
+                    .Id()
+            );
+        }
+
+        query.Raw(integers => { Assert.Equal(count, integers.Length); });
+
+        var random = new Random(69 + count);
+
+        for (var i = count; i > 0; i--)
+        {
+            var captured = i;
+            query.Raw(integers => { Assert.Equal(captured, integers.Length); });
+
+            var removalIndex = random.Next(entities.Count);
+            var removalEntity = entities[removalIndex];
+            entities.RemoveAt(removalIndex);
+            world.Despawn(removalEntity);
+        }
+
+        query.Raw(integers => { Assert.Equal(0, integers.Length); });
+    }
+
+
+    [Theory]
+    [ClassData(typeof(QueryCountGenerator))]
+    private void Query_Run_Count_Accurate(int count)
+    {
+        using var world = new World();
+
+        List<Entity> entities = new(count);
+
+        var query = world.Query<int>().Build();
+
+        query.Run(integers => { Assert.Equal(0, integers.Length); });
+
+        for (var index = 0; index < count; index++)
+        {
+            var captured = index;
+            query.Raw(integers => { Assert.Equal(captured, integers.Length); });
+
+            entities.Add(
+                world.Spawn()
+                    .Add(index)
+                    .Id()
+            );
+        }
+
+        query.Run(integers => { Assert.Equal(count, integers.Length); });
+
+        var random = new Random(69 + count);
+
+        for (var i = count; i > 0; i--)
+        {
+            var captured = i;
+            query.Run(integers => { Assert.Equal(captured, integers.Length); });
+
+            var removalIndex = random.Next(entities.Count);
+            var removalEntity = entities[removalIndex];
+            entities.RemoveAt(removalIndex);
+            world.Despawn(removalEntity);
+        }
+
+        query.Run(integers => { Assert.Equal(0, integers.Length); });
+    }
+
+
+    [Theory]
+    [ClassData(typeof(QueryCountGenerator))]
+    private void Query_Job_Count_Accurate(int count)
+    {
+        using var world = new World();
+
+        List<Entity> entities = new(count);
+
+        var query = world.Query<int>().Build();
+
+        query.Run(integers => { Assert.Equal(0, integers.Length); });
+
+        for (var index = 0; index < count; index++)
+        {
+            var captured = index;
+            query.Raw(integers => { Assert.Equal(captured, integers.Length); });
+
+            entities.Add(
+                world.Spawn()
+                    .Add(index)
+                    .Id()
+            );
+        }
+
+        query.Run(integers => { Assert.Equal(count, integers.Length); });
+
+        var random = new Random(69 + count);
+
+        for (var i = count; i > 0; i--)
+        {
+            var captured = i;
+            query.Run(integers => { Assert.Equal(captured, integers.Length); });
+
+            var removalIndex = random.Next(entities.Count);
+            var removalEntity = entities[removalIndex];
+            entities.RemoveAt(removalIndex);
+            world.Despawn(removalEntity);
+        }
+
+        query.Run(integers => { Assert.Equal(0, integers.Length); });
+    }
+
+
+    [Theory]
+    [ClassData(typeof(QueryChunkGenerator))]
     private void Job_Visits_All_Entities_Chunked(int count, int chunk)
     {
         using var world = new World();
@@ -39,11 +204,7 @@ public class Query1Tests
     }
 
     [Theory]
-    [InlineData(1_000, 100)] //fits
-    [InlineData(10_000, 10_000)] //exact
-    [InlineData(15_383, 1024)] //typical
-    [InlineData(214_363, 4096)] //typical
-    [InlineData(151_189, 13_441)] // prime numbers
+    [ClassData(typeof(QueryChunkGenerator))]
     private void Parallel_Visits_All_Entities_Chunked(int count, int chunk)
     {
         using var world = new World();
@@ -74,11 +235,7 @@ public class Query1Tests
     }
 
     [Theory]
-    [InlineData(1_000, 100)] //fits
-    [InlineData(10_000, 10_000)] //exact
-    [InlineData(15_383, 1024)] //typical
-    [InlineData(214_363, 4096)] //typical
-    [InlineData(151_189, 13_441)] // prime numbers
+    [ClassData(typeof(QueryChunkGenerator))]
     private void Parallel_Uniform_Visits_All_Entities_Chunked(int count, int chunk)
     {
         using var world = new World();
@@ -108,52 +265,8 @@ public class Query1Tests
         }, 0, chunkSize: chunk);
     }
 
-    [Fact]
-    private void Parallel_Visits_All_Entities_Chunked_Switched()
-    {
-        // There were issues with confusing storage.Length and table.Count.
-        // This test is to call me out when that happens again.
-        for (var i = 0; i < 50; i++)
-        {
-            for (var j = 1; j < 15; j++)
-            {
-                Parallel_Visits_All_Entities_Chunked(i, j);
-            }
-        }
-    }
-
-    [Fact]
-    private void Parallel_Uniform_Visits_All_Entities_Chunked_Switched()
-    {
-        // There were issues with confusing storage.Length and table.Count.
-        // This test is to call me out when that happens again.
-        for (var i = 0; i < 50; i++)
-        {
-            for (var j = 1; j < 15; j++)
-            {
-                Parallel_Uniform_Visits_All_Entities_Chunked(i, j);
-            }
-        }
-    }
-
-    [Fact]
-    private void Job_Visits_All_Entities_Chunked_Switched()
-    {
-        // There were issues with confusing storage.Length and table.Count.
-        // This test is to call me out when that happens again.
-        for (var i = 0; i < 50; i++)
-        {
-            for (var j = 1; j < 15; j++)
-            {
-                Job_Visits_All_Entities_Chunked(i, j);
-            }
-        }
-    }
-
     [Theory]
-    [InlineData(134_41)]
-    [InlineData(100_000)]
-    [InlineData(151_189)]
+    [ClassData(typeof(QueryCountGenerator))]
     private void Parallel_Visits_All_Entities(int count)
     {
         using var world = new World();
@@ -184,9 +297,7 @@ public class Query1Tests
     }
 
     [Theory]
-    [InlineData(134_41)]
-    [InlineData(100_000)]
-    [InlineData(151_189)]
+    [ClassData(typeof(QueryCountGenerator))]
     private void Job_Visits_All_Entities(int count)
     {
         using var world = new World();
@@ -215,11 +326,9 @@ public class Query1Tests
             Assert.Equal(123, index);
         });
     }
-    
+
     [Theory]
-    [InlineData(134_41)]
-    [InlineData(100_000)]
-    [InlineData(151_189)]
+    [ClassData(typeof(QueryCountGenerator))]
     private static void Raw_Visits_All_Entities(int count)
     {
         using var world = new World();
@@ -256,10 +365,7 @@ public class Query1Tests
 
 
     [Theory]
-    [InlineData(1_000)] //fits
-    [InlineData(10_000)] //typical
-    [InlineData(100_000)] //typical
-    [InlineData(151189)] // Prime numbers
+    [ClassData(typeof(QueryCountGenerator))]
     private void Run_Visits_All_Entities_in_Order(int count)
     {
         using var world = new World();

@@ -6,6 +6,8 @@ public class Query<C1>(Archetypes archetypes, Mask mask, List<Table> tables) : Q
 {
     private readonly CountdownEvent _countdown = new(1);
 
+    public ref C1 this[Entity entity] => ref Get(entity);
+    
     public ref C1 Get(Entity entity)
     {
         var meta = Archetypes.GetEntityMeta(entity.Identity);
