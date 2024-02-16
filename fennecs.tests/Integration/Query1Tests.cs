@@ -1,6 +1,4 @@
-﻿using Xunit.Sdk;
-
-namespace fennecs.tests.Integration;
+﻿namespace fennecs.tests.Integration;
 
 // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Local
 // ReSharper disable once ClassNeverInstantiated.Global
@@ -51,7 +49,7 @@ public class Query1Tests
 
         if (createEmptyTable)
         {
-            var dead = world.Spawn().Add<byte>().Add("nope").Id();
+            var dead = world.Spawn().Add<int>().Add("will be removed").Id();
             world.Despawn(dead);
         }
 
@@ -96,7 +94,7 @@ public class Query1Tests
 
         if (createEmptyTable)
         {
-            var dead = world.Spawn().Add<byte>().Add("nope").Id();
+            var dead = world.Spawn().Add<int>().Add("will be removed").Id();
             world.Despawn(dead);
         }
 
@@ -145,7 +143,7 @@ public class Query1Tests
 
         if (createEmptyTable)
         {
-            var dead = world.Spawn().Add<byte>().Add("nope").Id();
+            var dead = world.Spawn().Add<int>().Add("will be removed").Id();
             world.Despawn(dead);
         }
 
@@ -194,7 +192,7 @@ public class Query1Tests
 
         if (createEmptyTable)
         {
-            var dead = world.Spawn().Add<byte>().Add("nope").Id();
+            var dead = world.Spawn().Add<int>().Add("will be removed").Id();
             world.Despawn(dead);
         }
 
@@ -243,7 +241,7 @@ public class Query1Tests
 
         if (createEmptyTable)
         {
-            var dead = world.Spawn().Add<byte>().Add("nope").Id();
+            var dead = world.Spawn().Add<int>().Add("will be removed").Id();
             world.Despawn(dead);
         }
 
@@ -280,7 +278,7 @@ public class Query1Tests
 
         if (createEmptyTable)
         {
-            var dead = world.Spawn().Add<byte>().Add("nope").Id();
+            var dead = world.Spawn().Add<int>().Add("will be removed").Id();
             world.Despawn(dead);
         }
 
@@ -317,7 +315,7 @@ public class Query1Tests
 
         if (createEmptyTable)
         {
-            var dead = world.Spawn().Add<byte>().Add("nope").Id();
+            var dead = world.Spawn().Add<int>().Add("will be removed").Id();
             world.Despawn(dead);
         }
 
@@ -354,7 +352,7 @@ public class Query1Tests
 
         if (createEmptyTable)
         {
-            var dead = world.Spawn().Add<byte>().Add("nope").Id();
+            var dead = world.Spawn().Add<int>().Add("will be removed").Id();
             world.Despawn(dead);
         }
         
@@ -391,7 +389,7 @@ public class Query1Tests
 
         if (createEmptyTable)
         {
-            var dead = world.Spawn().Add<byte>().Add("nope").Id();
+            var dead = world.Spawn().Add<int>().Add("will be removed").Id();
             world.Despawn(dead);
         }
         
@@ -434,7 +432,7 @@ public class Query1Tests
 
         if (createEmptyTable)
         {
-            var dead = world.Spawn().Add<byte>().Add("nope").Id();
+            var dead = world.Spawn().Add<int>().Add("will be removed").Id();
             world.Despawn(dead);
         }
 
