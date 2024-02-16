@@ -8,11 +8,6 @@ public static class JobPool<T> where T : class, new()
 {
     private static readonly ConcurrentBag<T> Pool = [];
     
-    public static void Rent(out T destination)
-    {
-        destination = Rent();
-    }
-    
     public static T Rent()
     {
         return Pool.TryTake(out var job) ? job : new T();
@@ -31,12 +26,6 @@ public static class JobPool<T> where T : class, new()
     public static void Return(List<T> jobs)
     {
         foreach (var job in jobs) Return(job);
-        jobs.Clear();
-    }
-
-    public static void Return(List<IThreadPoolWorkItem> jobs)
-    {
-        foreach (var job in jobs) Return((T) job);
         jobs.Clear();
     }
 }
