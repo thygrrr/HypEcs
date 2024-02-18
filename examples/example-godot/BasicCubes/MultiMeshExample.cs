@@ -163,7 +163,8 @@ public partial class MultiMeshExample : Node
 		{
 			var floatSpan = MemoryMarshal.Cast<Matrix4X3, float>(transforms);
 
-			//We must copy the data manually once, into a pooled array.
+			//We must copy the data manually once, into a pre-created array.
+			//ISSUE: (Godot) It cannot come from an ArrayPool because it needs to have the exact size.
 			floatSpan.CopyTo(uniform.submission);
 			RenderingServer.MultimeshSetBuffer(uniform.mesh, uniform.submission);
 

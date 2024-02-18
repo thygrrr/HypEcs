@@ -127,4 +127,12 @@ public class IdentityTests(ITestOutputHelper output)
             Assert.Equal(self, other);
         }
     }
+
+    [Fact]
+    private void Implicit_Cast_From_Type()
+    {
+        var type = typeof(int);
+        Identity identity= type;
+        Assert.Equal(type, identity.Type);
+    }
 }

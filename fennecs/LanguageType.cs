@@ -1,4 +1,6 @@
-﻿namespace fennecs;
+﻿using System.Collections.Concurrent;
+
+namespace fennecs;
 
 internal class LanguageType
 {
@@ -60,4 +62,3 @@ internal class LanguageType<T> : LanguageType
         }
     }
 }
-

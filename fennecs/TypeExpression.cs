@@ -21,6 +21,18 @@ public readonly struct TypeExpression : IEquatable<TypeExpression>, IComparable<
     //   | Identity                     | TypeNumber |
     //   | 48 bits                      |  16 bits   |
     
+    //   PLANNED:
+    //   TypeNumber
+    //   | Type    | Flags |
+    //   | 14 bits | 2 bits |
+    
+    //   Flags
+    //   00 - Component Type
+    //   01 - Component Type Targeting Entity
+    //   10 - Component Type Targeting WeakReference
+    //   11 - Reserved (for potential hash-bucket storage features)
+    
+    
     //Union Backing Store
     [FieldOffset(0)] public readonly ulong Value;
 

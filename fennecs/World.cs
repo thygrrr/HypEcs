@@ -149,10 +149,10 @@ public partial class World : IEnumerable<Table>, IDisposable
     }
 
 
-    public IEnumerable<Entity> GetTargets<T>(Entity entity)
+    public PooledList<Entity> GetTargets<T>(Entity origin)
     {
-        var targets = new List<Entity>();
-        CollectTargets<T>(targets, entity);
+        var targets = PooledList<Entity>.Rent();
+        CollectTargets<T>(targets, origin);
         return targets;
     }
 
@@ -174,22 +174,22 @@ public partial class World : IEnumerable<Table>, IDisposable
         return new QueryBuilder<C>(this);
     }
 
-    public QueryBuilder<C1, C2> Query<C1, C2>() where C2 : struct
+    public QueryBuilder<C1, C2> Query<C1, C2>()
     {
         return new QueryBuilder<C1, C2>(this);
     }
 
-    public QueryBuilder<C1, C2, C3> Query<C1, C2, C3>() where C1 : struct where C2 : struct where C3 : struct
+    public QueryBuilder<C1, C2, C3> Query<C1, C2, C3>()
     {
         return new QueryBuilder<C1, C2, C3>(this);
     }
 
-    public QueryBuilder<C1, C2, C3, C4> Query<C1, C2, C3, C4>() where C1 : struct
+    public QueryBuilder<C1, C2, C3, C4> Query<C1, C2, C3, C4>()
     {
         return new QueryBuilder<C1, C2, C3, C4>(this);
     }
 
-    public QueryBuilder<C1, C2, C3, C4, C5> Query<C1, C2, C3, C4, C5>() where C1 : struct
+    public QueryBuilder<C1, C2, C3, C4, C5> Query<C1, C2, C3, C4, C5>()
     {
         return new QueryBuilder<C1, C2, C3, C4, C5>(this);
     }
