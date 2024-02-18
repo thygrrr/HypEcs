@@ -28,7 +28,25 @@ public class Query<C1>(World world, Mask mask, List<Table> tables) : Query(world
     }
 
 
+
     #region Runners
+
+
+
+    public void Run(SpanAction_C<C1> action)
+    {
+        AssertNotDisposed();
+
+        World.Lock();
+
+        foreach (var table in Tables)
+        {
+            if (table.IsEmpty) continue;
+            action(table.GetStorage<C1>(Identity.None).AsSpan(0, table.Count));
+        }
+
+        World.Unlock();
+    }
 
     public void ForEach(RefAction_C<C1> action)
     {
@@ -61,23 +79,6 @@ public class Query<C1>(World world, Mask mask, List<Table> tables) : Query(world
 
         World.Unlock();
     }
-
-    public void Run(SpanAction_C<C1> action)
-    {
-        AssertNotDisposed();
-        
-        World.Lock();
-
-        foreach (var table in Tables)
-        {
-            if (table.IsEmpty) continue;
-            action(table.GetStorage<C1>(Identity.None).AsSpan(0, table.Count));
-        }
-
-        World.Unlock();
-    }
-
-
     public void Job(RefAction_C<C1> action, int chunkSize = int.MaxValue)
     {
         AssertNotDisposed();

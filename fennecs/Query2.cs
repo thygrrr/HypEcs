@@ -4,6 +4,7 @@ namespace fennecs;
 
 public class Query<C1, C2>(World world, Mask mask, List<Table> tables) : Query(world, mask, tables)
 {
+
     public RefValueTuple<C1, C2> Get(Entity entity)
     {
         var meta = World.GetEntityMeta(entity.Identity);
@@ -16,7 +17,7 @@ public class Query<C1, C2>(World world, Mask mask, List<Table> tables) : Query(w
     private readonly CountdownEvent _countdown = new(1);
 
     #region Runners
-
+    
     public void ForEach(RefAction_CC<C1, C2> action)
     {
         World.Lock();
@@ -53,7 +54,7 @@ public class Query<C1, C2>(World world, Mask mask, List<Table> tables) : Query(w
         World.Unlock();
     }
 
-    public void Span<U>(SpanAction_CCU<C1, C2, U> action, U uniform)
+    public void Run<U>(SpanAction_CCU<C1, C2, U> action, U uniform)
     {
         World.Lock();
 
@@ -84,7 +85,7 @@ public class Query<C1, C2>(World world, Mask mask, List<Table> tables) : Query(w
     }
 
 
-    public void Job(RefAction_CC<C1, C2> action, int chunkSize = int.MaxValue)
+    public void JobNonU(RefAction_CC<C1, C2> action, int chunkSize = int.MaxValue)
     {
         World.Lock();
         _countdown.Reset();
