@@ -44,25 +44,24 @@ public readonly struct TypeExpression : IEquatable<TypeExpression>, IComparable<
 
     public Identity Target => new(Value);
 
-    private struct Any;
-    private struct None;
-    
     public bool isRelation => TypeId != 0 && Target != Identity.None;
-    public Type Type
-    {
-        get
+
+    public Type Type => LanguageType.Resolve(TypeId);
+    
+    /* TODO: Handle different flags if needed
         {
             return (TypeId, Id) switch
             {
                 (0, int.MaxValue) => typeof(Any),
                 (0, 0) => typeof(None),
                 (0, _) => typeof(Entity),
-                _ => LanguageType.Resolve(TypeId),
+                    _ => LanguageType.Resolve(TypeId),
             };
         }
-    }
-    
-    
+        internal struct None;
+        internal struct Any;    
+    */
+
     public bool Matches(IEnumerable<TypeExpression> other)
     {
         var self = this;
@@ -102,11 +101,7 @@ public readonly struct TypeExpression : IEquatable<TypeExpression>, IComparable<
     {
         return new TypeExpression(target, LanguageType.Identify(type));
     }
-
-    public static TypeExpression Create<T, Target>()
-    {
-        return new TypeExpression(new Identity(LanguageType<Target>.Id), LanguageType<T>.Id);
-    }
+    
 
     public override int GetHashCode()
     {

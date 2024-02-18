@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 
 namespace fennecs;
 
-public partial class World : IEnumerable<Table>, IDisposable
+public partial class World : IDisposable
 {
     public EntityBuilder Spawn()
     {
@@ -494,14 +494,6 @@ public partial class World : IEnumerable<Table>, IDisposable
         return table;
     }
 
-
-    [Obsolete("Use new Identity(type)")]
-    internal static Entity GetTypeEntity(Type type)
-    {
-        return new Identity(type);
-    }
-
-
     private void ApplyDeferredOperations()
     {
         if (_deferredOperations.IsEmpty) return;
@@ -583,12 +575,14 @@ public partial class World : IEnumerable<Table>, IDisposable
     
     #endregion
 
+    #endregion
+
+    /*
     #region Enumerators
     public IEnumerator<Table> GetEnumerator() => _tables.GetEnumerator();
-    
+
     IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable) _tables).GetEnumerator();
 
     #endregion
-
-    #endregion
+*/
 }
