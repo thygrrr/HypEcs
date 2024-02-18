@@ -4,17 +4,18 @@ using System.Collections;
 
 namespace fennecs;
 
-public class Query(World world, Mask mask, List<Table> tables) : IEnumerable<Entity>, IEnumerable
+public class Query(World world, Mask mask, List<Table> tables) : IEnumerable<Entity>, IDisposable
 {
     protected readonly ParallelOptions Options = new() {MaxDegreeOfParallelism = 24};
 
     private protected readonly List<Table> Tables = tables;
-    private protected readonly World world = world;
+    private protected readonly World World = world;
 
     protected internal readonly Mask Mask = mask;
     
 
     #region IEnumerable<Entity>
+
     /// <summary>
     /// Enumerator over all the entities in the query.
     /// Do not make modifications to the world affecting the query while enumerating.
@@ -24,6 +25,8 @@ public class Query(World world, Mask mask, List<Table> tables) : IEnumerable<Ent
     /// </returns>
     public IEnumerator<Entity> GetEnumerator()
     {
+        AssertNotDisposed();
+
         foreach (var table in Tables)
         {
             var snapshot = table.Version;
@@ -38,26 +41,50 @@ public class Query(World world, Mask mask, List<Table> tables) : IEnumerable<Ent
             }
         }
     }
-    
+
     IEnumerator IEnumerable.GetEnumerator()
     {
+        AssertNotDisposed();
+        
         return GetEnumerator();
     }
     #endregion
     
     public bool Contains(Entity entity)
     {
-        var meta = world.GetEntityMeta(entity.Identity);
-        var table = world.GetTable(meta.TableId);
+        AssertNotDisposed();
+        
+        var meta = World.GetEntityMeta(entity.Identity);
+        var table = World.GetTable(meta.TableId);
         return Tables.Contains(table);
     }
     
     internal void AddTable(Table table)
     {
+        AssertNotDisposed();
+        
         Tables.Add(table);
     }
 
     public int Count => Tables.Sum(t => t.Count);
+
+    public void Dispose()
+    {
+        AssertNotDisposed();
+        
+        tables.Clear();
+        disposed = true;
+        World.RemoveQuery(this);
+        Mask.Dispose();
+    }
+
+    protected void AssertNotDisposed()
+    {
+        if (!disposed) return;
+        throw new ObjectDisposedException(nameof(Query));
+    }
+    
+    private bool disposed { get; set; }
 }
 
 // ReSharper disable InconsistentNaming

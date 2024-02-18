@@ -6,8 +6,8 @@ public class Query<C1, C2>(World world, Mask mask, List<Table> tables) : Query(w
 {
     public RefValueTuple<C1, C2> Get(Entity entity)
     {
-        var meta = world.GetEntityMeta(entity.Identity);
-        var table = world.GetTable(meta.TableId);
+        var meta = World.GetEntityMeta(entity.Identity);
+        var table = World.GetTable(meta.TableId);
         var storage1 = table.GetStorage<C1>(Identity.None);
         var storage2 = table.GetStorage<C2>(Identity.None);
         return new RefValueTuple<C1, C2>(ref storage1[meta.Row], ref storage2[meta.Row]);
@@ -19,7 +19,7 @@ public class Query<C1, C2>(World world, Mask mask, List<Table> tables) : Query(w
 
     public void ForEach(RefAction_CC<C1, C2> action)
     {
-        world.Lock();
+        World.Lock();
 
         foreach (var table in Tables)
         {
@@ -32,12 +32,12 @@ public class Query<C1, C2>(World world, Mask mask, List<Table> tables) : Query(w
             }
         }
 
-        world.Unlock();
+        World.Unlock();
     }
 
     public void ForEach<U>(RefAction_CCU<C1, C2, U> action, U uniform)
     {
-        world.Lock();
+        World.Lock();
 
         foreach (var table in Tables)
         {
@@ -50,12 +50,12 @@ public class Query<C1, C2>(World world, Mask mask, List<Table> tables) : Query(w
             }
         }
 
-        world.Unlock();
+        World.Unlock();
     }
 
     public void Span<U>(SpanAction_CCU<C1, C2, U> action, U uniform)
     {
-        world.Lock();
+        World.Lock();
 
         foreach (var table in Tables)
         {
@@ -65,12 +65,12 @@ public class Query<C1, C2>(World world, Mask mask, List<Table> tables) : Query(w
             action(storage1.Span, storage2.Span, uniform);
         }
 
-        world.Unlock();
+        World.Unlock();
     }
 
     public void Run(SpanAction_CC<C1, C2> action)
     {
-        world.Lock();
+        World.Lock();
 
         foreach (var table in Tables)
         {
@@ -80,13 +80,13 @@ public class Query<C1, C2>(World world, Mask mask, List<Table> tables) : Query(w
             action(span1, span2);
         }
 
-        world.Unlock();
+        World.Unlock();
     }
 
 
     public void Job(RefAction_CC<C1, C2> action, int chunkSize = int.MaxValue)
     {
-        world.Lock();
+        World.Lock();
         _countdown.Reset();
 
         using var jobs = PooledList<Work<C1, C2>>.Rent();
@@ -123,12 +123,12 @@ public class Query<C1, C2>(World world, Mask mask, List<Table> tables) : Query(w
 
         JobPool<Work<C1, C2>>.Return(jobs);
 
-        world.Unlock();
+        World.Unlock();
     }
 
     public void Job<U>(RefAction_CCU<C1, C2, U> action, in U uniform, int chunkSize = int.MaxValue)
     {
-        world.Lock();
+        World.Lock();
         _countdown.Reset();
 
         using var jobs = PooledList<UniformWork<C1, C2, U>>.Rent();
@@ -165,12 +165,12 @@ public class Query<C1, C2>(World world, Mask mask, List<Table> tables) : Query(w
 
         JobPool<UniformWork<C1, C2, U>>.Return(jobs);
 
-        world.Unlock();
+        World.Unlock();
     }
 
     public void Raw(MemoryAction_CC<C1, C2> action)
     {
-        world.Lock();
+        World.Lock();
 
         foreach (var table in Tables)
         {
@@ -178,7 +178,7 @@ public class Query<C1, C2>(World world, Mask mask, List<Table> tables) : Query(w
             action(table.Memory<C1>(Identity.None), table.Memory<C2>(Identity.None));
         }
 
-        world.Unlock();
+        World.Unlock();
     }
     #endregion
 }

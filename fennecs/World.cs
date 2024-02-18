@@ -147,16 +147,7 @@ public partial class World : IEnumerable<Table>, IDisposable
         var type = TypeExpression.Create<T>(target.Identity);
         RemoveComponent(entity.Identity, type);
     }
-
-
-    public PooledList<Entity> GetTargets<T>(Entity origin)
-    {
-        var targets = PooledList<Entity>.Rent();
-        CollectTargets<T>(targets, origin);
-        return targets;
-    }
-
-
+    
     public void Dispose()
     {
     }
@@ -221,16 +212,6 @@ public partial class World : IEnumerable<Table>, IDisposable
         AddTable([TypeExpression.Create<Entity>(Identity.None)]);
     }
 
-    public Entity GetTarget(TypeExpression type)
-    {
-        if (type is {isRelation: true, Target.IsEntity: true})
-        {
-            return type.Target;
-        }
-
-        throw new InvalidCastException($"TypeExpression {type} is not a Entity-Component-Entity relation type");
-    }
-
     public void CollectTargets<T>(List<Entity> entities)
     {
         var type = TypeExpression.Create<T>(Identity.Any);
@@ -241,18 +222,6 @@ public partial class World : IEnumerable<Table>, IDisposable
             if (type.Matches(candidate)) entities.Add(new Entity(candidate.Target));
         }
     }
-
-    public void CollectTargets<T>(List<Entity> entities, Entity origin)
-    {
-        var type = TypeExpression.Create<T>(origin.Identity);
-
-        // Iterate through tables and get all concrete entities from their Archetype TypeExpressions
-        foreach (var candidate in _tablesByType.Keys)
-        {
-            if (type.Matches(candidate)) entities.Add(new Entity(candidate.Target));
-        }
-    }
-
     private readonly object _spawnLock = new();
 
     internal Entity SpawnInternal(Type? type = default)
@@ -421,13 +390,7 @@ public partial class World : IEnumerable<Table>, IDisposable
         meta.TableId = newTable.Id;
     }
 
-    public void DiscardQuery(Mask mask)
-    {
-        _queries.Remove(mask);
-        MaskPool.Return(mask);
-    }
-
-    public Query GetQuery(Mask mask, Func<World, Mask, List<Table>, Query> createQuery)
+    internal Query GetQuery(Mask mask, Func<World, Mask, List<Table>, Query> createQuery)
     {
         if (_queries.TryGetValue(mask, out var query))
         {
@@ -452,6 +415,11 @@ public partial class World : IEnumerable<Table>, IDisposable
 
         _queries.Add(mask, query);
         return query;
+    }
+    
+    internal void RemoveQuery(Query query)
+    {
+        _queries.Remove(query.Mask);
     }
 
 

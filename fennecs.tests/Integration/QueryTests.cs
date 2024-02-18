@@ -330,4 +330,21 @@ public static class QueryTests
         Assert.True(ReferenceEquals(query4A, query4B));
         Assert.True(ReferenceEquals(query5A, query5B));
     }
+
+    [Fact]
+    private static void Queries_are_Disposable()
+    {
+        using var world = new World();
+
+        var query = world.Query().Build();
+        query.Dispose();
+        Assert.Throws<ObjectDisposedException>(() => query.Raw(memory => { }));
+        Assert.Throws<ObjectDisposedException>(() =>
+        {
+            foreach (var _ in query)
+            {
+                Assert.Fail("Should not enumerate disposed Query.");
+            }
+        });
+    }
 }
