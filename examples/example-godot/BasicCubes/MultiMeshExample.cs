@@ -28,7 +28,7 @@ public partial class MultiMeshExample : Node
 		for (var i = 0; i < spawnCount; i++)
 		{
 			_world.Spawn()
-				.Add(i+ MeshInstance.Multimesh.InstanceCount)
+				.Add(i + MeshInstance.Multimesh.InstanceCount)
 				.Add<Matrix4X3>()
 				.Id();
 		}
@@ -57,12 +57,11 @@ public partial class MultiMeshExample : Node
 
 		//Update positions
 		_query.Job(UpdatePositionForCube, ((float) _time, _amplitude), chunkSize: 4096);
-
 		
 		// Write transforms into Multimesh
-		_query.Run(static (Span<int> _, Span<Matrix4X3> transforms, in (Rid mesh, float[] submission) uniform) =>
+		_query.Raw(static (Memory<int> _, Memory<Matrix4X3> transforms, (Rid mesh, float[] submission) uniform) =>
 		{
-			var floatSpan = MemoryMarshal.Cast<Matrix4X3, float>(transforms);
+			var floatSpan = MemoryMarshal.Cast<Matrix4X3, float>(transforms.Span);
 
 			//We must copy the data manually once, into a pre-created array.
 			//ISSUE: (Godot) It cannot come from an ArrayPool because it needs to have the exact size.
@@ -70,7 +69,7 @@ public partial class MultiMeshExample : Node
 			RenderingServer.MultimeshSetBuffer(uniform.mesh, uniform.submission);
 
 			// Ideal way - raw query to pass Memory<T>, Godot Memory<TY overload not yet available.
-			// query.Raw((_, transforms) => RenderingServer.MultimeshSetBuffer(MeshInstance.Multimesh.GetRid(), transforms));
+			//_query.Raw((_, transforms) => RenderingServer.MultimeshSetBuffer(MeshInstance.Multimesh.GetRid(), transforms));
 			
 			// This variant is also fast, but it doesn't work with the Godot API as that expects an array.
 			// We're waiting on a change to the Godot API to expose the Span<float> overloads, which actually

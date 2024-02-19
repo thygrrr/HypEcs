@@ -1,5 +1,7 @@
 ﻿// SPDX-License-Identifier: MIT
 
+using fennecs.pools;
+
 namespace fennecs;
 
 public class Query<C1>(World world, Mask mask, List<Table> tables) : Query(world, mask, tables)
@@ -26,12 +28,9 @@ public class Query<C1>(World world, Mask mask, List<Table> tables) : Query(world
         }
         return ref World.GetComponent<C1>(entity);
     }
-
-
+    
 
     #region Runners
-
-
 
     public void Run(SpanAction_C<C1> action)
     {
@@ -58,12 +57,12 @@ public class Query<C1>(World world, Mask mask, List<Table> tables) : Query(world
         {
             if (table.IsEmpty) continue;
             var storage = table.GetStorage<C1>(Identity.None).AsSpan(0, table.Count);
-            foreach (ref var c in storage) action(ref c);
+            for (var i = 0; i < storage.Length; i++) action(ref storage[i]);
         }
 
         World.Unlock();
     }
-
+    
     public void ForEach<U>(RefAction_CU<C1, U> action, U uniform)
     {
         AssertNotDisposed();
@@ -74,11 +73,12 @@ public class Query<C1>(World world, Mask mask, List<Table> tables) : Query(world
         {
             if (table.IsEmpty) continue;
             var storage = table.GetStorage<C1>(Identity.None).AsSpan(0, table.Count);
-            foreach (ref var c in storage) action(ref c, uniform);
+            for (var i = 0; i < storage.Length; i++) action(ref storage[i], uniform);
         }
 
         World.Unlock();
     }
+    
     public void Job(RefAction_C<C1> action, int chunkSize = int.MaxValue)
     {
         AssertNotDisposed();
@@ -146,7 +146,7 @@ public class Query<C1>(World world, Mask mask, List<Table> tables) : Query(world
                 var length = Math.Min(chunkSize, count - start);
 
                 var job = JobPool<UniformWork<C1, U>>.Rent();
-                job.Memory = storage.AsMemory(start, length);
+                job.Memory1 = storage.AsMemory(start, length);
                 job.Action = action;
                 job.Uniform = uniform;
                 job.CountDown = _countdown;

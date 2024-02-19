@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 
-namespace fennecs;
+namespace fennecs.pools;
 
 public class PooledList<T> : List<T>, IDisposable
 {

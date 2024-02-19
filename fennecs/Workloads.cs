@@ -16,15 +16,15 @@ internal class Work<C1> : IThreadPoolWorkItem
 
 internal class UniformWork<C1, U> : IThreadPoolWorkItem
 {
-    public Memory<C1> Memory = null!;
+    public Memory<C1> Memory1 = null!;
     public RefAction_CU<C1, U> Action = null!;
     public CountdownEvent CountDown = null!;
     public U Uniform = default!;
 
     public void Execute()
     {
-        using var _1 = Memory.Pin();
-        foreach (ref var c in Memory.Span) Action(ref c, Uniform);
+        using var _1 = Memory1.Pin();
+        foreach (ref var c in Memory1.Span) Action(ref c, Uniform);
         CountDown.Signal();
     }
 }

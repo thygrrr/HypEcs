@@ -2,6 +2,8 @@
 
 // ReSharper disable MemberCanBePrivate.Global
 
+using fennecs.pools;
+
 namespace fennecs;
 
 public class QueryBuilder

@@ -1,5 +1,7 @@
 ﻿// SPDX-License-Identifier: MIT
 
+using fennecs.pools;
+
 namespace fennecs;
 
 public class Query<C1, C2>(World world, Mask mask, List<Table> tables) : Query(world, mask, tables)
@@ -54,7 +56,7 @@ public class Query<C1, C2>(World world, Mask mask, List<Table> tables) : Query(w
         World.Unlock();
     }
 
-    public void Run<U>(SpanAction_CCU<C1, C2, U> action, U uniform)
+    public void ForSpan<U>(SpanAction_CCU<C1, C2, U> action, U uniform)
     {
         World.Lock();
 
@@ -69,7 +71,7 @@ public class Query<C1, C2>(World world, Mask mask, List<Table> tables) : Query(w
         World.Unlock();
     }
 
-    public void Run(SpanAction_CC<C1, C2> action)
+    public void ForSpan(SpanAction_CC<C1, C2> action)
     {
         World.Lock();
 
@@ -85,7 +87,7 @@ public class Query<C1, C2>(World world, Mask mask, List<Table> tables) : Query(w
     }
 
 
-    public void JobNonU(RefAction_CC<C1, C2> action, int chunkSize = int.MaxValue)
+    public void Job(RefAction_CC<C1, C2> action, int chunkSize = int.MaxValue)
     {
         World.Lock();
         _countdown.Reset();
@@ -181,5 +183,19 @@ public class Query<C1, C2>(World world, Mask mask, List<Table> tables) : Query(w
 
         World.Unlock();
     }
+
+    public void Raw<U>(MemoryAction_CCU<C1, C2, U> action, U uniform)
+    {
+        World.Lock();
+
+        foreach (var table in Tables)
+        {
+            if (table.IsEmpty) continue;
+            action(table.Memory<C1>(Identity.None), table.Memory<C2>(Identity.None), uniform);
+        }
+
+        World.Unlock();
+    }
+
     #endregion
 }

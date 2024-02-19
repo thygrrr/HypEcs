@@ -3,6 +3,7 @@
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
+using fennecs.pools;
 
 namespace fennecs;
 
@@ -10,7 +11,7 @@ public partial class World : IDisposable
 {
     public EntityBuilder Spawn()
     {
-        return new EntityBuilder(this, SpawnInternal());
+        return new EntityBuilder(this, NewEntity());
     }
 
     public EntityBuilder On(Entity entity)
@@ -188,15 +189,17 @@ public partial class World : IDisposable
     #endregion
     
     #region Archetypes
-        private EntityMeta[] _meta = new EntityMeta[65536];
+    
+    private readonly IdentityPool _identityPool = new();
+    private EntityMeta[] _meta;
+
+    internal int Count => _identityPool.Count;
+
     private readonly List<Table> _tables = [];
     private readonly Dictionary<int, Query> _queries = new();
 
+    private readonly Table _root;
 
-    private readonly Stack<Identity> _unusedIds = [];
-    private Table entityRoot => _tables[0];
-
-    internal int Count { get; private set; }
 
     private readonly ConcurrentQueue<DeferredOperation> _deferredOperations = new();
     private readonly Dictionary<TypeExpression, List<Table>> _tablesByType = new();
@@ -206,11 +209,6 @@ public partial class World : IDisposable
     private readonly object _modeChangeLock = new();
 
     private Mode _mode = Mode.Immediate;
-
-    public World()
-    {
-        AddTable([TypeExpression.Create<Entity>(Identity.None)]);
-    }
 
     public void CollectTargets<T>(List<Entity> entities)
     {
@@ -224,24 +222,30 @@ public partial class World : IDisposable
     }
     private readonly object _spawnLock = new();
 
-    internal Entity SpawnInternal(Type? type = default)
+    public World(int capacity = 4096)
+    {
+        _identityPool = new IdentityPool(capacity);
+        _meta = new EntityMeta[capacity];
+
+        //Create an entity root.
+        _root = AddTable([TypeExpression.Create<Entity>(Identity.None)]);
+    }
+
+    private Entity NewEntity(Type? type = default)
     {
         lock (_spawnLock)
         {
-            if (!_unusedIds.TryPop(out var identity))
-            {
-                identity = new Identity(++Count);
-            }
+            var identity = _identityPool.Spawn();
             
-            var row = entityRoot.Add(identity);
+            var row = _root.Add(identity);
 
-            if (_meta.Length == Count) Array.Resize(ref _meta, Count * 2);
+            while (_meta.Length <= _identityPool.Living) Array.Resize(ref _meta, _meta.Length * 2);
 
-            _meta[identity.Id] = new EntityMeta(identity, entityRoot.Id, row);
+            _meta[identity.Id] = new EntityMeta(identity, _root.Id, row);
 
             var entity = new Entity(identity);
 
-            var entityStorage = (Entity[]) entityRoot.Storages[0];
+            var entityStorage = (Entity[]) _root.Storages.First();
             entityStorage[row] = entity;
 
             return entity;
@@ -267,7 +271,7 @@ public partial class World : IDisposable
             table.Remove(meta.Row);
             meta.Clear();
 
-            _unusedIds.Push(identity.Successor);
+            _identityPool.Despawn(identity);
 
             // Find entity-entity relation reverse lookup (if applicable)
             if (!_typesByRelationTarget.TryGetValue(identity, out var list)) return;

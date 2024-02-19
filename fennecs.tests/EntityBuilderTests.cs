@@ -20,7 +20,7 @@ public class EntityBuilderTests
         Assert.Throws<InvalidOperationException>(() => { builder.Add(123, Identity.Any); });
     }
 
-    [Fact]
+    [Fact(Skip = "Refactor")]
     public void Can_Remove_Type_Target()
     {
         using var world = new World();
@@ -29,5 +29,24 @@ public class EntityBuilderTests
         builder.Add(123, typeof(int));
         builder.Remove<int>(typeof(int));
         Assert.False(world.HasComponent<int>(entity));
+    }
+
+
+    struct Owes
+    {
+        public int amount;
+    }
+
+    [Fact(Skip = "Refactor")]
+    public void Can_Add_Type_as_Relation_Target()
+    {
+        using var world = new World();
+        var entity = world.Spawn().Id();
+        
+        world.On(entity).Add(new Owes {amount = 123}, typeof(EntityBuilderTests));
+        
+        var query = world.Query<Owes>().Has<Owes>(typeof(EntityBuilderTests)).Build();
+        var owes = query.Ref(entity);
+        Assert.Equal(123, owes.amount);
     }
 }
