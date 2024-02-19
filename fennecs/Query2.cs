@@ -74,7 +74,7 @@ public class Query<C1, C2>(World world, Mask mask, List<Table> tables) : Query(w
     public void ForSpan(SpanAction_CC<C1, C2> action)
     {
         World.Lock();
-
+        
         foreach (var table in Tables)
         {
             if (table.IsEmpty) continue;

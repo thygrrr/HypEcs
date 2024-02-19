@@ -1,11 +1,27 @@
-﻿namespace fennecs;
+﻿using fennecs.pools;
 
-public readonly struct EntityBuilder(World world, Entity entity)
+namespace fennecs;
+
+public readonly struct EntityBuilder(World world, Entity entity) : IDisposable
 {
+    private readonly PooledList<World.DeferredOperation> _operations = PooledList<World.DeferredOperation>.Rent();
+    
     public EntityBuilder Add<T>(Entity target = default) where T : new() 
     {
         if (target.Identity == Identity.Any) throw new InvalidOperationException("EntityBuilder: Cannot relate to Identity.Any.");
+
         world.AddComponent<T>(entity, target);
+        
+        /*
+         TODO: Change to this pattern.
+        _operations.Add(
+            new World.DeferredOperation()
+            {
+                Operation = World.Operation.Add,
+                Identity = entity,
+                Data = target,
+            });
+        */
         return this;
     }
 
@@ -16,7 +32,7 @@ public readonly struct EntityBuilder(World world, Entity entity)
     }
     
     
-    public EntityBuilder Add<T>(T data)
+    public EntityBuilder Add<T>(T? data)
     {
         world.AddComponent(entity, data);
         return this;
@@ -61,6 +77,12 @@ public readonly struct EntityBuilder(World world, Entity entity)
 
     public Entity Id()
     {
+        Dispose();
         return entity;
+    }
+
+    public void Dispose()
+    {
+        _operations.Dispose();
     }
 }
