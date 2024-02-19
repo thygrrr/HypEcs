@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using fennecs.pools;
 
 namespace fennecs;
 
@@ -45,14 +46,31 @@ internal class LanguageType
 }
 
 
-// ReSharper disable once UnusedTypeParameter
-// ReSharper disable once ClassNeverInstantiated.Global
 internal class LanguageType<T> : LanguageType
 {
-    // ReSharper disable once StaticMemberInGenericType
+    // ReSharper disable once StaticMemberInGenericType (we want this unique for each T)
     public static readonly ushort Id;
 
     static LanguageType()
+    {
+        lock (RegistryLock)
+        {
+            Id = ++Counter;
+            Types.Add(Id, typeof(T));
+            Ids.Add(typeof(T), Id);
+        }
+    }
+}
+
+internal class RelationType<T> : LanguageType where T : class
+{
+    // ReSharper disable once StaticMemberInGenericType (we want this unique for each T)
+    private static ReferenceStore<T> _store = new();
+
+    // ReSharper disable once StaticMemberInGenericType (we want this unique for each T)
+    public static readonly ushort Id;
+
+    static RelationType()
     {
         lock (RegistryLock)
         {

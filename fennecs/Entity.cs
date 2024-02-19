@@ -9,7 +9,7 @@ public readonly struct Entity(Identity identity) : IComparable<Entity>
 
     internal Identity Identity { get; } = identity;
 
-    public bool IsType => Identity.IsType;
+    public bool IsType => Identity.IsObject;
 
     public int CompareTo(Entity other)
     {

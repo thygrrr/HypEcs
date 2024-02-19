@@ -27,7 +27,9 @@ public class ReferenceStore<T>(int capacity = 4096) where T : class
 
     private Identity[] _keys = new Identity[capacity];
     private WeakReference<T>[] _storage = new WeakReference<T>[capacity];
-    public Identity Spawn(WeakReference<T> item)
+    private Dictionary<object, Identity> _mapping = new(capacity);
+    
+    public Identity Spawn(T item)
     {
         var identity = _pool.Spawn();
 
@@ -37,14 +39,17 @@ public class ReferenceStore<T>(int capacity = 4096) where T : class
             Array.Resize(ref _keys, _pool.Living);
             Array.Resize(ref _storage, _pool.Living);
         }
-
+        
         _keys[identity.Id] = identity;
+        _storage[identity.Id] = new WeakReference<T>(item);
+        
         return identity;
     }
 
     public void Despawn(Identity identity)
     {
         _keys[identity.Id] = default;
+        _storage[identity.Id] = default!;
         _pool.Despawn(identity);
     }
 
@@ -58,7 +63,7 @@ public class ReferenceStore<T>(int capacity = 4096) where T : class
         for (var i = 0; i < _keys.Length; i++)
         {
             if (_keys[i] == default) continue;
-            if (_storage[i]!.TryGetTarget(out _) == false) Despawn(_keys[i]);
+            if (_storage[i].TryGetTarget(out _) == false) Despawn(_keys[i]);
         }
     }
 

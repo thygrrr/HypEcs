@@ -69,6 +69,21 @@ public partial class World
         return GetComponents(entity.Identity);
     }
 
+    public void AddRelation<C>(Entity entity, Entity relation) where C : new()
+    {
+        AddComponent<C>(entity, relation);
+    }
+
+    public void AddRelation<C, R>(Entity entity, R relation) where C : new() where R : class
+    {
+        /*
+        var target = _referenceStore.Spawn(relation);
+        var type = TypeExpression.Create<C>(target);
+        
+        AddComponent(type, entity.Identity, new C());
+        */
+    }
+
     public bool TryGetComponent<T>(Entity entity, out Ref<T> component)
     {
         if (!HasComponent<T>(entity))
@@ -116,7 +131,7 @@ public partial class World
         var type = TypeExpression.Create<T>(target.Identity);
         AddComponent(type, entity.Identity, new T());
     }
-
+    
     public void AddComponent<T>(Entity entity, T data, Entity target)
     {
         var type = TypeExpression.Create<T>(target.Identity);

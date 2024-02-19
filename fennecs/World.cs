@@ -15,7 +15,6 @@ public partial class World : IDisposable
     #region Archetypes
     
     private readonly IdentityPool _identityPool;
-    private readonly ReferenceStore<WeakReference<object>> _referenceStore = new();
     
     private EntityMeta[] _meta;
 

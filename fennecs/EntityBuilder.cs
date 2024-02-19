@@ -31,8 +31,7 @@ public readonly struct EntityBuilder(World world, Entity entity) : IDisposable
         return this;
     }
     
-    
-    public EntityBuilder Add<T>(T? data)
+    public EntityBuilder Add<T>(T data) where T : notnull
     {
         world.AddComponent(entity, data);
         return this;
@@ -48,7 +47,7 @@ public readonly struct EntityBuilder(World world, Entity entity) : IDisposable
     }
 
     
-    public EntityBuilder Add<T>(T data, Type target) 
+    public EntityBuilder Add<T>(T data, Type target) where T : notnull
     {
         world.AddComponent(entity, data, new Identity(target));
         return this;

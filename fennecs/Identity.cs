@@ -20,11 +20,12 @@ public readonly struct Identity(ulong value) : IEquatable<Identity>, IComparable
     //public ulong Value => (uint) Id | (ulong) Generation << 32;
 
     public static readonly Identity None = new(0, 0);
-    public static readonly Identity Any = new(-1, ushort.MaxValue);
+    public static readonly Identity Any = new(0, ushort.MaxValue);
     
     public bool IsEntity => Id > 0;
-    public bool IsVirtual => !IsEntity;
-    public bool IsType => IsVirtual && Decoration is > 0 and < ushort.MaxValue;
+    
+    public bool IsVirtual => Id == 0;
+    public bool IsObject => Id < 0 && Decoration is > 0 and < ushort.MaxValue;
 
     public static implicit operator Identity(Type type) => new(type);
 
@@ -89,6 +90,6 @@ public readonly struct Identity(ulong value) : IEquatable<Identity>, IComparable
         if (this == Any)
             return $"Any";
 
-        return IsType ? $"{Type}" : $"\u2756{Id:x8}:{Generation:D5}";
+        return IsObject ? $"{Type}" : $"\u2756{Id:x8}:{Generation:D5}";
     }
 }
