@@ -53,13 +53,6 @@ _operations.Add(
         return this;
     }
 
-    [Obsolete("remove me")]
-    public EntityBuilder Add<T>(Type type) where T : new()
-    {
-        world.AddComponent<T>(entity, new Identity(type));
-        return this;
-    }
-
     public EntityBuilder Add<T>(T data)
     {
         world.AddComponent(entity, data);
@@ -70,23 +63,6 @@ _operations.Add(
     public EntityBuilder Add<T>() where T : new()
     {
         world.AddComponent(entity, new T());
-        return this;
-    }
-
-    /*
-    public EntityBuilder Link<T>(Entity target, T data) 
-    {
-        if (target.Identity == Identity.Any) throw new InvalidOperationException("EntityBuilder: Cannot relate to Identity.Any.");
-        
-        world.AddComponent(entity, data, target);
-        return this;
-    }
-    */
-
-    [Obsolete("Remove me")]
-    public EntityBuilder Add<T>(T data, Type target) where T : notnull
-    {
-        world.AddComponent(entity, data, new Identity(target));
         return this;
     }
 

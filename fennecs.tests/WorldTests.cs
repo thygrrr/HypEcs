@@ -36,11 +36,11 @@ public class WorldTests(ITestOutputHelper output)
         var e1 = world.Spawn().Id();
         Assert.Equal(1, world.Count);
 
-        world.On(e1).Add<int>(typeof(bool));
+        world.On(e1).Add(new { });
         Assert.Equal(1, world.Count);
 
         var e2 = world.Spawn().Id();
-        world.On(e2).Add<int>(typeof(bool));
+        world.On(e2).Add(new { });
         Assert.Equal(2, world.Count);
     }
 
@@ -216,9 +216,9 @@ public class WorldTests(ITestOutputHelper output)
         var target = world.Spawn().Id();
         world.Lock();
         world.On(entity).Link(target, 666);
-        Assert.False(world.HasComponent<int>(entity, target));
+        Assert.False(world.HasLink<int>(entity, target));
         world.Unlock();
-        Assert.True(world.HasComponent<int>(entity, target));
+        Assert.True(world.HasLink<int>(entity, target));
     }
 
     [Fact]
@@ -255,7 +255,7 @@ public class WorldTests(ITestOutputHelper output)
         var entity = world.Spawn().Id();
         var target = world.Spawn().Id();
         world.On(entity).Link(target, 666);
-        Assert.True(world.HasComponent<int>(entity, target));
+        Assert.True(world.HasLink<int>(entity, target));
     }
 
     [Fact]
