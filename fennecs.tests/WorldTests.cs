@@ -1,6 +1,6 @@
 namespace fennecs.tests;
 
-public class WorldTests(ITestOutputHelper output)
+public class WorldTests
 {
     [Fact]
     public World World_Creates()
@@ -288,6 +288,29 @@ public class WorldTests(ITestOutputHelper output)
         Assert.False(world.HasLink(entity, target));
     }
 
+    [Fact]
+    private void Can_Relate_Over_Entity()
+    {
+        using var world = new World();
+        var entity = world.Spawn().Id();
+        var other = world.Spawn().Id();
+        var data = new Entity(new Identity(123));
+        world.On(entity).Link(other, data);
+        Assert.True(world.HasLink<Entity>(entity, other));
+    }
+
+    [Fact]
+    private void Cannot_Add_null_Component_Data()
+    {
+        using var world = new World();
+        var entity = world.Spawn().Id();
+        Assert.Throws<ArgumentNullException>(() => world.On(entity).Add<string>(null!));
+    }
+
+    
+    
+/*
+    This API was retired, but might come back
 
     [Fact]
     private void Can_Try_Get_Component()
@@ -309,7 +332,6 @@ public class WorldTests(ITestOutputHelper output)
             output.WriteLine(reference.Value.ToString());
         });
     }
-
     [Fact]
     private void Can_Try_Get_Component_With_Target_Entity()
     {
@@ -334,23 +356,5 @@ public class WorldTests(ITestOutputHelper output)
             output.WriteLine(reference.Value.ToString());
         });
     }
-
-    [Fact]
-    private void Can_Relate_Over_Entity()
-    {
-        using var world = new World();
-        var entity = world.Spawn().Id();
-        var other = world.Spawn().Id();
-        var data = new Entity(new Identity(123));
-        world.On(entity).Link(other, data);
-        Assert.True(world.HasLink<Entity>(entity, other));
-    }
-
-    [Fact]
-    private void Cannot_Add_null_Component_Data()
-    {
-        using var world = new World();
-        var entity = world.Spawn().Id();
-        Assert.Throws<ArgumentNullException>(() => world.On(entity).Add<string>(null!));
-    }
+*/
 }

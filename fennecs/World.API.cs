@@ -155,6 +155,7 @@ public partial class World
         AddComponent(entity.Identity, type, new T());
     }
 
+    
     public void AddComponent<T>(Entity entity, T data)
     {
         if (data == null) throw new ArgumentNullException(nameof(data));
@@ -162,11 +163,13 @@ public partial class World
         AddComponent(entity.Identity, type, data);
     }
 
+    
     public bool HasComponent<T>(Entity entity, Identity target = default)
     {
         var type = TypeExpression.Create<T>(target);
         return HasComponent(entity, type);
     }
+
     
     public void RemoveComponent<T>(Entity entity)
     {
@@ -191,31 +194,6 @@ public partial class World
         return GetComponents(entity.Identity);
     }
 
-    public bool TryGetComponent<T>(Entity entity, out Ref<T> component)
-    {
-        if (!HasComponent<T>(entity))
-        {
-            component = default;
-            return false;
-        }
-
-        component = new Ref<T>(ref GetComponent<T>(entity.Identity, Identity.None));
-        return true;
-    }
-
-    
-    public bool TryGetComponent<T>(Entity entity, Identity target, out Ref<T> component)
-    {
-        if (!HasComponent<T>(entity, target))
-        {
-            component = default;
-            return false;
-        }
-
-        component = new Ref<T>(ref GetComponent<T>(entity.Identity, target));
-        return true;
-    }
-    
     
     public World(int capacity = 4096)
     {
@@ -313,6 +291,11 @@ public partial class World
     public ref T GetComponent<T>(Identity identity, Identity target = default)
     {
         AssertAlive(identity);
+        
+        if (typeof(T) == typeof(Entity))
+        {
+            throw new TypeAccessException("Cannot get mutable reference to root Entity table (system integrity).");
+        }
 
         var type = TypeExpression.Create<T>(target);
         var meta = _meta[identity.Id];

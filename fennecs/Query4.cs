@@ -4,19 +4,7 @@ namespace fennecs;
 
 public class Query<C1, C2, C3, C4>(World world, Mask mask, List<Table> tables) : Query(world, mask, tables)
 {
-    public RefValueTuple<C1, C2, C3, C4> Get(Entity entity)
-    {
-        var meta = World.GetEntityMeta(entity.Identity);
-        var table = World.GetTable(meta.TableId);
-        var s1 = table.GetStorage<C1>(Identity.None);
-        var s2 = table.GetStorage<C2>(Identity.None);
-        var s3 = table.GetStorage<C3>(Identity.None);
-        var s4 = table.GetStorage<C4>(Identity.None);
-        return new RefValueTuple<C1, C2, C3, C4>(ref s1[meta.Row], ref s2[meta.Row],
-            ref s3[meta.Row], ref s4[meta.Row]);
-    }
-
-    #region Runner
+    #region Runners
 
     public void Run(RefAction_CCCC<C1, C2, C3, C4> action)
     {
