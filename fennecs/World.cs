@@ -15,6 +15,7 @@ public partial class World : IDisposable
     #region Archetypes
     
     private readonly IdentityPool _identityPool;
+    private readonly ReferenceStore _referenceStore;
     
     private EntityMeta[] _meta;
 

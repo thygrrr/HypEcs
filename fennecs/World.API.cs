@@ -23,7 +23,39 @@ public partial class World
     /// <returns>an EntityBuilder whose methods return itself, to provide a fluid syntax. </returns>
     public EntityBuilder On(Entity entity) => new(this, entity);
 
+    public void Link<T>(Entity entity, T target) where T : class
+    {
+        var typeExpression = TypeExpression.Create<T>(Identity.Of(target));
+        AddComponent(typeExpression, entity, target);
+    }
 
+    public void Unlink<T>(Entity entity, T target) where T : class
+    {
+        var typeExpression = TypeExpression.Create<T>(Identity.Of(target));
+        RemoveComponent(entity, typeExpression);
+    }
+
+
+    public void Link<T>(Entity entity, Entity target)
+    {
+        var typeExpression = TypeExpression.Create<T>(target.Identity);
+        AddComponent(typeExpression, entity, target);
+    }
+
+    public void Unlink<T>(Entity entity, Entity target)
+    {
+        var typeExpression = TypeExpression.Create<T>(target.Identity);
+        RemoveComponent(entity, typeExpression);
+    }
+
+
+    public void RemoveComponent<T>(Entity entity, Identity target)
+    {
+        var type = TypeExpression.Create<T>(target);
+        RemoveComponent(entity, type);
+    }
+    
+    
     public void DespawnAllWith<T>()
     {
         var query = Query<Entity>().Has<T>().Build();
@@ -67,21 +99,6 @@ public partial class World
     public IEnumerable<(TypeExpression, object)> GetComponents(Entity entity)
     {
         return GetComponents(entity.Identity);
-    }
-
-    public void AddRelation<C>(Entity entity, Entity relation) where C : new()
-    {
-        AddComponent<C>(entity, relation);
-    }
-
-    public void AddRelation<C, R>(Entity entity, R relation) where C : new() where R : class
-    {
-        /*
-        var target = _referenceStore.Spawn(relation);
-        var type = TypeExpression.Create<C>(target);
-        
-        AddComponent(type, entity.Identity, new C());
-        */
     }
 
     public bool TryGetComponent<T>(Entity entity, out Ref<T> component)
@@ -144,12 +161,6 @@ public partial class World
         RemoveComponent(entity.Identity, typeExpression);
     }
 
-    public void RemoveComponent<T>(Entity entity, Entity target)
-    {
-        var type = TypeExpression.Create<T>(target.Identity);
-        RemoveComponent(entity.Identity, type);
-    }
-
     #region QueryBuilders
 
     public QueryBuilder<Entity> Query()
@@ -189,6 +200,8 @@ public partial class World
     public World(int capacity = 4096)
     {
         _identityPool = new IdentityPool(capacity);
+        _referenceStore = new ReferenceStore(capacity);
+        
         _meta = new EntityMeta[capacity];
 
         //Create the "Entity" Archetype, which is also the root of the Archetype Graph.

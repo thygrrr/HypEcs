@@ -39,8 +39,10 @@ public readonly struct TypeExpression : IEquatable<TypeExpression>, IComparable<
     //Identity Components
     [FieldOffset(0)] public readonly int Id;
     [FieldOffset(4)] public readonly ushort Generation;
-    [FieldOffset(4)] public readonly ushort Decoration;
-    [FieldOffset(6)] public readonly ushort TypeId;
+    [FieldOffset(4)] public readonly TypeID Decoration;
+    
+    // Type Header
+    [FieldOffset(6)] public readonly TypeID TypeId;
 
     public Identity Target => new(Value);
 
@@ -129,7 +131,7 @@ public readonly struct TypeExpression : IEquatable<TypeExpression>, IComparable<
 
 
     [SetsRequiredMembers]
-    private TypeExpression(Identity target, ushort typeId)
+    private TypeExpression(Identity target, TypeID typeId)
     {
         Value = target.Value;
         TypeId = typeId;
