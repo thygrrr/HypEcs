@@ -43,12 +43,13 @@ public class ReferenceStore(int capacity = 4096)
         {
             if (!_storage.TryGetValue(identity, out var reference))
             {
-                throw new KeyNotFoundException("Identity is not tracked.");
+                throw new KeyNotFoundException($"Identity is not tracking an instance of {typeof(T)}.");
             }
             
             return (T) reference.Item;
         }
     }
+    
     
     public void Release(Identity identity)
     {
@@ -73,7 +74,7 @@ public class ReferenceStore(int capacity = 4096)
         }
     }
 
-    private struct StoredReference<T>
+    internal struct StoredReference<T>
     {
         public required T Item;
         public required int Count;
