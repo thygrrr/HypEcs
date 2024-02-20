@@ -59,21 +59,13 @@ public readonly struct EntityBuilder(World world, Entity entity) : IDisposable
         world.RemoveComponent<T>(entity);
         return this;
     }
-
     
     public EntityBuilder Remove<T>(Entity target) 
     {
-        world.RemoveComponent<T>(entity, target);
+        world.Unlink<T>(entity, target);
         return this;
     }
-
     
-    public EntityBuilder Remove<T>(Type target) 
-    {
-        world.RemoveComponent<T>(entity, new Identity(target));
-        return this;
-    }
-
     public Entity Id()
     {
         Dispose();

@@ -23,10 +23,12 @@ public partial class World
     /// <returns>an EntityBuilder whose methods return itself, to provide a fluid syntax. </returns>
     public EntityBuilder On(Entity entity) => new(this, entity);
 
+    #region Linked Components 
+    
     public void Link<T>(Entity entity, T target) where T : class
     {
         var typeExpression = TypeExpression.Create<T>(Identity.Of(target));
-        AddComponent(typeExpression, entity, target);
+        AddComponent(entity, typeExpression, target);
     }
 
     public void Unlink<T>(Entity entity, T target) where T : class
@@ -35,26 +37,29 @@ public partial class World
         RemoveComponent(entity, typeExpression);
     }
 
-
+    
     public void Link<T>(Entity entity, Entity target)
     {
         var typeExpression = TypeExpression.Create<T>(target.Identity);
-        AddComponent(typeExpression, entity, target);
+        AddComponent(entity, typeExpression, target);
     }
 
+    
     public void Unlink<T>(Entity entity, Entity target)
     {
         var typeExpression = TypeExpression.Create<T>(target.Identity);
         RemoveComponent(entity, typeExpression);
     }
 
+    #endregion
 
-    public void RemoveComponent<T>(Entity entity, Identity target)
+/*
+    public void Unlink<T>(Entity entity, Identity target)
     {
         var type = TypeExpression.Create<T>(target);
         RemoveComponent(entity, type);
     }
-    
+*/  
     
     public void DespawnAllWith<T>()
     {
@@ -74,14 +79,14 @@ public partial class World
     public void AddComponent<T>(Entity entity) where T : new()
     {
         var type = TypeExpression.Create<T>(Identity.None);
-        AddComponent(type, entity.Identity, new T());
+        AddComponent(entity.Identity, type, new T());
     }
 
     public void AddComponent<T>(Entity entity, T data, Identity target = default) where T : notnull
     {
         if (data == null) throw new ArgumentNullException(nameof(data));
         var type = TypeExpression.Create<T>(target);
-        AddComponent(type, entity.Identity, data);
+        AddComponent(entity.Identity, type, data);
     }
 
     public void RemoveComponent<T>(Entity entity)
@@ -146,13 +151,13 @@ public partial class World
     public void AddComponent<T>(Entity entity, Entity target) where T : new()
     {
         var type = TypeExpression.Create<T>(target.Identity);
-        AddComponent(type, entity.Identity, new T());
+        AddComponent(entity.Identity, type, new T());
     }
     
     public void AddComponent<T>(Entity entity, T data, Entity target)
     {
         var type = TypeExpression.Create<T>(target.Identity);
-        AddComponent(type, entity.Identity, data);
+        AddComponent(entity.Identity, type, data);
     }
 
     public void RemoveComponent(Entity entity, Type type, Entity target)
@@ -248,7 +253,7 @@ public partial class World
         }
     }
 
-    private void AddComponent<T>(TypeExpression typeExpression, Identity identity, T data)
+    private void AddComponent<T>(Identity identity, TypeExpression typeExpression, T data)
     {
         AssertAlive(identity);
 
@@ -355,7 +360,7 @@ public partial class World
             switch (op.Code)
             {
                 case OpCode.Add:
-                    AddComponent(op.TypeExpression, op.Identity, op.Data);
+                    AddComponent(op.Identity, op.TypeExpression, op.Data);
                     break;
                 case OpCode.Remove:
                     RemoveComponent(op.Identity, op.TypeExpression);
