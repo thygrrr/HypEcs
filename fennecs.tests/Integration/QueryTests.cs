@@ -3,7 +3,7 @@ using System.Numerics;
 
 namespace fennecs.tests.Integration;
 
-public static class QueryTests
+public class QueryTests
 {
     [Fact]
     private static void Can_Enumerate_PlainEnumerator()
@@ -346,5 +346,53 @@ public static class QueryTests
                 Assert.Fail("Should not enumerate disposed Query.");
             }
         });
+    }
+
+
+    [Fact]
+    private void Ref_disallows_Component_Type_Entity()
+    {
+        using var world = new World();
+        var entity = world.Spawn().Id();
+        var query = world.Query<Entity>().Build();
+        
+        Assert.Throws<TypeAccessException>(() => query.Ref<Entity>(entity));
+    }
+
+    [Fact]
+    private void Ref_disallows_Dead_Entity()
+    {
+        using var world = new World();
+        var entity = world.Spawn().Add<int>().Id();
+        world.Despawn(entity);
+        Assert.False(world.IsAlive(entity));
+
+        var query = world.Query<int>().Build();
+        Assert.Throws<ObjectDisposedException>(() => query.Ref<int>(entity));
+    }
+
+    [Fact]
+    private void Ref_disallows_Nonexistent_Component()
+    {
+        using var world = new World();
+        var entity = world.Spawn().Add<int>().Id();
+
+        var query = world.Query<int>().Build();
+        Assert.Throws<KeyNotFoundException>(() => query.Ref<float>(entity));
+    }
+
+    [Fact]
+    private void Ref_gets_Mutable_Component()
+    {
+        using var world = new World();
+        var entity = world.Spawn().Add(23).Id();
+        var query = world.Query<int>().Build();
+
+        ref var gotten = ref query.Ref<int>(entity);
+        Assert.Equal(23, gotten);
+
+        // Entity can't be a ref (is readonly - make sure!)
+        gotten = 42;
+        Assert.Equal(42, query.Ref<int>(entity));
     }
 }

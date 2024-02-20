@@ -7,28 +7,6 @@ namespace fennecs;
 public class Query<C1>(World world, Mask mask, List<Table> tables) : Query(world, mask, tables)
 {
     private readonly CountdownEvent _countdown = new(1);
-    
-    public ref C1 this[Entity entity] => ref Ref(entity);
-
-    /// <summary>
-    /// Gets a reference to the component of type <typeparamref name="C1"/> for the entity.
-    /// </summary>
-    /// <param name="entity">The entity to get the component from.</param>
-    /// <typeparam name="C1">The type of the component to get.</typeparam>
-    /// <returns>A reference to the component of type <typeparamref name="C1"/> for the entity.</returns>
-    /// <exception cref="InvalidOperationException">Thrown when trying to get a reference to
-    /// <see cref="Entity"/> itself, because its immutability is crucial for the integrity of the tables.</exception>
-    public ref C1 Ref(Entity entity)
-    {
-        AssertNotDisposed();
-        
-        if (typeof(C1) == typeof(Entity))
-        {
-            throw new TypeAccessException("Can't request a mutable ref to type <Entity>.");
-        }
-        return ref World.GetComponent<C1>(entity);
-    }
-    
 
     #region Runners
 

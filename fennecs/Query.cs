@@ -12,7 +12,34 @@ public class Query(World world, Mask mask, List<Table> tables) : IEnumerable<Ent
     private protected readonly World World = world;
 
     protected internal readonly Mask Mask = mask;
-    
+
+    /// <summary>
+    /// Gets a reference to the component of type <typeparamref name="C"/> for the entity.
+    /// </summary>
+    /// <param name="entity"></param>
+    /// <typeparam name="C">any component type</typeparam>
+    /// <returns>ref C, the component.</returns>
+    /// <exception cref="KeyNotFoundException">If no C or C(Target) exists in any of the query's tables for Entity entity.</exception>
+    public ref C Ref<C>(Entity entity)
+    {
+        AssertNotDisposed();
+
+        if (!world.IsAlive(entity))
+        {
+            throw new ObjectDisposedException($"Entity {entity.Identity} is not alive.");
+        }
+        
+        if (typeof(C) == typeof(Entity))
+        {
+            throw new TypeAccessException("Can't request a mutable ref to type <Entity>.");
+        }
+
+        var meta = World.GetEntityMeta(entity.Identity);
+        var table = World.GetTable(meta.TableId);
+        var storage = table.GetStorage<C>(Identity.None);
+        return ref storage[meta.Row];
+    }
+
 
     #region IEnumerable<Entity>
 
