@@ -184,24 +184,3 @@ internal class UniformWork<C1, C2, C3, C4, C5, U> : IThreadPoolWorkItem
         CountDown.Signal();
     }
 }
-
-
-/*
-internal class RawWork<C1> : IThreadPoolWorkItem
-{
-    public Memory<C1> Memory = null!;
-    public MemoryAction_C<C1> Action = null!;
-    public CountdownEvent CountDown = null!;
-
-    public WaitCallback WaitCallback => Execute;
-
-    private void Execute(object? state) => Execute();
-
-    public void Execute()
-    {
-        using var _ = Memory.Pin();
-        Action(Memory);
-        CountDown.Signal();
-    }
-}
-*/
