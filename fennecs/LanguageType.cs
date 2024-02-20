@@ -53,7 +53,6 @@ internal class LanguageType
 
 internal class LanguageType<T> : LanguageType
 {
-
     // ReSharper disable once StaticMemberInGenericType (we indeed want this unique for each T)
     public static readonly TypeID Id;
 
@@ -62,7 +61,7 @@ internal class LanguageType<T> : LanguageType
         lock (RegistryLock)
         {
             Id = ++Counter;
-            if (!Types.TryAdd(Id, typeof(T))) throw new InvalidOperationException($"Type Ids exhausted. {nameof(LanguageType)}() for {nameof(LanguageType<T>)}");
+            Types.Add(Id, typeof(T));
             Ids.Add(typeof(T), Id);
         }
     }
