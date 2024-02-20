@@ -13,10 +13,10 @@ public partial class World : IDisposable
     }
 
     #region Archetypes
-    
+
     private readonly IdentityPool _identityPool;
     private readonly ReferenceStore _referenceStore;
-    
+
     private EntityMeta[] _meta;
 
     internal int Count
@@ -32,14 +32,14 @@ public partial class World : IDisposable
 
     private readonly List<Table> _tables = [];
     private readonly Dictionary<int, Query> _queries = new();
-        
+
     // The "Entity" Archetype, which is the root of the Archetype Graph.
     private readonly Table _root;
 
 
     private readonly ConcurrentQueue<DeferredOperation> _deferredOperations = new();
     private readonly Dictionary<TypeExpression, List<Table>> _tablesByType = new();
-    
+
     private readonly Dictionary<Identity, HashSet<TypeExpression>> _typesByRelationTarget = new();
 
     private readonly object _modeChangeLock = new();
@@ -56,14 +56,16 @@ public partial class World : IDisposable
             if (type.Matches(candidate)) entities.Add(new Entity(candidate.Target));
         }
     }
+
     private readonly object _spawnLock = new();
 
+    #region CRUD
     private Entity NewEntity()
     {
         lock (_spawnLock)
         {
             var identity = _identityPool.Spawn();
-            
+
             var row = _root.Add(identity);
 
             while (_meta.Length <= _identityPool.Living) Array.Resize(ref _meta, _meta.Length * 2);
@@ -79,6 +81,51 @@ public partial class World : IDisposable
         }
     }
 
+    private bool HasComponent(Identity identity, TypeExpression typeExpression)
+    {
+        var meta = _meta[identity.Id];
+        return meta.Identity != Identity.None
+               && meta.Identity == identity
+               && typeExpression.Matches(_tables[meta.TableId].Types);
+    }
+
+    private void RemoveComponent(Identity identity, TypeExpression typeExpression)
+    {
+        if (_mode == Mode.Deferred)
+        {
+            _deferredOperations.Enqueue(new DeferredOperation {Code = OpCode.Remove, Identity = identity, TypeExpression = typeExpression});
+            return;
+        }
+
+        ref var meta = ref _meta[identity.Id];
+        var oldTable = _tables[meta.TableId];
+
+        if (!oldTable.Types.Contains(typeExpression))
+        {
+            throw new ArgumentException($"cannot remove non-existent component {typeExpression} from entity {identity}");
+        }
+
+        var oldEdge = oldTable.GetTableEdge(typeExpression);
+
+        var newTable = oldEdge.Remove;
+
+        if (newTable == null)
+        {
+            var newTypes = oldTable.Types.ToList();
+            newTypes.Remove(typeExpression);
+            newTable = AddTable(new SortedSet<TypeExpression>(newTypes));
+            oldEdge.Remove = newTable;
+
+            var newEdge = newTable.GetTableEdge(typeExpression);
+            newEdge.Add = oldTable;
+        }
+
+        var newRow = Table.MoveEntry(identity, meta.Row, oldTable, newTable);
+
+        meta.Row = newRow;
+        meta.TableId = newTable.Id;
+    }
+    #endregion
 
     internal Query GetQuery(Mask mask, Func<World, Mask, List<Table>, Query> createQuery)
     {
@@ -100,13 +147,13 @@ public partial class World : IDisposable
         {
             if (table.Matches(mask)) matchingTables.Add(table);
         }
-        
+
         query = createQuery(this, mask, matchingTables);
 
         _queries.Add(mask, query);
         return query;
     }
-    
+
     internal void RemoveQuery(Query query)
     {
         _queries.Remove(query.Mask);
@@ -117,12 +164,12 @@ public partial class World : IDisposable
     {
         return ref _meta[identity.Id];
     }
-    
+
     internal Table GetTable(int tableId)
     {
         return _tables[tableId];
     }
-    
+
     internal (TypeExpression, object)[] GetComponents(Identity identity)
     {
         AssertAlive(identity);
@@ -201,6 +248,44 @@ public partial class World : IDisposable
         }
     }
 
+
+    private void Apply(ConcurrentQueue<DeferredOperation> operations)
+    {
+        while (operations.TryDequeue(out var op))
+        {
+            AssertAlive(op.Identity);
+
+            switch (op.Code)
+            {
+                case OpCode.Add:
+                    AddComponent(op.Identity, op.TypeExpression, op.Data);
+                    break;
+                case OpCode.Remove:
+                    RemoveComponent(op.Identity, op.TypeExpression);
+                    break;
+                case OpCode.Despawn:
+                    Despawn(op.Identity);
+                    break;
+            }
+        }
+    }
+
+
+    public struct DeferredOperation
+    {
+        public required OpCode Code;
+        public TypeExpression TypeExpression;
+        public Identity Identity;
+        public object Data;
+    }
+
+    public enum OpCode
+    {
+        Add,
+        Remove,
+        Despawn,
+    }
+
     private enum Mode
     {
         Immediate = default,
@@ -209,14 +294,14 @@ public partial class World : IDisposable
     }
 
     #region Assert Helpers
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void AssertAlive(Identity identity)
     {
         if (IsAlive(identity)) return;
-        
+
         throw new ObjectDisposedException($"Entity {identity} is no longer alive.");
     }
-    
+
     #endregion
 }

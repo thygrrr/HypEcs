@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
-using System.Security.Claims;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using fennecs.pools;
 
 namespace fennecs;
@@ -23,65 +24,143 @@ public partial class World
     /// <returns>an EntityBuilder whose methods return itself, to provide a fluid syntax. </returns>
     public EntityBuilder On(Entity entity) => new(this, entity);
 
-    #region Linked Components 
-    
-    public void Link<T>(Entity entity, T target) where T : class
+    #region Linked Components
+
+    /* Idea for alternative API
+    public struct Linked<T>(T link)
+    {
+        public readonly T Link = link;
+
+        public static Linked<O> With<O>(O link) where O : class
+        {
+            return new Linked<O>(link);
+        }
+
+        public static Linked<Entity> With(Entity link)
+        {
+            return new Linked<Entity>(link);
+        }
+    }
+
+    public void Add<T>(Entity entity, Linked<T> target) where T : class
+    {
+        var linkIdentity = _referenceStore.Request(target.Link);
+        var typeExpression = TypeExpression.Create<T>(linkIdentity);
+        AddComponent(entity, typeExpression, target);
+    }
+    */
+
+    /// <summary>
+    /// Creates an Archetype relation between this entity and an object (instance of a class).
+    /// The relation is backed by the object itself, which will be enumerated by queries if desired.
+    /// Whenever the entity is enumerated by a query, it will be batched only with other entities
+    /// that share the exact relation, in addition to conforming with the other clauses of the query.
+    /// The object is internally reference-counted, and the reference will be discarded once no other
+    /// entity is linked to it.
+    /// </summary>
+    ///<remarks>
+    /// Beware of Archetype Fragmentation!
+    /// This feature is great to express relations between entities, but it will lead to
+    /// fragmentation of the Archetype Graph, i.e. Archetypes with very few entities that
+    /// are difficult to iterate over efficiently.
+    /// </remarks>
+    /// <param name="entity"></param>
+    /// <param name="target"></param>
+    /// <typeparam name="T"></typeparam>
+    public void Link<T>(Entity entity, [NotNull] T target) where T : class
     {
         var typeExpression = TypeExpression.Create<T>(Identity.Of(target));
         AddComponent(entity, typeExpression, target);
     }
+    
+    /// <summary>
+    /// Checks if this entity has an object-backed relation (instance of a class).
+    /// </summary>
+    /// <param name="entity"></param>
+    /// <param name="target"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public bool HasLink<T>(Entity entity, [NotNull] T target) where T : class
+    {
+        var typeExpression = TypeExpression.Create<T>(Identity.Of(target));
+        return HasComponent(entity, typeExpression);
+    }
 
-    public void Unlink<T>(Entity entity, T target) where T : class
+    /// <summary>
+    /// Removes the object-backed relation between this entity and the object (instance of a class).
+    /// The object is internally reference-counted, and the reference will be discarded once no other
+    /// entity is linked to it.
+    /// </summary>
+    /// <param name="entity"></param>
+    /// <param name="target"></param>
+    /// <typeparam name="T"></typeparam>
+    public void Unlink<T>(Entity entity, [NotNull] T target) where T : class
     {
         var typeExpression = TypeExpression.Create<T>(Identity.Of(target));
         RemoveComponent(entity, typeExpression);
     }
 
-    
-    public void Link<T>(Entity entity, Entity target)
+
+    /// <summary>
+    /// Creates an Archetype relation between this entity and another entity.
+    /// The relation is backed by an arbitrary type to provide additional data.
+    /// Whenever the entity is enumerated by a query, it will be batched only with other entities
+    /// that share the exact relation, in addition to conforming with the other clauses of the query.
+    /// </summary>
+    ///<remarks>
+    /// Beware of Archetype Fragmentation!
+    /// This feature is great to express relations between entities, but it will lead to
+    /// fragmentation of the Archetype Graph, i.e. Archetypes with very few entities that
+    /// are difficult to iterate over efficiently.
+    /// </remarks>
+    /// <param name="entity"></param>
+    /// <param name="target"></param>
+    /// <param name="data"></param>
+    /// <typeparam name="T">any type except Entity</typeparam>
+    public void Link<T>(Entity entity, Entity target, T data)
     {
+        if (typeof(T) == typeof(Entity)) throw new ArgumentException("Relations cannot exist over Entity root Component type.");
         var typeExpression = TypeExpression.Create<T>(target.Identity);
-        AddComponent(entity, typeExpression, target);
+        AddComponent(entity, typeExpression, data);
+    }
+    
+    /// <summary>
+    /// Checks if this entity has a relation component with another entity.
+    /// </summary>
+    /// <param name="entity"></param>
+    /// <param name="target"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
+    public bool HasLink<T>(Entity entity, Entity target)
+    {
+        if (typeof(T) == typeof(Entity)) throw new ArgumentException("Relations cannot exist over Entity root Component type.");
+        var typeExpression = TypeExpression.Create<T>(target.Identity);
+        return HasComponent(entity, typeExpression);
     }
 
-    
+    /// <summary>
+    /// Removes the relation component between this entity and another entity.
+    /// </summary>
+    /// <param name="entity"></param>
+    /// <param name="target"></param>
+    /// <typeparam name="T">any component type</typeparam>
     public void Unlink<T>(Entity entity, Entity target)
     {
+        if (typeof(T) == typeof(Entity)) throw new ArgumentException("Relations cannot exist over Entity root Component type.");
         var typeExpression = TypeExpression.Create<T>(target.Identity);
         RemoveComponent(entity, typeExpression);
     }
 
     #endregion
-
-/*
-    public void Unlink<T>(Entity entity, Identity target)
-    {
-        var type = TypeExpression.Create<T>(target);
-        RemoveComponent(entity, type);
-    }
-*/  
     
-    public void DespawnAllWith<T>()
-    {
-        var query = Query<Entity>().Has<T>().Build();
-        query.Run(delegate (Span<Entity> entities)
-        {
-            foreach (var entity in entities) Despawn(entity);
-        });
-    }
-
-    public bool HasComponent<T>(Entity entity)
-    {
-        var type = TypeExpression.Create<T>(Identity.None);
-        return HasComponent(entity, type);
-    }
-
     public void AddComponent<T>(Entity entity) where T : new()
     {
         var type = TypeExpression.Create<T>(Identity.None);
         AddComponent(entity.Identity, type, new T());
     }
 
+    [Obsolete("Use link")]
     public void AddComponent<T>(Entity entity, T data, Identity target = default) where T : notnull
     {
         if (data == null) throw new ArgumentNullException(nameof(data));
@@ -89,18 +168,37 @@ public partial class World
         AddComponent(entity.Identity, type, data);
     }
 
+    public void AddComponent<T>(Entity entity, T data)
+    {
+        if (data == null) throw new ArgumentNullException(nameof(data));
+        var type = TypeExpression.Create<T>();
+        AddComponent(entity.Identity, type, data);
+    }
+
+    public bool HasComponent<T>(Entity entity, Identity target = default)
+    {
+        var type = TypeExpression.Create<T>(target);
+        return HasComponent(entity, type);
+    }
+    
     public void RemoveComponent<T>(Entity entity)
     {
         var type = TypeExpression.Create<T>(Identity.None);
         RemoveComponent(entity.Identity, type);
     }
+    
 
-    public void RemoveComponent<T>(Entity entity, Type target)
+    
+    public void DespawnAllWith<T>(Identity target = default)
     {
-        var type = TypeExpression.Create<T>(new Identity(target));
-        RemoveComponent(entity, type);
+        using var query = Query<Entity>().Has<T>(target).Build();
+        query.Run(delegate(Span<Entity> entities)
+        {
+            foreach (var entity in entities) Despawn(entity);
+        });
     }
-
+    
+    
     public IEnumerable<(TypeExpression, object)> GetComponents(Entity entity)
     {
         return GetComponents(entity.Identity);
@@ -118,6 +216,7 @@ public partial class World
         return true;
     }
 
+    
     public bool TryGetComponent<T>(Entity entity, Identity target, out Ref<T> component)
     {
         if (!HasComponent<T>(entity, target))
@@ -130,78 +229,61 @@ public partial class World
         return true;
     }
 
+
+    [Obsolete("Use link instead")]
+    public bool HasComponent<T>(Entity entity, T target) where T : class
+    {
+        var type = TypeExpression.Create<T>(Identity.Of(target));
+        return HasComponent(entity.Identity, type);
+    }
+
+    [Obsolete("Use link instead")]
     public bool HasComponent<T>(Entity entity, Entity target)
     {
         var type = TypeExpression.Create<T>(target.Identity);
         return HasComponent(entity.Identity, type);
     }
 
-    public bool HasComponent<T>(Entity entity, Type target)
-    {
-        var type = TypeExpression.Create<T>(new Identity(target));
-        return HasComponent(entity.Identity, type);
-    }
 
+    [Obsolete("Use link instead")]
     public bool HasComponent<T, Target>(Entity entity)
     {
         var type = TypeExpression.Create<T>(new Identity(LanguageType<Target>.Id));
         return HasComponent(entity.Identity, type);
     }
 
+    [Obsolete("Use link instead")]
     public void AddComponent<T>(Entity entity, Entity target) where T : new()
     {
         var type = TypeExpression.Create<T>(target.Identity);
         AddComponent(entity.Identity, type, new T());
     }
-    
+
+    [Obsolete("Use link instead")]
     public void AddComponent<T>(Entity entity, T data, Entity target)
     {
         var type = TypeExpression.Create<T>(target.Identity);
         AddComponent(entity.Identity, type, data);
     }
 
+    [Obsolete("Use link instead")]
     public void RemoveComponent(Entity entity, Type type, Entity target)
     {
         var typeExpression = TypeExpression.Create(type, target.Identity);
         RemoveComponent(entity.Identity, typeExpression);
     }
 
-    #region QueryBuilders
+    
 
-    public QueryBuilder<Entity> Query()
-    {
-        return new QueryBuilder<Entity>(this);
-    }
-
-    public QueryBuilder<C> Query<C>()
-    {
-        return new QueryBuilder<C>(this);
-    }
-
-    public QueryBuilder<C1, C2> Query<C1, C2>()
-    {
-        return new QueryBuilder<C1, C2>(this);
-    }
-
-    public QueryBuilder<C1, C2, C3> Query<C1, C2, C3>()
-    {
-        return new QueryBuilder<C1, C2, C3>(this);
-    }
-
-    public QueryBuilder<C1, C2, C3, C4> Query<C1, C2, C3, C4>()
-    {
-        return new QueryBuilder<C1, C2, C3, C4>(this);
-    }
-
-    public QueryBuilder<C1, C2, C3, C4, C5> Query<C1, C2, C3, C4, C5>()
-    {
-        return new QueryBuilder<C1, C2, C3, C4, C5>(this);
-    }
-
-    #endregion
-
-    #region Archetypes
-
+    
+    
+    
+    
+    
+    
+    
+    
+    
     public World(int capacity = 4096)
     {
         _identityPool = new IdentityPool(capacity);
@@ -304,88 +386,5 @@ public partial class World
         var table = _tables[meta.TableId];
         var storage = (T[]) table.GetStorage(type);
         return ref storage[meta.Row];
-    }
-
-    private bool HasComponent(Identity identity, TypeExpression typeExpression)
-    {
-        var meta = _meta[identity.Id];
-        return meta.Identity != Identity.None
-               && meta.Identity == identity
-               && typeExpression.Matches(_tables[meta.TableId].Types);
-    }
-
-    private void RemoveComponent(Identity identity, TypeExpression typeExpression)
-    {
-        if (_mode == Mode.Deferred)
-        {
-            _deferredOperations.Enqueue(new DeferredOperation {Code = OpCode.Remove, Identity = identity, TypeExpression = typeExpression});
-            return;
-        }
-
-        ref var meta = ref _meta[identity.Id];
-        var oldTable = _tables[meta.TableId];
-
-        if (!oldTable.Types.Contains(typeExpression))
-        {
-            throw new ArgumentException($"cannot remove non-existent component {typeExpression} from entity {identity}");
-        }
-
-        var oldEdge = oldTable.GetTableEdge(typeExpression);
-
-        var newTable = oldEdge.Remove;
-
-        if (newTable == null)
-        {
-            var newTypes = oldTable.Types.ToList();
-            newTypes.Remove(typeExpression);
-            newTable = AddTable(new SortedSet<TypeExpression>(newTypes));
-            oldEdge.Remove = newTable;
-
-            var newEdge = newTable.GetTableEdge(typeExpression);
-            newEdge.Add = oldTable;
-        }
-
-        var newRow = Table.MoveEntry(identity, meta.Row, oldTable, newTable);
-
-        meta.Row = newRow;
-        meta.TableId = newTable.Id;
-    }
-
-    private void Apply(ConcurrentQueue<DeferredOperation> operations)
-    {
-        while (operations.TryDequeue(out var op))
-        {
-            AssertAlive(op.Identity);
-
-            switch (op.Code)
-            {
-                case OpCode.Add:
-                    AddComponent(op.Identity, op.TypeExpression, op.Data);
-                    break;
-                case OpCode.Remove:
-                    RemoveComponent(op.Identity, op.TypeExpression);
-                    break;
-                case OpCode.Despawn:
-                    Despawn(op.Identity);
-                    break;
-            }
-        }
-    }
-
-    #endregion
-
-    public struct DeferredOperation
-    {
-        public required OpCode Code;
-        public TypeExpression TypeExpression;
-        public Identity Identity;
-        public object Data;
-    }
-
-    public enum OpCode
-    {
-        Add,
-        Remove,
-        Despawn,
     }
 }

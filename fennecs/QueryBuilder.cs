@@ -6,7 +6,7 @@ using fennecs.pools;
 
 namespace fennecs;
 
-public class QueryBuilder
+public class QueryBuilder : IDisposable
 {
     internal readonly World World;
     protected readonly Mask Mask = MaskPool.Rent();
@@ -71,6 +71,11 @@ public class QueryBuilder
         var identity = new Identity(type);
         Mask.Any(TypeExpression.Create<T>(identity));
         return this;
+    }
+
+    public void Dispose()
+    {
+        Mask.Dispose();
     }
 }
 

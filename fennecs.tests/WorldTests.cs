@@ -21,8 +21,9 @@ public class WorldTests(ITestOutputHelper output)
     {
         using var world = new World();
         var entity = world.Spawn().Id();
-        Assert.NotEqual(entity, Entity.None);
-        Assert.NotEqual(entity, Entity.Any);
+        Assert.True(entity.Identity.IsEntity);
+        Assert.False(entity.Identity.IsVirtual);
+        Assert.False(entity.Identity.IsObject);
         return entity;
     }
 
@@ -50,9 +51,9 @@ public class WorldTests(ITestOutputHelper output)
         var target1 = world.Spawn().Id();
         var target2 = world.Spawn().Add("hallo dieter").Id();
 
-        world.Spawn().Add(666, target1).Id();
-        world.Spawn().Add(1.0f, target2).Id();
-        world.Spawn().Add("hunter2", typeof(Thread)).Id();
+        world.Spawn().Link(target1, 666).Id();
+        world.Spawn().Link(target2, 1.0f).Id();
+        world.Spawn().Link<string>("123").Id();
 
         var targets = new List<Entity>();
         world.CollectTargets<int>(targets);
@@ -75,8 +76,8 @@ public class WorldTests(ITestOutputHelper output)
 
         for (var i = 0; i < 1000; i++)
         {
-            world.Spawn().Add(666, target1).Id();
-            world.Spawn().Add(444, target2).Id();
+            world.Spawn().Link(target1, 666).Id();
+            world.Spawn().Link(target2, 444).Id();
         }
 
         var query1 = world.Query<Entity>().Has<int>(target1).Build();
@@ -214,7 +215,7 @@ public class WorldTests(ITestOutputHelper output)
         var entity = world.Spawn().Id();
         var target = world.Spawn().Id();
         world.Lock();
-        world.On(entity).Add(666, target);
+        world.On(entity).Link(target, 666);
         Assert.False(world.HasComponent<int>(entity, target));
         world.Unlock();
         Assert.True(world.HasComponent<int>(entity, target));
@@ -227,7 +228,7 @@ public class WorldTests(ITestOutputHelper output)
         var entity = world.Spawn().Id();
         var target = world.Spawn().Id();
         world.Lock();
-        world.On(entity).Add(666, target);
+        world.On(entity).Link(target, 666);
         world.On(entity).Remove<int>(target);
         Assert.False(world.HasComponent<int>(entity));
         Assert.False(world.HasComponent<int>(target));
@@ -253,7 +254,7 @@ public class WorldTests(ITestOutputHelper output)
         using var world = new World();
         var entity = world.Spawn().Id();
         var target = world.Spawn().Id();
-        world.On(entity).Add(666, target);
+        world.On(entity).Link(target, 666);
         Assert.True(world.HasComponent<int>(entity, target));
     }
 
@@ -262,10 +263,9 @@ public class WorldTests(ITestOutputHelper output)
     {
         using var world = new World();
         var entity = world.Spawn().Id();
-        var target = world.Spawn().Id();
-        world.On(entity).Add(666, typeof(object));
-        Assert.True(world.HasComponent<int>(entity, typeof(object)));
-        Assert.True(world.HasComponent<int, object>(entity));
+        object target = new { };
+        world.On(entity).Link(target);
+        Assert.True(world.HasLink(entity, target));
     }
 
     [Fact]
@@ -278,25 +278,16 @@ public class WorldTests(ITestOutputHelper output)
     }
 
     [Fact]
-    private void Can_Remove_Component_with_Type_and_Entity_Target()
+    private void Can_Remove_Component_with_Object_and_Entity_Target()
     {
         using var world = new World();
         var entity = world.Spawn().Id();
-        var target = world.Spawn().Id();
-        world.On(entity).Add(666, target);
-        world.RemoveComponent(entity, typeof(int), target);
-        Assert.False(world.HasComponent<int>(entity, target));
+        object target = new { };
+        world.On(entity).Link(target);
+        world.Unlink(entity, target);
+        Assert.False(world.HasLink(entity, target));
     }
     
-    [Fact]
-    private void Can_Remove_Component_with_Type_and_Type_Target()
-    {
-        using var world = new World();
-        var entity = world.Spawn().Id();
-        world.On(entity).Add(666, typeof(object));
-        world.RemoveComponent<int>(entity, typeof(object));
-        Assert.False(world.HasComponent<int>(entity, typeof(object)));
-    }
 
     [Fact]
     private void Can_Try_Get_Component()
@@ -325,7 +316,7 @@ public class WorldTests(ITestOutputHelper output)
         using var world = new World();
         var entity = world.Spawn().Id();
         var target = world.Spawn().Id();
-        world.On(entity).Add(666, target);
+        world.On(entity).Link(target, 666);
         Assert.True(world.TryGetComponent<int>(entity, target, out var value));
         Assert.Equal(666, value);
     }
@@ -336,7 +327,7 @@ public class WorldTests(ITestOutputHelper output)
         using var world = new World();
         var entity = world.Spawn().Id();
         var target = world.Spawn().Id();
-        world.On(entity).Add(666.0, target);
+        world.On(entity).Link(target, 666.0);
         Assert.Throws<NullReferenceException>(() =>
         {
             Assert.False(world.TryGetComponent<int>(entity, target, out var reference));
