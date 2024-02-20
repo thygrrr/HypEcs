@@ -287,7 +287,7 @@ public class WorldTests(ITestOutputHelper output)
         world.Unlink(entity, target);
         Assert.False(world.HasLink(entity, target));
     }
-    
+
 
     [Fact]
     private void Can_Try_Get_Component()
@@ -297,7 +297,7 @@ public class WorldTests(ITestOutputHelper output)
         Assert.True(world.TryGetComponent<int>(entity, out var value));
         Assert.Equal(666, value);
     }
-    
+
     [Fact]
     private void Can_Fail_Try_Get_Component()
     {
@@ -333,5 +333,24 @@ public class WorldTests(ITestOutputHelper output)
             Assert.False(world.TryGetComponent<int>(entity, target, out var reference));
             output.WriteLine(reference.Value.ToString());
         });
+    }
+
+    [Fact]
+    private void Can_Relate_Over_Entity()
+    {
+        using var world = new World();
+        var entity = world.Spawn().Id();
+        var other = world.Spawn().Id();
+        var data = new Entity(new Identity(123));
+        world.On(entity).Link(other, data);
+        Assert.True(world.HasLink<Entity>(entity, other));
+    }
+
+    [Fact]
+    private void Cannot_Add_null_Component_Data()
+    {
+        using var world = new World();
+        var entity = world.Spawn().Id();
+        Assert.Throws<ArgumentNullException>(() => world.On(entity).Add<string>(null!));
     }
 }

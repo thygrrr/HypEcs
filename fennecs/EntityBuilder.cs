@@ -16,25 +16,6 @@ _operations.Add(
         Data = target,
     });
 */
-
-    public void SyntaxTest()
-    {
-        Link(new Entity(new Identity(123)), "dieter");
-        Link<int>(new Entity(new Identity(123)));
-        Link(new Entity(new Identity(123)), 444);
-    }
-/*
-    public EntityBuilder Add<T>(Entity target, T data) where T : class
-    {
-        data ??= new T();
-
-        if (target == Identity.Any) throw new InvalidOperationException("EntityBuilder: Cannot relate to Identity.Any.");
-
-        world.Link<T>(entity, target, data);
-
-        return this;
-    }
-*/
     public EntityBuilder Link<T>(Entity target) where T : notnull, new()
     {
         world.Link(entity, target, new T());

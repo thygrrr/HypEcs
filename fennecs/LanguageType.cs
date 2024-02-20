@@ -16,13 +16,14 @@ internal class LanguageType
 
     protected internal static TypeID Identify(Type type)
     {
-        // Query the registry directly for a fast response.
-        if (Ids.TryGetValue(type, out var id)) return id;
-        
-        lock (RegistryLock) // Pattern: double-checked locking.
+        lock (RegistryLock)
         {
+            // Query the registry directly for a fast response.
+            if (Ids.TryGetValue(type, out var id)) return id;
+        
+            // TODO: Pattern: double-checked locking (DCL); move lock here
             // Query the registry again, this time synchronized.
-            if (Ids.TryGetValue(type, out id)) return id;
+            //if (Ids.TryGetValue(type, out id)) return id;
             
             // Construct LanguageType<T>, invoking its static constructor.
             Type[] typeArgs = [type];

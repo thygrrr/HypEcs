@@ -1,6 +1,4 @@
-﻿using System.Collections.Concurrent;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using fennecs.pools;
 
 namespace fennecs;
@@ -116,10 +114,9 @@ public partial class World
     /// <param name="entity"></param>
     /// <param name="target"></param>
     /// <param name="data"></param>
-    /// <typeparam name="T">any type except Entity</typeparam>
+    /// <typeparam name="T">any component type</typeparam>
     public void Link<T>(Entity entity, Entity target, T data)
     {
-        if (typeof(T) == typeof(Entity)) throw new ArgumentException("Relations cannot exist over Entity root Component type.");
         var typeExpression = TypeExpression.Create<T>(target.Identity);
         AddComponent(entity, typeExpression, data);
     }
@@ -129,12 +126,11 @@ public partial class World
     /// </summary>
     /// <param name="entity"></param>
     /// <param name="target"></param>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="T">any component type</typeparam>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
     public bool HasLink<T>(Entity entity, Entity target)
     {
-        if (typeof(T) == typeof(Entity)) throw new ArgumentException("Relations cannot exist over Entity root Component type.");
         var typeExpression = TypeExpression.Create<T>(target.Identity);
         return HasComponent(entity, typeExpression);
     }
@@ -147,7 +143,6 @@ public partial class World
     /// <typeparam name="T">any component type</typeparam>
     public void Unlink<T>(Entity entity, Entity target)
     {
-        if (typeof(T) == typeof(Entity)) throw new ArgumentException("Relations cannot exist over Entity root Component type.");
         var typeExpression = TypeExpression.Create<T>(target.Identity);
         RemoveComponent(entity, typeExpression);
     }
@@ -158,14 +153,6 @@ public partial class World
     {
         var type = TypeExpression.Create<T>(Identity.None);
         AddComponent(entity.Identity, type, new T());
-    }
-
-    [Obsolete("Use link")]
-    public void AddComponent<T>(Entity entity, T data, Identity target = default) where T : notnull
-    {
-        if (data == null) throw new ArgumentNullException(nameof(data));
-        var type = TypeExpression.Create<T>(target);
-        AddComponent(entity.Identity, type, data);
     }
 
     public void AddComponent<T>(Entity entity, T data)
@@ -228,60 +215,6 @@ public partial class World
         component = new Ref<T>(ref GetComponent<T>(entity.Identity, target));
         return true;
     }
-
-
-    [Obsolete("Use link instead")]
-    public bool HasComponent<T>(Entity entity, T target) where T : class
-    {
-        var type = TypeExpression.Create<T>(Identity.Of(target));
-        return HasComponent(entity.Identity, type);
-    }
-
-    [Obsolete("Use link instead")]
-    public bool HasComponent<T>(Entity entity, Entity target)
-    {
-        var type = TypeExpression.Create<T>(target.Identity);
-        return HasComponent(entity.Identity, type);
-    }
-
-
-    [Obsolete("Use link instead")]
-    public bool HasComponent<T, Target>(Entity entity)
-    {
-        var type = TypeExpression.Create<T>(new Identity(LanguageType<Target>.Id));
-        return HasComponent(entity.Identity, type);
-    }
-
-    [Obsolete("Use link instead")]
-    public void AddComponent<T>(Entity entity, Entity target) where T : new()
-    {
-        var type = TypeExpression.Create<T>(target.Identity);
-        AddComponent(entity.Identity, type, new T());
-    }
-
-    [Obsolete("Use link instead")]
-    public void AddComponent<T>(Entity entity, T data, Entity target)
-    {
-        var type = TypeExpression.Create<T>(target.Identity);
-        AddComponent(entity.Identity, type, data);
-    }
-
-    [Obsolete("Use link instead")]
-    public void RemoveComponent(Entity entity, Type type, Entity target)
-    {
-        var typeExpression = TypeExpression.Create(type, target.Identity);
-        RemoveComponent(entity.Identity, typeExpression);
-    }
-
-    
-
-    
-    
-    
-    
-    
-    
-    
     
     
     public World(int capacity = 4096)

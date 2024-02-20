@@ -76,4 +76,16 @@ public class TypeExpressionTests
         var id = TypeExpression.Create<TypeA>();
         Assert.Throws<InvalidCastException>(() => id.Equals(o));
     }
+
+    [Fact]
+    public void Can_Create_For_Type()
+    {
+        var tx1 = TypeExpression.Create(typeof(TypeA));
+        var tx2 = TypeExpression.Create(typeof(TypeA), Identity.Any);
+        var tx3 = TypeExpression.Create(typeof(TypeA), new Identity(123));
+
+        Assert.False(tx1.isRelation);
+        Assert.True(tx2.isRelation);
+        Assert.True(tx3.isRelation);
+    }
 }
