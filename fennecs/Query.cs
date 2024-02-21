@@ -140,11 +140,11 @@ public delegate void MemoryAction_CU<C0, U>(Memory<C0> c0, in U uniform);
 
 public delegate void MemoryAction_CCU<C0, C1, in U>(Memory<C0> c0, Memory<C1> c1, U uniform);
 
-public delegate void MemoryAction_CCCU<C0, C1, C2, U>(Memory<C0> c0, Memory<C1> c1, Memory<C2> c2, in U uniform);
+public delegate void MemoryAction_CCCU<C0, C1, C2, in U>(Memory<C0> c0, Memory<C1> c1, Memory<C2> c2, U uniform);
 
-public delegate void MemoryAction_CCCCU<C0, C1, C2, C3, U>(Memory<C0> c0, Memory<C1> c1, Memory<C2> c2, Memory<C3> c3, in U uniform);
+public delegate void MemoryAction_CCCCU<C0, C1, C2, C3, in U>(Memory<C0> c0, Memory<C1> c1, Memory<C2> c2, Memory<C3> c3, U uniform);
 
-public delegate void MemoryAction_CCCCCU<C0, C1, C2, C3, C4, U>(Memory<C0> c0, Memory<C1> c1, Memory<C2> c2, Memory<C3> c3, Memory<C4> c4, in U uniform);
+public delegate void MemoryAction_CCCCCU<C0, C1, C2, C3, C4, in U>(Memory<C0> c0, Memory<C1> c1, Memory<C2> c2, Memory<C3> c3, Memory<C4> c4, U uniform);
 
 
 public delegate void SpanAction_C<C0>(Span<C0> c0);

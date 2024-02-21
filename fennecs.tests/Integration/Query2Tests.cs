@@ -5,8 +5,8 @@
 public class Query2Tests
 {
     [Theory]
-    [ClassData(typeof(QueryBatchGenerator))]
-    private void All_Runners_Applicable(int count)
+    [ClassData(typeof(QueryCountGenerator))]
+    private void All_Runners_Applicable(int count, bool createEmptyTable)
     {
         using var world = new World();
 
@@ -14,8 +14,11 @@ public class Query2Tests
 
         //Create an empty table by spawning and despawning a single entity
         //that matches our test query (but is a larger archetype)
-        var dead = world.Spawn().Add<int>().Add(0.25f).Add("will be removed").Id();
-        world.Despawn(dead);
+        if (createEmptyTable)
+        {
+            var dead = world.Spawn().Add<int>().Add(0.25f).Add("will be removed").Id();
+            world.Despawn(dead);
+        }
 
         for (var index = 0; index < count; index++)
         {
@@ -27,7 +30,7 @@ public class Query2Tests
                 .Id();
         }
 
-        query.ForEach((ref int index, ref string str) =>
+        query.ForEach((ref int _, ref string str) =>
         {
             Assert.Equal("one", str);
             str = "two";
@@ -64,13 +67,13 @@ public class Query2Tests
         }, 6, 4096);
 
 
-        query.ForEach((ref int index, ref string str, int uniform) =>
+        query.ForEach((ref int _, ref string str, int uniform) =>
         {
             Assert.Equal(6.ToString(), str);
             str = uniform.ToString();
         }, 7);
         
-        query.ForSpan((integers, strings, uniform) =>
+        query.ForSpan((_, strings, uniform) =>
         {
             for (var i = 0; i < count; i++)
             {
@@ -79,7 +82,7 @@ public class Query2Tests
             }
         }, 8);
         
-        query.Raw((c0, c1, uniform) =>
+        query.Raw((_, c1, uniform) =>
         {
             for (var i = 0; i < count; i++)
             {
@@ -87,7 +90,11 @@ public class Query2Tests
                 c1.Span[i] = uniform.ToString();
             }
         }, 9);
-            
+        
+        query.ForEach((ref int _, ref string str) =>
+        {
+            Assert.Equal(9.ToString(), str);
+        });
     }
     
     
@@ -187,7 +194,7 @@ public class Query2Tests
         for (var i = count; i > 0; i--)
         {
             var captured = i;
-            query.Raw((integers, strings) => { Assert.Equal(captured, integers.Length); });
+            query.Raw((integers, _) => { Assert.Equal(captured, integers.Length); });
 
             var removalIndex = random.Next(entities.Count);
             var removalEntity = entities[removalIndex];
@@ -195,7 +202,7 @@ public class Query2Tests
             world.Despawn(removalEntity);
         }
 
-        query.Raw((integers, strings) => { Assert.Equal(0, integers.Length); });
+        query.Raw((integers, _) => { Assert.Equal(0, integers.Length); });
     }
 
 
@@ -215,12 +222,12 @@ public class Query2Tests
 
         var query = world.Query<int, string>().Build();
 
-        query.Raw((integers, strings) => { Assert.Equal(0, integers.Length); });
+        query.Raw((integers, _) => { Assert.Equal(0, integers.Length); });
 
         for (var index = 0; index < count; index++)
         {
             var captured = index;
-            query.Raw((integers, strings) => { Assert.Equal(captured, integers.Length); });
+            query.Raw((integers, _) => { Assert.Equal(captured, integers.Length); });
 
             entities.Add(
                 world.Spawn()
@@ -230,7 +237,7 @@ public class Query2Tests
             );
         }
 
-        query.Raw((integers, strings) => { Assert.Equal(count, integers.Length); });
+        query.Raw((integers, _) => { Assert.Equal(count, integers.Length); });
 
         var random = new Random(69 + count);
 

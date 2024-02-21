@@ -63,7 +63,7 @@ public class DocumentationExampleTests
         }, chunkSize: chunkSize);
         Assert.Equal(count, query2.Count);
 
-        query3.RunParallel((ref float _, ref Position _, ref int _) =>
+        query3.Job((ref float _, ref Position _, ref int _) =>
         {
         }, chunkSize: chunkSize);
         Assert.Equal(count, query3.Count);
