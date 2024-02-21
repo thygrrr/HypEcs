@@ -14,25 +14,17 @@ public class EntityTests(ITestOutputHelper output)
         //Assert.Throws<InvalidCastException>(() => new Entity(typeof(bool)).Successor);
     }
 
-    /* API retired. TODO: Replace with new object API.
     [Fact]
-    public void NonVirtual_Identity_Resolves_as_Type()
+    public void Entity_Resolves_as_Type()
     {
-        var boolType = new Entity(typeof(bool));
-        Assert.False(boolType.IsVirtual);
-        
-        Assert.Equal(typeof(bool), boolType.Type);
+        var entity = new Entity(123);
+        Assert.Equal(typeof(Entity), entity.Type);
 
-        Assert.Equal(typeof(LanguageType.Any), Entity.Any.Type);
-        Assert.Equal(typeof(LanguageType.None), Entity.None.Type);
-
-        using var world = new World();
-        var identity = world.Spawn().Id();
-        Assert.Equal(typeof(Entity), identity.Type);
+        var objEntity = Entity.Of("hello world");
+        Assert.Equal(typeof(string), objEntity.Type);
     }
-    */
-    
     [Fact]
+    
     public void Identity_None_is_Zeros()
     {
         var none = Entity.None;

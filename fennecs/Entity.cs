@@ -39,10 +39,6 @@ public readonly struct Entity(ulong value) : IEquatable<Entity>, IComparable<Ent
     public Entity(int id, TypeID decoration = 1) : this((uint) id | (ulong) decoration << 32)
     {
     }
-    
-    internal Entity(TypeID typeId) : this(0, typeId)
-    {
-    }
 
     public static Entity Of<T>(T item) where T : class
     {
@@ -73,9 +69,11 @@ public readonly struct Entity(ulong value) : IEquatable<Entity>, IComparable<Ent
     public static bool operator ==(Entity left, Entity right) => left.Equals(right);
     public static bool operator !=(Entity left, Entity right) => !left.Equals(right);
 
-    public Type Type => Id switch
+    public Type Type => Decoration switch
     {
-        <= 0 => LanguageType.Resolve(Decoration),
+        // Decoration is Type Id
+        <= 0 => LanguageType.Resolve(Math.Abs(Decoration)),
+        // Decoration is Generation
         _ => typeof(Entity),
     };
 
