@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: MIT
 
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 namespace fennecs;
@@ -117,9 +116,7 @@ public readonly struct TypeExpression : IEquatable<TypeExpression>, IComparable<
     }
 
     public static implicit operator ulong(TypeExpression self) => self.Value;
-
-
-    [SetsRequiredMembers]
+    
     private TypeExpression(Entity target, TypeID typeId)
     {
         Value = target.Value;

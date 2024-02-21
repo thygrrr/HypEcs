@@ -12,11 +12,13 @@ namespace fennecs;
 public readonly struct Entity : IEquatable<Entity>, IComparable<Entity>
 {
     [FieldOffset(0)] internal readonly ulong Value;
-    [FieldOffset(0)] internal readonly int Id;
 
-    [FieldOffset(4)] internal readonly ushort Generation;
-    [FieldOffset(4)] internal readonly TypeID Decoration;
+    //Identity Components
+    [FieldOffset(0)] public readonly int Id;
+    [FieldOffset(4)] public readonly ushort Generation;
+    [FieldOffset(4)] public readonly TypeID Decoration;
 
+    //Type header (only used in TypeExpression, so must be 0 here) 
     [FieldOffset(6)] internal readonly TypeID RESERVED = 0;
 
     //Constituents for GetHashCode()
@@ -24,7 +26,7 @@ public readonly struct Entity : IEquatable<Entity>, IComparable<Entity>
     [FieldOffset(4)] internal readonly uint DWordHigh;
     
     public static readonly Entity None = default; // == 0-bit == new(0,0)
-    public static readonly Entity Any = new(0, TypeID.MaxValue);
+    public static readonly Entity Any = new(-1, TypeID.MaxValue);
     
     // Entity Reference.
     public bool IsReal => Id > 0 && Generation > 0;
@@ -47,8 +49,8 @@ public readonly struct Entity : IEquatable<Entity>, IComparable<Entity>
     
     public override bool Equals(object? obj)
     {
-        throw new InvalidCastException("Identity: Boxing equality comparisons disallowed. Use IEquatable<Identity>.Equals(Identity other) instead.");
-        //return obj is Identity other && Equals(other); <-- second best option   
+      throw new InvalidCastException("Entity: Boxing equality comparisons disallowed. Use IEquatable<Entity>.Equals(Entity other) instead.");
+      //return obj is Entity other && Equals(other); //<-- second best option   
     }
     
     public override int GetHashCode()
@@ -69,27 +71,21 @@ public readonly struct Entity : IEquatable<Entity>, IComparable<Entity>
         // Decoration is Generation
         _ => typeof(Entity),
     };
-
-    
-    public override string ToString()
-    {
-        if (this == None)
-            return "None";
-
-        if (this == Any)
-            return "Any";
-
-        if (IsObject) 
-            return $"{Type}#{Id:X8}";
-            
-        return $"\u2756{Id:x8}:{Generation:D5}";
-    }
-
     
     #region Constructors / Creators
     
     public static Entity Of<T>(T item) where T : class => new(item.GetHashCode(), LanguageType<T>.TargetId);
 
+
+    internal Entity(int id, TypeID decoration = 1) : this((uint) id | (ulong) decoration << 32)
+    {
+    }
+
+
+    public Entity(ulong value)
+    {
+        Value = value;
+    }
 
     internal Entity Successor
     {
@@ -101,17 +97,20 @@ public readonly struct Entity : IEquatable<Entity>, IComparable<Entity>
             return new Entity(Id, generationWrappedStartingAtOne);
         }
     }
-
-    
-    internal Entity(int id, TypeID decoration = 1) : this((uint) id | (ulong) decoration << 32)
-    {
-    }
-
-    
-    internal Entity(ulong value)
-    {
-        Value = value;
-    }
     
     #endregion
+
+    public override string ToString()
+    {
+        if (Equals(None))
+            return "\u25c7None";
+
+        if (Equals(Any))
+            return "\u25c6Any";
+
+        if (IsObject)
+            return $"\u25c8{Type}#{Id:X8}";
+
+        return $"\u2756{Id:x8}:{Generation:D5}";
+    }
 }

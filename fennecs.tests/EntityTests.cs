@@ -68,7 +68,7 @@ public class EntityTests(ITestOutputHelper output)
 
     [Theory]
     [InlineData(1500, 1500)]
-    internal void Identity_HashCodes_are_Unique(TypeID idCount, TypeID genCount)
+    public void Identity_HashCodes_are_Unique(TypeID idCount, TypeID genCount)
     {
         var ids = new Dictionary<int, Entity>((int) (idCount * genCount * 4f));
 
@@ -168,7 +168,7 @@ public class EntityTests(ITestOutputHelper output)
     */
     
     [Fact]
-    private void Entity_HashCode_is_Stable()
+    public void Entity_HashCode_is_Stable()
     {
         using var world = new World();
         var entity1 = world.Spawn().Id();
