@@ -44,26 +44,17 @@ public readonly struct TypeExpression : IEquatable<TypeExpression>, IComparable<
     // Type Header
     [FieldOffset(6)] public readonly TypeID TypeId;
 
-    public Entity Target => new(Value);
+    //Constituents for GetHashCode()
+    [FieldOffset(0)] internal readonly uint DWordLow;
+    [FieldOffset(4)] internal readonly uint DWordHigh;
+
+    
+    public Entity Target => new(Id, Decoration);
 
     public bool isRelation => TypeId != 0 && Target != Entity.None;
 
     public Type Type => LanguageType.Resolve(TypeId);
     
-    /* TODO: Handle different flags if needed
-        {
-            return (TypeId, Id) switch
-            {
-                (0, int.MaxValue) => typeof(Any),
-                (0, 0) => typeof(None),
-                (0, _) => typeof(Entity),
-                    _ => LanguageType.Resolve(TypeId),
-            };
-        }
-        internal struct None;
-        internal struct Any;    
-    */
-
     public bool Matches(IEnumerable<TypeExpression> other)
     {
         var self = this;
@@ -109,9 +100,7 @@ public readonly struct TypeExpression : IEquatable<TypeExpression>, IComparable<
     {
         unchecked
         {
-            var low = (uint) (Value & 0xFFFFFFFFu);
-            var high = (uint) (Value >> 32);
-            return (int) (0x811C9DC5u * low + 0x1000193u * high + 0xc4ceb9fe1a85ec53u);
+            return (int) (0x811C9DC5u * DWordLow + 0x1000193u * DWordHigh + 0xc4ceb9fe1a85ec53u);
         }
     }
 

@@ -85,7 +85,7 @@ public class EntityTests(ITestOutputHelper output)
 
                 if (ids.ContainsKey(identity.GetHashCode()))
                 {
-                    Assert.Fail($"Collision of {identity} with {ids[identity.GetHashCode()]}, #{identity.GetHashCode()}");
+                    Assert.Fail($"Collision of {identity} with {ids[identity.GetHashCode()]}, {identity.GetHashCode()}#==#{ids[identity.GetHashCode()].GetHashCode()}");
                 }
                 else
                 {

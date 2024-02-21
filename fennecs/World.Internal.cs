@@ -37,8 +37,8 @@ public partial class World : IDisposable
 
 
     private readonly ConcurrentQueue<DeferredOperation> _deferredOperations = new();
+    
     private readonly Dictionary<TypeExpression, List<Table>> _tablesByType = new();
-
     private readonly Dictionary<Entity, HashSet<TypeExpression>> _typesByRelationTarget = new();
 
     private readonly object _modeChangeLock = new();

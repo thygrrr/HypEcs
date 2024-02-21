@@ -5,26 +5,25 @@ using System.Runtime.InteropServices;
 namespace fennecs;
 
 /// <summary>
-/// Refers to an entity, object, or virtual concept (e.g. any/none wildcard).
+/// Refers to an identity:
+/// real entity, tracked object, or virtual concept (e.g. any/none wildcard).
 /// </summary>
-/// <param name="value"></param>
 [StructLayout(LayoutKind.Explicit)]
-public readonly struct Entity(ulong value) : IEquatable<Entity>, IComparable<Entity>
+public readonly struct Entity : IEquatable<Entity>, IComparable<Entity>
 {
-    [FieldOffset(0)] internal readonly ulong Value = value;
+    [FieldOffset(0)] internal readonly ulong Value;
     [FieldOffset(0)] internal readonly int Id;
-    
+
     [FieldOffset(4)] internal readonly ushort Generation;
     [FieldOffset(4)] internal readonly TypeID Decoration;
 
     [FieldOffset(6)] internal readonly TypeID RESERVED = 0;
 
+    //Constituents for GetHashCode()
     [FieldOffset(0)] internal readonly uint DWordLow;
     [FieldOffset(4)] internal readonly uint DWordHigh;
     
-    //public ulong Value => (uint) Id | (ulong) Generation << 32;
-
-    public static readonly Entity None = new(0, 0);
+    public static readonly Entity None = default; // == 0-bit == new(0,0)
     public static readonly Entity Any = new(0, TypeID.MaxValue);
     
     // Entity Reference.
@@ -36,28 +35,22 @@ public readonly struct Entity(ulong value) : IEquatable<Entity>, IComparable<Ent
     // Special Entities, such as None, Any.
     public bool IsVirtual => Decoration >= 0 && Id <= 0;
 
-    public Entity(int id, TypeID decoration = 1) : this((uint) id | (ulong) decoration << 32)
-    {
-    }
-
-    public static Entity Of<T>(T item) where T : class
-    {
-        return new(item.GetHashCode(), LanguageType<T>.TargetId);
-    }
+    #region  IComparable/IEquatable Implementation
     
-    public bool Equals(Entity other) => Id == other.Id && Generation == other.Generation;
+    public static bool operator ==(Entity left, Entity right) => left.Equals(right);
+    public static bool operator !=(Entity left, Entity right) => !left.Equals(right);
 
-    public int CompareTo(Entity other)
-    {
-        return Value.CompareTo(other.Value);
-    }
+    public bool Equals(Entity other) => Value == other.Value;
 
+    public int CompareTo(Entity other) => Value.CompareTo(other.Value);
+    
+    
     public override bool Equals(object? obj)
     {
         throw new InvalidCastException("Identity: Boxing equality comparisons disallowed. Use IEquatable<Identity>.Equals(Identity other) instead.");
         //return obj is Identity other && Equals(other); <-- second best option   
     }
-
+    
     public override int GetHashCode()
     {
         unchecked
@@ -65,9 +58,9 @@ public readonly struct Entity(ulong value) : IEquatable<Entity>, IComparable<Ent
             return (int) (0x811C9DC5u * DWordLow + 0x1000193u * DWordHigh + 0xc4ceb9fe1a85ec53u);
         }
     }
+    
+    #endregion
 
-    public static bool operator ==(Entity left, Entity right) => left.Equals(right);
-    public static bool operator !=(Entity left, Entity right) => !left.Equals(right);
 
     public Type Type => Decoration switch
     {
@@ -77,25 +70,48 @@ public readonly struct Entity(ulong value) : IEquatable<Entity>, IComparable<Ent
         _ => typeof(Entity),
     };
 
-    public Entity Successor
+    
+    public override string ToString()
+    {
+        if (this == None)
+            return "None";
+
+        if (this == Any)
+            return "Any";
+
+        if (IsObject) 
+            return $"{Type}#{Id:X8}";
+            
+        return $"\u2756{Id:x8}:{Generation:D5}";
+    }
+
+    
+    #region Constructors / Creators
+    
+    public static Entity Of<T>(T item) where T : class => new(item.GetHashCode(), LanguageType<T>.TargetId);
+
+
+    internal Entity Successor
     {
         get
         {
             if (!IsReal) throw new InvalidCastException("Cannot reuse virtual Identities");
-                
+
             var generationWrappedStartingAtOne = (TypeID) (Generation % (TypeID.MaxValue - 1) + 1);
             return new Entity(Id, generationWrappedStartingAtOne);
         }
     }
 
-    public override string ToString()
+    
+    internal Entity(int id, TypeID decoration = 1) : this((uint) id | (ulong) decoration << 32)
     {
-        if (this == None)
-            return $"None";
-
-        if (this == Any)
-            return $"Any";
-
-        return IsObject ? $"{Type}" : $"\u2756{Id:x8}:{Generation:D5}";
     }
+
+    
+    internal Entity(ulong value)
+    {
+        Value = value;
+    }
+    
+    #endregion
 }
