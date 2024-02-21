@@ -198,7 +198,6 @@ public partial class World
     public World(int capacity = 4096)
     {
         _identityPool = new IdentityPool(capacity);
-        _referenceStore = new ReferenceStore(capacity);
         
         _meta = new EntityMeta[capacity];
 
