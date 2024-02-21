@@ -70,25 +70,37 @@ public class EntityTests(ITestOutputHelper output)
     [Fact]
     private void Same_Entity_is_Equal()
     {
-        using var world = new World();
-        var entity1 = world.Spawn().Id();
-        var entity2 = entity1;
+        var entity1 = new Entity(new Identity(123, 999));
+        var entity2 = new Entity(new Identity(123, 999));
         Assert.Equal(entity1, entity2);
         Assert.True(entity1 == entity2);
     }
-    
-    
+
+
+
     [Fact]
     private void Different_Entity_is_Not_Equal()
     {
-        using var world = new World();
-        var entity1 = world.Spawn().Id();
-        var entity2 = world.Spawn().Id();
+        var entity1 = new Entity(new Identity(69, 420));
+        var entity2 = new Entity(new Identity(420, 69));
+
+        var entity3 = new Entity(new Identity(69, 69));
+        var entity4 = new Entity(new Identity(420, 420));
+        
         Assert.NotEqual(entity1, entity2);
         Assert.True(entity1 != entity2);
+        
+        Assert.NotEqual(entity3, entity4);
+        Assert.True(entity3 != entity4);
+        
+        Assert.NotEqual(entity1, entity3);
+        Assert.True(entity1 != entity3);
+        
+        Assert.NotEqual(entity2, entity4);
+        Assert.True(entity2 != entity4);
     }
 
-    
+
     [Fact]
     public Entity Entity_is_Alive_after_Spawn()
     {

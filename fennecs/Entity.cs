@@ -2,9 +2,15 @@
 
 namespace fennecs;
 
-public readonly struct Entity(Identity identity) : IComparable<Entity>
+public readonly struct Entity : IComparable<Entity>
 {
-    internal readonly Identity Identity = identity;
+    internal readonly Identity Identity;
+
+    public Entity(Identity identity)
+    {
+        if (!identity.IsEntity) throw new ArgumentException($"Identity cannot be an entity: {identity}", nameof(identity));
+        Identity = identity;
+    }
 
     public int CompareTo(Entity other) => Identity.CompareTo(other.Identity);
 
