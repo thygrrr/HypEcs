@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace fennecs;
@@ -103,13 +104,13 @@ public readonly struct Entity : IEquatable<Entity>, IComparable<Entity>
     public override string ToString()
     {
         if (Equals(None))
-            return "\u25c7None";
+            return "\u25c7[None]";
 
         if (Equals(Any))
-            return "\u25c6Any";
+            return "\u25c6[Any]";
 
         if (IsObject)
-            return $"\u25c8{Type}#{Id:X8}";
+            return $"\u27d0<{Type}>#{Id:X8}";
 
         return $"\u2756{Id:x8}:{Generation:D5}";
     }

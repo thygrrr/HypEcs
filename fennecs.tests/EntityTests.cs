@@ -11,7 +11,6 @@ public class EntityTests(ITestOutputHelper output)
     {
         Assert.Throws<InvalidCastException>(() => Entity.Any.Successor);
         Assert.Throws<InvalidCastException>(() => Entity.None.Successor);
-        //Assert.Throws<InvalidCastException>(() => new Entity(typeof(bool)).Successor);
     }
 
     [Fact]
@@ -25,7 +24,7 @@ public class EntityTests(ITestOutputHelper output)
     }
     [Fact]
     
-    public void Identity_None_is_Zeros()
+    public void Identity_None_is_default()
     {
         var none = Entity.None;
         Assert.Equal(default, none.Generation);
@@ -37,9 +36,15 @@ public class EntityTests(ITestOutputHelper output)
     [Fact]
     public void Identity_ToString()
     {
+        _ = Entity.None.ToString();
+        _ = Entity.Any.ToString();
+        _ = Entity.Of("hello world").ToString();
+        _ = new Entity(123, 456).ToString();
+
         output.WriteLine(Entity.None.ToString());
         output.WriteLine(Entity.Any.ToString());
-        output.WriteLine(new Entity(123).ToString());
+        output.WriteLine(Entity.Of("hello world").ToString());
+        output.WriteLine(new Entity(123, 456).ToString());
     }
 
     [Fact]
