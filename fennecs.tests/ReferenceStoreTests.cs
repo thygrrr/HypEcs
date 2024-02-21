@@ -109,12 +109,13 @@ public class ReferenceStoreTests(ITestOutputHelper output)
     [Fact]
     public void StoredReference_ToString()
     {
-        var store = new ReferenceStore.StoredReference<List<int>>
+        var reference = new ReferenceStore.StoredReference<List<int>>
         {
             Item = new List<int>(3),
-            Count = 7
+            Count = 7,
         };
-        Assert.Equal($"{typeof(List<int>)} x7", store.ToString());
+        output.WriteLine(reference.ToString());
+        Assert.Equal($"{typeof(List<int>)} x7", reference.ToString());
     }
     
 }

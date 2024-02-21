@@ -331,6 +331,7 @@ public class QueryTests
         Assert.True(ReferenceEquals(query5A, query5B));
     }
 
+    
     [Fact]
     private static void Queries_are_Disposable()
     {
@@ -355,10 +356,11 @@ public class QueryTests
         using var world = new World();
         var entity = world.Spawn().Id();
         var query = world.Query<Entity>().Build();
-        
+
         Assert.Throws<TypeAccessException>(() => query.Ref<Entity>(entity));
     }
 
+    
     [Fact]
     private void Ref_disallows_Dead_Entity()
     {

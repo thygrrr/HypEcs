@@ -6,10 +6,6 @@ namespace fennecs;
 
 public class Query<C1>(World world, Mask mask, List<Table> tables) : Query(world, mask, tables)
 {
-    private readonly CountdownEvent _countdown = new(1);
-
-    #region Runners
-
     public void Run(SpanAction_C<C1> action)
     {
         AssertNotDisposed();
@@ -62,7 +58,7 @@ public class Query<C1>(World world, Mask mask, List<Table> tables) : Query(world
         AssertNotDisposed();
         
         World.Lock();
-        _countdown.Reset();
+        Countdown.Reset();
 
         using var jobs = PooledList<Work<C1>>.Rent();
 
@@ -76,7 +72,7 @@ public class Query<C1>(World world, Mask mask, List<Table> tables) : Query(world
 
             for (var chunk = 0; chunk < partitions; chunk++)
             {
-                _countdown.AddCount();
+                Countdown.AddCount();
 
                 var start = chunk * chunkSize;
                 var length = Math.Min(chunkSize, count - start);
@@ -84,15 +80,15 @@ public class Query<C1>(World world, Mask mask, List<Table> tables) : Query(world
                 var job = JobPool<Work<C1>>.Rent();
                 job.Memory1 = storage.AsMemory(start, length);
                 job.Action = action;
-                job.CountDown = _countdown;
+                job.CountDown = Countdown;
                 jobs.Add(job);
 
                 ThreadPool.UnsafeQueueUserWorkItem(job, true);
             }
         }
 
-        _countdown.Signal();
-        _countdown.Wait();
+        Countdown.Signal();
+        Countdown.Wait();
 
         JobPool<Work<C1>>.Return(jobs);
 
@@ -104,7 +100,7 @@ public class Query<C1>(World world, Mask mask, List<Table> tables) : Query(world
         AssertNotDisposed();
         
         World.Lock();
-        _countdown.Reset();
+        Countdown.Reset();
 
         using var jobs = PooledList<UniformWork<C1, U>>.Rent();
 
@@ -118,7 +114,7 @@ public class Query<C1>(World world, Mask mask, List<Table> tables) : Query(world
 
             for (var chunk = 0; chunk < partitions; chunk++)
             {
-                _countdown.AddCount();
+                Countdown.AddCount();
 
                 var start = chunk * chunkSize;
                 var length = Math.Min(chunkSize, count - start);
@@ -127,14 +123,14 @@ public class Query<C1>(World world, Mask mask, List<Table> tables) : Query(world
                 job.Memory1 = storage.AsMemory(start, length);
                 job.Action = action;
                 job.Uniform = uniform;
-                job.CountDown = _countdown;
+                job.CountDown = Countdown;
                 jobs.Add(job);
                 ThreadPool.UnsafeQueueUserWorkItem(job, true);
             }
         }
 
-        _countdown.Signal();
-        _countdown.Wait();
+        Countdown.Signal();
+        Countdown.Wait();
 
         JobPool<UniformWork<C1, U>>.Return(jobs);
 
@@ -155,6 +151,4 @@ public class Query<C1>(World world, Mask mask, List<Table> tables) : Query(world
 
         World.Unlock();
     }
-
-    #endregion
 }

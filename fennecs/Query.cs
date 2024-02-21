@@ -7,10 +7,14 @@ namespace fennecs;
 public class Query(World world, Mask mask, List<Table> tables) : IEnumerable<Entity>, IDisposable
 {
     protected readonly ParallelOptions Options = new() {MaxDegreeOfParallelism = 24};
+    
+    /// <summary>
+    /// Countdown event for parallel runners.
+    /// </summary>
+    protected readonly CountdownEvent Countdown = new(1);
 
-    private protected readonly List<Table> Tables = tables;
-    private protected readonly World World = world;
-
+    protected readonly List<Table> Tables = tables;
+    protected readonly World World = world;
     protected internal readonly Mask Mask = mask;
 
     /// <summary>
@@ -24,6 +28,8 @@ public class Query(World world, Mask mask, List<Table> tables) : IEnumerable<Ent
     public ref C Ref<C>(Entity entity, Identity target = default)
     {
         AssertNotDisposed();
+        //TODO: Returning this ref should lock the world for the ref's scope?
+        //TODO: This is just a facade for World.GetComponent, should it be removed?
         return ref World.GetComponent<C>(entity, target);
     }
 

@@ -288,19 +288,18 @@ public partial class World
         storage.SetValue(data, newRow);
     }
 
-    public ref T GetComponent<T>(Identity identity, Identity target = default)
+    public ref T GetComponent<T>(Entity entity, Identity target = default)
     {
-        AssertAlive(identity);
-        
+        AssertAlive(entity);
+
         if (typeof(T) == typeof(Entity))
         {
-            throw new TypeAccessException("Cannot get mutable reference to root Entity table (system integrity).");
+            throw new TypeAccessException("Not allowed get mutable reference in root table (TypeExpression<Entity>, system integrity).");
         }
 
-        var type = TypeExpression.Create<T>(target);
-        var meta = _meta[identity.Id];
+        var meta = _meta[entity.Identity.Id];
         var table = _tables[meta.TableId];
-        var storage = (T[]) table.GetStorage(type);
+        var storage = table.GetStorage<T>(target);
         return ref storage[meta.Row];
     }
 }

@@ -5,9 +5,10 @@ using System.Numerics;
 
 namespace fennecs.tests;
 
-public class EntityTests
+public class EntityTests(ITestOutputHelper output)
 {
     #region Input Data
+
     private struct CompoundComponent
     {
         // ReSharper disable once NotAccessedField.Local
@@ -16,7 +17,7 @@ public class EntityTests
         // ReSharper disable once NotAccessedField.Local
         public required int I1;
     }
-    
+
     private class ComponentDataSource : List<object[]>
     {
         public ComponentDataSource()
@@ -33,7 +34,61 @@ public class EntityTests
             Add([new CompoundComponent {B1 = default, I1 = default}]);
         }
     }
+
     #endregion
+
+    [Fact]
+    private void Entity_ToString_Facades_Identity_ToString()
+    {
+        var identity = new Identity(123, 456);
+        var entity = new Entity(identity);
+        output.WriteLine(entity.ToString());
+        Assert.Equal(identity.ToString(), entity.ToString());
+    }
+    
+    [Fact]
+    private void Entity_HashCode_is_Stable()
+    {
+        using var world = new World();
+        var entity1 = world.Spawn().Id();
+        var entity2 = world.Spawn().Id();
+        var hash1 = entity1.GetHashCode();
+        var hash2 = entity2.GetHashCode();
+        Assert.NotEqual(hash1, hash2);
+        Assert.Equal(hash1, entity1.GetHashCode());
+        Assert.Equal(hash2, entity2.GetHashCode());
+    }
+
+    [Fact] 
+    private void Entity_is_Equal_to_Itself()
+    {
+        using var world = new World();
+        var entity = world.Spawn().Id();
+        Assert.Equal(entity, entity);
+    }
+    
+    [Fact]
+    private void Same_Entity_is_Equal()
+    {
+        using var world = new World();
+        var entity1 = world.Spawn().Id();
+        var entity2 = entity1;
+        Assert.Equal(entity1, entity2);
+        Assert.True(entity1 == entity2);
+    }
+    
+    
+    [Fact]
+    private void Different_Entity_is_Not_Equal()
+    {
+        using var world = new World();
+        var entity1 = world.Spawn().Id();
+        var entity2 = world.Spawn().Id();
+        Assert.NotEqual(entity1, entity2);
+        Assert.True(entity1 != entity2);
+    }
+
+    
     [Fact]
     public Entity Entity_is_Alive_after_Spawn()
     {
