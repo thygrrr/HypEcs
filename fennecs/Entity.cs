@@ -36,17 +36,11 @@ public readonly struct Entity(ulong value) : IEquatable<Entity>, IComparable<Ent
     // Special Entities, such as None, Any.
     public bool IsVirtual => Decoration >= 0 && Id <= 0;
 
-    public static implicit operator Entity(Type type) => new(type);
-
     public Entity(int id, TypeID decoration = 1) : this((uint) id | (ulong) decoration << 32)
     {
     }
     
     internal Entity(TypeID typeId) : this(0, typeId)
-    {
-    }
-
-    public Entity(Type type) : this(LanguageType.Identify(type))
     {
     }
 
