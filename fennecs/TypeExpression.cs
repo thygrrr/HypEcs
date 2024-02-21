@@ -17,7 +17,7 @@ public readonly struct TypeExpression : IEquatable<TypeExpression>, IComparable<
     //   | Id              | Generation | TypeNumber |
     //   | 32 bits         |  16 bits   |  16 bits   |
     //   |-------------------------------------------|
-    //   | Identity                     | TypeNumber |
+    //   | Entity (Identity)            | TypeNumber |
     //   | 48 bits                      |  16 bits   |
     
     //   PLANNED:

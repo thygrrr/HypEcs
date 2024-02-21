@@ -23,7 +23,6 @@ internal class UniformWork<C1, U> : IThreadPoolWorkItem
 
     public void Execute()
     {
-        using var _1 = Memory1.Pin();
         foreach (ref var c in Memory1.Span) Action(ref c, Uniform);
         CountDown.Signal();
     }
@@ -38,8 +37,6 @@ internal class Work<C1, C2> : IThreadPoolWorkItem
 
     public void Execute()
     {
-        using var _1 = Memory1.Pin();
-        using var _2 = Memory2.Pin();
         for (var i = 0; i < Memory1.Length; i++) Action(ref Memory1.Span[i], ref Memory2.Span[i]);
         CountDown.Signal();
     }
@@ -55,8 +52,6 @@ internal class UniformWork<C1, C2, U> : IThreadPoolWorkItem
 
     public void Execute()
     {
-        using var _1 = Memory1.Pin();
-        using var _2 = Memory2.Pin();
         for (var i = 0; i < Memory1.Length; i++) Action(ref Memory1.Span[i], ref Memory2.Span[i], Uniform);
         CountDown.Signal();
     }
@@ -72,9 +67,6 @@ internal class Work<C1, C2, C3> : IThreadPoolWorkItem
 
     public void Execute()
     {
-        using var _1 = Memory1.Pin();
-        using var _2 = Memory2.Pin();
-        using var _3 = Memory3.Pin();
         for (var i = 0; i < Memory1.Length; i++) Action(ref Memory1.Span[i], ref Memory2.Span[i], ref Memory3.Span[i]);
         CountDown.Signal();
     }
@@ -91,9 +83,6 @@ internal class UniformWork<C1, C2, C3, U> : IThreadPoolWorkItem
 
     public void Execute()
     {
-        using var _1 = Memory1.Pin();
-        using var _2 = Memory2.Pin();
-        using var _3 = Memory3.Pin();
         for (var i = 0; i < Memory1.Length; i++) Action(ref Memory1.Span[i], ref Memory2.Span[i], ref Memory3.Span[i], Uniform);
         CountDown.Signal();
     }
@@ -110,10 +99,6 @@ internal class Work<C1, C2, C3, C4> : IThreadPoolWorkItem
 
     public void Execute()
     {
-        using var _1 = Memory1.Pin();
-        using var _2 = Memory2.Pin();
-        using var _3 = Memory3.Pin();
-        using var _4 = Memory4.Pin();
         for (var i = 0; i < Memory1.Length; i++) Action(ref Memory1.Span[i], ref Memory2.Span[i], ref Memory3.Span[i], ref Memory4.Span[i]);
         CountDown.Signal();
     }
@@ -152,11 +137,6 @@ internal class Work<C1, C2, C3, C4, C5> : IThreadPoolWorkItem
 
     public void Execute()
     {
-        using var _1 = Memory1.Pin();
-        using var _2 = Memory2.Pin();
-        using var _3 = Memory3.Pin();
-        using var _4 = Memory4.Pin();
-        using var _5 = Memory5.Pin();
         for (var i = 0; i < Memory1.Length; i++) Action(ref Memory1.Span[i], ref Memory2.Span[i], ref Memory3.Span[i], ref Memory4.Span[i], ref Memory5.Span[i]);
         CountDown.Signal();
     }
@@ -175,11 +155,6 @@ internal class UniformWork<C1, C2, C3, C4, C5, U> : IThreadPoolWorkItem
 
     public void Execute()
     {
-        using var _1 = Memory1.Pin();
-        using var _2 = Memory2.Pin();
-        using var _3 = Memory3.Pin();
-        using var _4 = Memory4.Pin();
-        using var _5 = Memory5.Pin();
         for (var i = 0; i < Memory1.Length; i++) Action(ref Memory1.Span[i], ref Memory2.Span[i], ref Memory3.Span[i], ref Memory4.Span[i], ref Memory5.Span[i], Uniform);
         CountDown.Signal();
     }
