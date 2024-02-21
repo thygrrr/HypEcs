@@ -8,7 +8,6 @@ internal class Work<C1> : IThreadPoolWorkItem
 
     public void Execute()
     {
-        using var _1 = Memory1.Pin();
         foreach (ref var c in Memory1.Span) Action(ref c);
         CountDown.Signal();
     }
@@ -116,11 +115,8 @@ internal class UniformWork<C1, C2, C3, C4, U> : IThreadPoolWorkItem
 
     public void Execute()
     {
-        using var _1 = Memory1.Pin();
-        using var _2 = Memory2.Pin();
-        using var _3 = Memory3.Pin();
-        using var _4 = Memory4.Pin();
         for (var i = 0; i < Memory1.Length; i++) Action(ref Memory1.Span[i], ref Memory2.Span[i], ref Memory3.Span[i], ref Memory4.Span[i], Uniform);
+        
         CountDown.Signal();
     }
 }
