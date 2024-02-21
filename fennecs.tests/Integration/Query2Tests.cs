@@ -5,6 +5,94 @@
 public class Query2Tests
 {
     [Theory]
+    [ClassData(typeof(QueryBatchGenerator))]
+    private void All_Runners_Applicable(int count)
+    {
+        using var world = new World();
+
+        var query = world.Query<int, string>().Build();
+
+        //Create an empty table by spawning and despawning a single entity
+        //that matches our test query (but is a larger archetype)
+        var dead = world.Spawn().Add<int>().Add(0.25f).Add("will be removed").Id();
+        world.Despawn(dead);
+
+        for (var index = 0; index < count; index++)
+        {
+            Assert.Equal(index, query.Count);
+
+            world.Spawn()
+                .Add(index)
+                .Add("one")
+                .Id();
+        }
+
+        query.ForEach((ref int index, ref string str) =>
+        {
+            Assert.Equal("one", str);
+            str = "two";
+        });
+
+        query.ForSpan((integers, strings) =>
+        {
+            for (var i = 0; i < count; i++)
+            {
+                Assert.Equal(i, integers[i]);
+                Assert.Equal("two", strings[i]);
+                strings[i] = "three";
+            }
+        });
+        
+        query.Job((ref int _, ref string str) =>
+        {
+            Assert.Equal("three", str);
+            str = "four";
+        });
+        
+        query.Job((ref int index, ref string str) =>
+        {
+            Assert.Equal(index, index);
+            Assert.Equal("four", str);
+            str = "five";
+        }, 4096);
+
+        query.Job((ref int index, ref string str, int uniform) =>
+        {
+            Assert.Equal(index, index);
+            Assert.Equal("five", str);
+            str = uniform.ToString();
+        }, 6, 4096);
+
+
+        query.ForEach((ref int index, ref string str, int uniform) =>
+        {
+            Assert.Equal(6.ToString(), str);
+            str = uniform.ToString();
+        }, 7);
+        
+        query.ForSpan((integers, strings, uniform) =>
+        {
+            for (var i = 0; i < count; i++)
+            {
+                Assert.Equal(7.ToString(), strings[i]);
+                strings[i] = uniform.ToString();
+            }
+        }, 8);
+        
+        query.Raw((c0, c1, uniform) =>
+        {
+            for (var i = 0; i < count; i++)
+            {
+                Assert.Equal(8.ToString(), c1.Span[i]);
+                c1.Span[i] = uniform.ToString();
+            }
+        }, 9);
+            
+    }
+    
+    
+    
+    [Theory]
     [ClassData(typeof(QueryCountGenerator))]
     private void Query_Count_Accurate(int count, bool createEmptyTable)
     {
@@ -99,10 +187,7 @@ public class Query2Tests
         for (var i = count; i > 0; i--)
         {
             var captured = i;
-            query.Raw((integers, strings) =>
-            {
-                Assert.Equal(captured, integers.Length);
-            });
+            query.Raw((integers, strings) => { Assert.Equal(captured, integers.Length); });
 
             var removalIndex = random.Next(entities.Count);
             var removalEntity = entities[removalIndex];
@@ -110,10 +195,7 @@ public class Query2Tests
             world.Despawn(removalEntity);
         }
 
-        query.Raw((integers, strings) =>
-        {
-            Assert.Equal(0, integers.Length);
-        });
+        query.Raw((integers, strings) => { Assert.Equal(0, integers.Length); });
     }
 
 
@@ -133,18 +215,12 @@ public class Query2Tests
 
         var query = world.Query<int, string>().Build();
 
-        query.Raw((integers, strings) =>
-        {
-            Assert.Equal(0, integers.Length);
-        });
+        query.Raw((integers, strings) => { Assert.Equal(0, integers.Length); });
 
         for (var index = 0; index < count; index++)
         {
             var captured = index;
-            query.Raw((integers, strings) =>
-            {
-                Assert.Equal(captured, integers.Length);
-            });
+            query.Raw((integers, strings) => { Assert.Equal(captured, integers.Length); });
 
             entities.Add(
                 world.Spawn()
@@ -154,10 +230,7 @@ public class Query2Tests
             );
         }
 
-        query.Raw((integers, strings) =>
-        {
-            Assert.Equal(count, integers.Length);
-        });
+        query.Raw((integers, strings) => { Assert.Equal(count, integers.Length); });
 
         var random = new Random(69 + count);
 
@@ -281,6 +354,7 @@ public class Query2Tests
         {
             Interlocked.Increment(ref processed);
             index = 123;
+            Assert.Equal("I'll stay", str);
             str = "fools";
         }, chunkSize: chunk);
 
@@ -302,7 +376,7 @@ public class Query2Tests
 
         if (createEmptyTable)
         {
-            var dead = world.Spawn().Add<int>().Add("will be removed").Id();
+            var dead = world.Spawn().Add<int>().Add(0.25f).Add("will be removed").Id();
             world.Despawn(dead);
         }
 
@@ -310,30 +384,34 @@ public class Query2Tests
         {
             world.Spawn()
                 .Add(index)
+                .Add("I'll stay")
                 .Id();
         }
 
-        var query = world.Query<int>().Build();
+        var query = world.Query<int, string>().Build();
 
         var processed = 0;
-        query.Job((ref int index, float _) =>
+        query.Job((ref int index, ref string str, float _) =>
         {
             Interlocked.Increment(ref processed);
             index = 123;
+            Assert.Equal("I'll stay", str);
+            str = "fools";
         }, 0, chunkSize: chunk);
 
         Assert.Equal(count, processed);
 
-        query.Job((ref int index, float _) =>
+        query.Job((ref int index, ref string str, float _) =>
         {
             ArgumentOutOfRangeException.ThrowIfNegative(index);
             Assert.Equal(123, index);
+            Assert.Equal("fools", str);
         }, 0, chunkSize: chunk);
     }
 
     [Theory]
     [ClassData(typeof(QueryCountGenerator))]
-    private void Parallel_Visits_All_Entities(int count, bool createEmptyTable) 
+    private void Parallel_Visits_All_Entities(int count, bool createEmptyTable)
     {
         using var world = new World();
 
@@ -347,24 +425,28 @@ public class Query2Tests
         {
             world.Spawn()
                 .Add(index)
+                .Add("I'll stay")
                 .Id();
         }
 
-        var query = world.Query<int>().Build();
+        var query = world.Query<int, string>().Build();
 
         var processed = 0;
-        query.Job((ref int index) =>
+        query.Job((ref int index, ref string str) =>
         {
             Interlocked.Increment(ref processed);
             index = 123;
+            Assert.Equal("I'll stay", str);
+            str = "fools";
         });
 
         Assert.Equal(count, processed);
 
-        query.Job((ref int index) =>
+        query.Job((ref int index, ref string str) =>
         {
             ArgumentOutOfRangeException.ThrowIfNegative(index);
             Assert.Equal(123, index);
+            Assert.Equal("fools", str);
         });
     }
 
@@ -376,32 +458,36 @@ public class Query2Tests
 
         if (createEmptyTable)
         {
-            var dead = world.Spawn().Add<int>().Add("will be removed").Id();
+            var dead = world.Spawn().Add<int>().Add(0.25f).Add("will be removed").Id();
             world.Despawn(dead);
         }
-        
+
         for (var index = 0; index < count; index++)
         {
             world.Spawn()
                 .Add(index)
+                .Add("I'll stay")
                 .Id();
         }
 
-        var query = world.Query<int>().Build();
+        var query = world.Query<int, string>().Build();
 
         var processed = 0;
-        query.Job((ref int index) =>
+        query.Job((ref int index, ref string str) =>
         {
             Interlocked.Increment(ref processed);
             index = 123;
+            Assert.Equal("I'll stay", str);
+            str = "fools";
         });
 
         Assert.Equal(count, processed);
 
-        query.Job((ref int index) =>
+        query.Job((ref int index, ref string str) =>
         {
             ArgumentOutOfRangeException.ThrowIfNegative(index);
             Assert.Equal(123, index);
+            Assert.Equal("fools", str);
         });
     }
 
@@ -413,15 +499,15 @@ public class Query2Tests
 
         if (createEmptyTable)
         {
-            var dead = world.Spawn().Add<int>().Add("will be removed").Id();
+            var dead = world.Spawn().Add<int>().Add(0.25f).Add("will be removed").Id();
             world.Despawn(dead);
         }
-        
+
         for (var c = 0; c < count; c++)
         {
             world.Spawn()
                 .Add(c)
-                .Add(0.0f)
+                .Add(0.1f)
                 .Id();
         }
 
@@ -432,7 +518,7 @@ public class Query2Tests
             for (var i = 0; i < count; i++)
             {
                 Assert.Equal(i, integers.Span[i]);
-                Assert.Equal(0, floats.Span[i]);
+                Assert.Equal(0.1f, floats.Span[i]);
                 floats.Span[i] = integers.Span[i];
             }
         });
@@ -445,53 +531,5 @@ public class Query2Tests
                 Assert.Equal(i, floats.Span[i]);
             }
         });
-    }
-
-
-    [Theory]
-    [ClassData(typeof(QueryCountGenerator))]
-    private void Run_Visits_All_Entities_in_Order(int count, bool createEmptyTable)
-    {
-        using var world = new World();
-
-        if (createEmptyTable)
-        {
-            var dead = world.Spawn().Add<long>().Add("will be removed").Id();
-            world.Despawn(dead);
-        }
-
-        for (var c = 0; c < count; c++)
-        {
-            world.Spawn()
-                .Add<long>()
-                .Id();
-        }
-
-        var query = world.Query<long>().Build();
-
-        var processed = 0;
-
-        query.Run(longs =>
-        {
-            foreach (ref var i in longs) i = processed++;
-        });
-
-        Assert.Equal(count, processed);
-
-        query.Run(longs =>
-        {
-            Assert.Equal(count, longs.Length);
-            for (var i = 0; i < count; i++)
-            {
-                Assert.Equal(i, longs[i]);
-            }
-        });
-
-        var index = 0;
-        query.ForEach((ref long value) => { Assert.Equal(index++, value); });
-
-        var index2 = 0;
-        query.ForEach((ref long value, int _) => { Assert.Equal(index2++, value); },
-            1337);
     }
 }

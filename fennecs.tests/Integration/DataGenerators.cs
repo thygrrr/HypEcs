@@ -13,8 +13,25 @@ public class QueryCountGenerator : IEnumerable<object[]>
         // common powers of 2
         for (var i = 4; i <= 12; i++) yield return [(int) Math.Pow(2, i), i % 2 == 0];
 
-        yield return [151, true];   // prime number
+        yield return [151, true]; // prime number
         yield return [6_197, false]; // prime number
+    }
+
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+}
+
+public class QueryBatchGenerator : IEnumerable<object[]>
+{
+    public IEnumerator<object[]> GetEnumerator()
+    {
+        // base induction
+        for (var i = 0; i <= 8; i++) yield return [i];
+
+        // common powers of 2
+        for (var i = 4; i <= 12; i++) yield return [(int) Math.Pow(2, i)];
+
+        yield return [151]; // prime number
+        yield return [6_197]; // prime number
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
