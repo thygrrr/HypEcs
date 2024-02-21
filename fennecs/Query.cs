@@ -4,7 +4,7 @@ using System.Collections;
 
 namespace fennecs;
 
-public class Query(World world, Mask mask, List<Table> tables) : IEnumerable<Identity>, IDisposable
+public class Query(World world, Mask mask, List<Table> tables) : IEnumerable<Entity>, IDisposable
 {
     protected readonly ParallelOptions Options = new() {MaxDegreeOfParallelism = 24};
     
@@ -25,7 +25,7 @@ public class Query(World world, Mask mask, List<Table> tables) : IEnumerable<Ide
     /// <typeparam name="C">any component type</typeparam>
     /// <returns>ref C, the component.</returns>
     /// <exception cref="KeyNotFoundException">If no C or C(Target) exists in any of the query's tables for Entity entity.</exception>
-    public ref C Ref<C>(Identity entity, Identity target = default)
+    public ref C Ref<C>(Entity entity, Entity target = default)
     {
         AssertNotDisposed();
         //TODO: Returning this ref should lock the world for the ref's scope?
@@ -43,7 +43,7 @@ public class Query(World world, Mask mask, List<Table> tables) : IEnumerable<Ide
     /// <returns>
     ///  An enumerator over all the entities in the query.
     /// </returns>
-    public IEnumerator<Identity> GetEnumerator()
+    public IEnumerator<Entity> GetEnumerator()
     {
         AssertNotDisposed();
 
@@ -70,7 +70,7 @@ public class Query(World world, Mask mask, List<Table> tables) : IEnumerable<Ide
     }
     #endregion
     
-    public bool Contains(Identity entity)
+    public bool Contains(Entity entity)
     {
         AssertNotDisposed();
         

@@ -44,9 +44,9 @@ public readonly struct TypeExpression : IEquatable<TypeExpression>, IComparable<
     // Type Header
     [FieldOffset(6)] public readonly TypeID TypeId;
 
-    public Identity Target => new(Value);
+    public Entity Target => new(Value);
 
-    public bool isRelation => TypeId != 0 && Target != Identity.None;
+    public bool isRelation => TypeId != 0 && Target != Entity.None;
 
     public Type Type => LanguageType.Resolve(TypeId);
     
@@ -76,16 +76,16 @@ public readonly struct TypeExpression : IEquatable<TypeExpression>, IComparable<
         if (TypeId != other.TypeId) return false;
 
         // Most common case.
-        if (Target == Identity.None) return other.Target == Identity.None;
+        if (Target == Entity.None) return other.Target == Entity.None;
         
         // Any only matches other Relations, not pure components (Target == None).
-        if (Target == Identity.Any) return other.Target != Identity.None;
+        if (Target == Entity.Any) return other.Target != Entity.None;
 
         // Direct match.
         if (Target == other.Target) return true;
         
         // For commutative matching only. (usually a TypeId from a Query is matched against one from a Table)
-        return other.Target == Identity.Any;
+        return other.Target == Entity.Any;
     } 
 
     public bool Equals(TypeExpression other) => Value == other.Value;
@@ -94,12 +94,12 @@ public readonly struct TypeExpression : IEquatable<TypeExpression>, IComparable<
 
     public override bool Equals(object? obj) => throw new InvalidCastException("Boxing Disallowed; use TypeId.Equals(TypeId) instead.");
 
-    public static TypeExpression Create<T>(Identity target = default)
+    public static TypeExpression Create<T>(Entity target = default)
     {
         return new TypeExpression(target, LanguageType<T>.Id);
     }
 
-    public static TypeExpression Create(Type type, Identity target = default)
+    public static TypeExpression Create(Type type, Entity target = default)
     {
         return new TypeExpression(target, LanguageType.Identify(type));
     }
@@ -131,7 +131,7 @@ public readonly struct TypeExpression : IEquatable<TypeExpression>, IComparable<
 
 
     [SetsRequiredMembers]
-    private TypeExpression(Identity target, TypeID typeId)
+    private TypeExpression(Entity target, TypeID typeId)
     {
         Value = target.Value;
         TypeId = typeId;

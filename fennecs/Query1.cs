@@ -15,7 +15,7 @@ public class Query<C1>(World world, Mask mask, List<Table> tables) : Query(world
         foreach (var table in Tables)
         {
             if (table.IsEmpty) continue;
-            action(table.GetStorage<C1>(Identity.None).AsSpan(0, table.Count));
+            action(table.GetStorage<C1>(Entity.None).AsSpan(0, table.Count));
         }
 
         World.Unlock();
@@ -30,7 +30,7 @@ public class Query<C1>(World world, Mask mask, List<Table> tables) : Query(world
         foreach (var table in Tables)
         {
             if (table.IsEmpty) continue;
-            var storage = table.GetStorage<C1>(Identity.None).AsSpan(0, table.Count);
+            var storage = table.GetStorage<C1>(Entity.None).AsSpan(0, table.Count);
             for (var i = 0; i < storage.Length; i++) action(ref storage[i]);
         }
 
@@ -46,7 +46,7 @@ public class Query<C1>(World world, Mask mask, List<Table> tables) : Query(world
         foreach (var table in Tables)
         {
             if (table.IsEmpty) continue;
-            var storage = table.GetStorage<C1>(Identity.None).AsSpan(0, table.Count);
+            var storage = table.GetStorage<C1>(Entity.None).AsSpan(0, table.Count);
             for (var i = 0; i < storage.Length; i++) action(ref storage[i], uniform);
         }
 
@@ -65,7 +65,7 @@ public class Query<C1>(World world, Mask mask, List<Table> tables) : Query(world
         foreach (var table in Tables)
         {
             if (table.IsEmpty) continue;
-            var storage = table.GetStorage<C1>(Identity.None);
+            var storage = table.GetStorage<C1>(Entity.None);
 
             var count = table.Count; // storage.Length is the capacity, not the count.
             var partitions = count / chunkSize + Math.Sign(count % chunkSize);
@@ -107,7 +107,7 @@ public class Query<C1>(World world, Mask mask, List<Table> tables) : Query(world
         foreach (var table in Tables)
         {
             if (table.IsEmpty) continue;
-            var storage = table.GetStorage<C1>(Identity.None);
+            var storage = table.GetStorage<C1>(Entity.None);
 
             var count = table.Count; // storage.Length is the capacity, not the count.
             var partitions = count / chunkSize + Math.Sign(count % chunkSize);
@@ -146,7 +146,7 @@ public class Query<C1>(World world, Mask mask, List<Table> tables) : Query(world
         foreach (var table in Tables)
         {
             if (table.IsEmpty) continue;
-            action(table.Memory<C1>(Identity.None));
+            action(table.Memory<C1>(Entity.None));
         }
 
         World.Unlock();

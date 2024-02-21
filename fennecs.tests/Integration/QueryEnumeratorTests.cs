@@ -4,7 +4,7 @@ public static class QueryEnumeration
 {
     public static class QueryTests
     {
-        private static World SetupWorld(out List<Identity> intEntities, out List<Identity> notIntEntities, out List<Identity> floatEntities, out List<Identity> bothEntities, out List<Identity> anyEntities)
+        private static World SetupWorld(out List<Entity> intEntities, out List<Entity> notIntEntities, out List<Entity> floatEntities, out List<Entity> bothEntities, out List<Entity> anyEntities)
         {
             intEntities = [];
             notIntEntities = [];

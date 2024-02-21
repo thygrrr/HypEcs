@@ -9,7 +9,7 @@ namespace fennecs;
 /// </summary>
 /// <param name="value"></param>
 [StructLayout(LayoutKind.Explicit)]
-public readonly struct Identity(ulong value) : IEquatable<Identity>, IComparable<Identity>
+public readonly struct Entity(ulong value) : IEquatable<Entity>, IComparable<Entity>
 {
     [FieldOffset(0)] internal readonly ulong Value = value;
     [FieldOffset(0)] internal readonly int Id;
@@ -24,11 +24,11 @@ public readonly struct Identity(ulong value) : IEquatable<Identity>, IComparable
     
     //public ulong Value => (uint) Id | (ulong) Generation << 32;
 
-    public static readonly Identity None = new(0, 0);
-    public static readonly Identity Any = new(0, TypeID.MaxValue);
+    public static readonly Entity None = new(0, 0);
+    public static readonly Entity Any = new(0, TypeID.MaxValue);
     
     // Entity Reference.
-    public bool IsEntity => Id > 0 && Generation > 0;
+    public bool IsReal => Id > 0 && Generation > 0;
 
     // Tracked Object Reference.
     public bool IsObject => Decoration < 0;
@@ -36,28 +36,28 @@ public readonly struct Identity(ulong value) : IEquatable<Identity>, IComparable
     // Special Entities, such as None, Any.
     public bool IsVirtual => Decoration >= 0 && Id <= 0;
 
-    public static implicit operator Identity(Type type) => new(type);
+    public static implicit operator Entity(Type type) => new(type);
 
-    public Identity(int id, TypeID decoration = 1) : this((uint) id | (ulong) decoration << 32)
+    public Entity(int id, TypeID decoration = 1) : this((uint) id | (ulong) decoration << 32)
     {
     }
     
-    internal Identity(TypeID typeId) : this(0, typeId)
+    internal Entity(TypeID typeId) : this(0, typeId)
     {
     }
 
-    public Identity(Type type) : this(LanguageType.Identify(type))
+    public Entity(Type type) : this(LanguageType.Identify(type))
     {
     }
 
-    public static Identity Of<T>(T item) where T : class
+    public static Entity Of<T>(T item) where T : class
     {
         return new(item.GetHashCode(), LanguageType<T>.TargetId);
     }
     
-    public bool Equals(Identity other) => Id == other.Id && Generation == other.Generation;
+    public bool Equals(Entity other) => Id == other.Id && Generation == other.Generation;
 
-    public int CompareTo(Identity other)
+    public int CompareTo(Entity other)
     {
         return Value.CompareTo(other.Value);
     }
@@ -76,23 +76,23 @@ public readonly struct Identity(ulong value) : IEquatable<Identity>, IComparable
         }
     }
 
-    public static bool operator ==(Identity left, Identity right) => left.Equals(right);
-    public static bool operator !=(Identity left, Identity right) => !left.Equals(right);
+    public static bool operator ==(Entity left, Entity right) => left.Equals(right);
+    public static bool operator !=(Entity left, Entity right) => !left.Equals(right);
 
     public Type Type => Id switch
     {
         <= 0 => LanguageType.Resolve(Decoration),
-        _ => typeof(Identity),
+        _ => typeof(Entity),
     };
 
-    public Identity Successor
+    public Entity Successor
     {
         get
         {
-            if (!IsEntity) throw new InvalidCastException("Cannot reuse virtual Identities");
+            if (!IsReal) throw new InvalidCastException("Cannot reuse virtual Identities");
                 
             var generationWrappedStartingAtOne = (TypeID) (Generation % (TypeID.MaxValue - 1) + 1);
-            return new Identity(Id, generationWrappedStartingAtOne);
+            return new Entity(Id, generationWrappedStartingAtOne);
         }
     }
 

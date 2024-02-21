@@ -2,9 +2,9 @@
 
 public partial class World
 {
-    public QueryBuilder<Identity> Query()
+    public QueryBuilder<Entity> Query()
     {
-        return new QueryBuilder<Identity>(this);
+        return new QueryBuilder<Entity>(this);
     }
 
     public QueryBuilder<C> Query<C>()

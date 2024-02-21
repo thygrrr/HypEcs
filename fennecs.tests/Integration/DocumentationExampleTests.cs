@@ -50,7 +50,7 @@ public class DocumentationExampleTests
         var query1 = world.Query<Position>().Build();
         var query2 = world.Query<Position, int>().Build();
         var query3 = world.Query<float, Position, int>().Build();
-        var query4 = world.Query<Identity, string, Position, int>().Build();
+        var query4 = world.Query<Entity, string, Position, int>().Build();
         var query5 = world.Query<Position, int, float, string, TypeA>().Build();
 
         query1.Job((ref Position _) =>
@@ -68,7 +68,7 @@ public class DocumentationExampleTests
         }, chunkSize: chunkSize);
         Assert.Equal(count, query3.Count);
 
-        query4.RunParallel((ref Identity _, ref string _, ref Position _, ref int _) =>
+        query4.RunParallel((ref Entity _, ref string _, ref Position _, ref int _) =>
         {
         }, chunkSize: chunkSize);
         Assert.Equal(count, query4.Count);

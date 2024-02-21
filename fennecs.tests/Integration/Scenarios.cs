@@ -15,7 +15,7 @@ public class Scenarios
         using var world = new World();
         
         var random = new Random(9001);
-        var entities = new List<Identity>();
+        var entities = new List<Entity>();
         
         var floats = 0;
         var doubles = 0;
@@ -65,10 +65,10 @@ public class Scenarios
         var stringsAndDoublesActual = world.Query<string, double>().Build().Count;
         Assert.Equal(count / (stringRate * doubleRate), stringsAndDoublesActual);
 
-        var floatsAndShortsActual = world.Query().Any<float>().Has<short>(Identity.Any).Build().Count;
+        var floatsAndShortsActual = world.Query().Any<float>().Has<short>(Entity.Any).Build().Count;
         Assert.Equal(count / (floatRate * shortRate), floatsAndShortsActual);
 
-        var shortsActual = world.Query().Has<short>(Identity.Any).Build().Count;
+        var shortsActual = world.Query().Has<short>(Entity.Any).Build().Count;
         Assert.Equal(shorts, shortsActual);
     }
 }

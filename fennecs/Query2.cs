@@ -13,8 +13,8 @@ public class Query<C1, C2>(World world, Mask mask, List<Table> tables) : Query(w
         foreach (var table in Tables)
         {
             if (table.IsEmpty) continue;
-            var storage1 = table.GetStorage<C1>(Identity.None).AsSpan(0, table.Count);
-            var storage2 = table.GetStorage<C2>(Identity.None).AsSpan(0, table.Count);
+            var storage1 = table.GetStorage<C1>(Entity.None).AsSpan(0, table.Count);
+            var storage2 = table.GetStorage<C2>(Entity.None).AsSpan(0, table.Count);
             for (var i = 0; i < table.Count; i++)
             {
                 action(ref storage1[i], ref storage2[i]);
@@ -31,8 +31,8 @@ public class Query<C1, C2>(World world, Mask mask, List<Table> tables) : Query(w
         foreach (var table in Tables)
         {
             if (table.IsEmpty) continue;
-            var storage1 = table.GetStorage<C1>(Identity.None).AsSpan(0, table.Count);
-            var storage2 = table.GetStorage<C2>(Identity.None).AsSpan(0, table.Count);
+            var storage1 = table.GetStorage<C1>(Entity.None).AsSpan(0, table.Count);
+            var storage2 = table.GetStorage<C2>(Entity.None).AsSpan(0, table.Count);
             for (var i = 0; i < table.Count; i++)
             {
                 action(ref storage1[i], ref storage2[i], uniform);
@@ -49,8 +49,8 @@ public class Query<C1, C2>(World world, Mask mask, List<Table> tables) : Query(w
         foreach (var table in Tables)
         {
             if (table.IsEmpty) continue;
-            var storage1 = table.Memory<C1>(Identity.None);
-            var storage2 = table.Memory<C2>(Identity.None);
+            var storage1 = table.Memory<C1>(Entity.None);
+            var storage2 = table.Memory<C2>(Entity.None);
             action(storage1.Span, storage2.Span, uniform);
         }
 
@@ -64,8 +64,8 @@ public class Query<C1, C2>(World world, Mask mask, List<Table> tables) : Query(w
         foreach (var table in Tables)
         {
             if (table.IsEmpty) continue;
-            var span1 = table.GetStorage<C1>(Identity.None).AsSpan(0, table.Count);
-            var span2 = table.GetStorage<C2>(Identity.None).AsSpan(0, table.Count);
+            var span1 = table.GetStorage<C1>(Entity.None).AsSpan(0, table.Count);
+            var span2 = table.GetStorage<C2>(Entity.None).AsSpan(0, table.Count);
             action(span1, span2);
         }
 
@@ -83,8 +83,8 @@ public class Query<C1, C2>(World world, Mask mask, List<Table> tables) : Query(w
         foreach (var table in Tables)
         {
             if (table.IsEmpty) continue;
-            var storage1 = table.GetStorage<C1>(Identity.None);
-            var storage2 = table.GetStorage<C2>(Identity.None);
+            var storage1 = table.GetStorage<C1>(Entity.None);
+            var storage2 = table.GetStorage<C2>(Entity.None);
 
             var count = table.Count; // storage.Length is the capacity, not the count.
             var partitions = count / chunkSize + Math.Sign(count % chunkSize);
@@ -125,8 +125,8 @@ public class Query<C1, C2>(World world, Mask mask, List<Table> tables) : Query(w
         foreach (var table in Tables)
         {
             if (table.IsEmpty) continue;
-            var storage1 = table.GetStorage<C1>(Identity.None);
-            var storage2 = table.GetStorage<C2>(Identity.None);
+            var storage1 = table.GetStorage<C1>(Entity.None);
+            var storage2 = table.GetStorage<C2>(Entity.None);
 
             var count = table.Count; // storage.Length is the capacity, not the count.
             var partitions = count / chunkSize + Math.Sign(count % chunkSize);
@@ -164,7 +164,7 @@ public class Query<C1, C2>(World world, Mask mask, List<Table> tables) : Query(w
         foreach (var table in Tables)
         {
             if (table.IsEmpty) continue;
-            action(table.Memory<C1>(Identity.None), table.Memory<C2>(Identity.None));
+            action(table.Memory<C1>(Entity.None), table.Memory<C2>(Entity.None));
         }
 
         World.Unlock();
@@ -177,7 +177,7 @@ public class Query<C1, C2>(World world, Mask mask, List<Table> tables) : Query(w
         foreach (var table in Tables)
         {
             if (table.IsEmpty) continue;
-            action(table.Memory<C1>(Identity.None), table.Memory<C2>(Identity.None), uniform);
+            action(table.Memory<C1>(Entity.None), table.Memory<C2>(Entity.None), uniform);
         }
 
         World.Unlock();

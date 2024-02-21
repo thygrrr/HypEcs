@@ -17,11 +17,11 @@ public class WorldTests
     }
 
     [Fact]
-    public Identity World_Spawns_valid_Entities()
+    public Entity World_Spawns_valid_Entities()
     {
         using var world = new World();
         var identity = world.Spawn().Id();
-        Assert.True(identity.IsEntity);
+        Assert.True(identity.IsReal);
         Assert.False(identity.IsVirtual);
         Assert.False(identity.IsObject);
         return identity;
@@ -55,7 +55,7 @@ public class WorldTests
         world.Spawn().Link(target2, 1.0f).Id();
         world.Spawn().Link<string>("123").Id();
 
-        var targets = new List<Identity>();
+        var targets = new List<Entity>();
         world.CollectTargets<int>(targets);
         Assert.Single(targets);
         Assert.Contains(target1, targets);
@@ -80,8 +80,8 @@ public class WorldTests
             world.Spawn().Link(target2, 444).Id();
         }
 
-        var query1 = world.Query<Identity>().Has<int>(target1).Build();
-        var query2 = world.Query<Identity>().Has<int>(target2).Build();
+        var query1 = world.Query<Entity>().Has<int>(target1).Build();
+        var query2 = world.Query<Entity>().Has<int>(target2).Build();
 
         Assert.Equal(1000, query1.Count);
         Assert.Equal(1000, query2.Count);
@@ -294,9 +294,9 @@ public class WorldTests
         using var world = new World();
         var identity = world.Spawn().Id();
         var other = world.Spawn().Id();
-        var data = new Identity(123);
+        var data = new Entity(123);
         world.On(identity).Link(other, data);
-        Assert.True(world.HasLink<Identity>(identity, other));
+        Assert.True(world.HasLink<Entity>(identity, other));
     }
 
     [Fact]

@@ -10,7 +10,7 @@ public class QueryTests
     {
         using var world = new World();
 
-        var entities = new List<Identity>();
+        var entities = new List<Entity>();
         for (var i = 0; i < 234; i++)
         {
             var identity = world.Spawn().Add(new object()).Id();
@@ -24,9 +24,9 @@ public class QueryTests
         using var disposable = enumerator as IDisposable;
         while (enumerator.MoveNext())
         {
-            Assert.IsType<Identity>(enumerator.Current);
+            Assert.IsType<Entity>(enumerator.Current);
             
-            var identity = (Identity) enumerator.Current;
+            var identity = (Entity) enumerator.Current;
             Assert.Contains(identity, entities);
             entities.Remove(identity);            
         }
@@ -39,7 +39,7 @@ public class QueryTests
         using var world = new World();
 
         var random = new Random(1234);
-        var entities = new List<Identity>();
+        var entities = new List<Entity>();
         for (var i = 0; i < 2345; i++)
         {
             var identity = world.Spawn().Add(i).Id();
@@ -119,8 +119,8 @@ public class QueryTests
         var bob = world.Spawn().Add(p2).Link(alice, 111).Id();
         /*var charlie = */world.Spawn().Add(p3).Link(bob, 222).Id();
 
-        var query = world.Query<Identity, Vector3>()
-            .Any<int>(Identity.None)
+        var query = world.Query<Entity, Vector3>()
+            .Any<int>(Entity.None)
             .Build();
 
         var count = 0;
@@ -146,7 +146,7 @@ public class QueryTests
         var eve = world.Spawn().Add(p2).Link(alice, 111).Id();
         var charlie = world.Spawn().Add(p3).Link(eve, 222).Id();
 
-        var query = world.Query<Identity, Vector3>().Any<int>(eve).Build();
+        var query = world.Query<Entity, Vector3>().Any<int>(eve).Build();
 
         var count = 0;
         query.Raw((me, mp) =>
@@ -173,7 +173,7 @@ public class QueryTests
         var eve = world.Spawn().Add(p2).Link(alice, 111).Id();
         var charlie = world.Spawn().Add(p3).Link(eve, 222).Id();
 
-        var query = world.Query<Identity, Vector3>()
+        var query = world.Query<Entity, Vector3>()
             .Any<int>(eve)
             .Any<int>(alice)
             .Build();
@@ -222,7 +222,7 @@ public class QueryTests
         /*var charlie = */
         world.Spawn().Add(p3).Link(eve, 222).Id();
 
-        var query = world.Query<Identity, Vector3>()
+        var query = world.Query<Entity, Vector3>()
             .Not<int>(bob)
             .Any<int>(alice)
             .Build();
@@ -266,7 +266,7 @@ public class QueryTests
         world.Spawn().Add(p3).Link(bob, 555).Id();
         world.Spawn().Add(p3).Link(eve, 666).Id();
 
-        var query = world.Query<Identity, Vector3, int>()
+        var query = world.Query<Entity, Vector3, int>()
             .Not<int>(bob)
             .Build();
 
@@ -312,17 +312,17 @@ public class QueryTests
         var query1A = world.Query().Build();
         var query1B = world.Query().Build();
 
-        var query2A = world.Query<Identity>().Build();
-        var query2B = world.Query<Identity>().Build();
+        var query2A = world.Query<Entity>().Build();
+        var query2B = world.Query<Entity>().Build();
 
         var query3A = world.Query().Has<int>().Build();
         var query3B = world.Query().Has<int>().Build();
 
-        var query4A = world.Query<Identity>().Not<int>().Build();
-        var query4B = world.Query<Identity>().Not<int>().Build();
+        var query4A = world.Query<Entity>().Not<int>().Build();
+        var query4B = world.Query<Entity>().Not<int>().Build();
 
-        var query5A = world.Query<Identity>().Any<int>().Any<float>().Build();
-        var query5B = world.Query<Identity>().Any<int>().Any<float>().Build();
+        var query5A = world.Query<Entity>().Any<int>().Any<float>().Build();
+        var query5B = world.Query<Entity>().Any<int>().Any<float>().Build();
 
         Assert.True(ReferenceEquals(query1A, query1B));
         Assert.True(ReferenceEquals(query2A, query2B));
@@ -355,9 +355,9 @@ public class QueryTests
     {
         using var world = new World();
         var identity = world.Spawn().Id();
-        var query = world.Query<Identity>().Build();
+        var query = world.Query<Entity>().Build();
 
-        Assert.Throws<TypeAccessException>(() => query.Ref<Identity>(identity));
+        Assert.Throws<TypeAccessException>(() => query.Ref<Entity>(identity));
     }
 
     

@@ -13,11 +13,11 @@ public class Query<C1, C2, C3, C4, C5>(World world, Mask mask, List<Table> table
         foreach (var table in Tables)
         {
             if (table.IsEmpty) continue;
-            var s1 = table.GetStorage<C1>(Identity.None).AsSpan(0, table.Count);
-            var s2 = table.GetStorage<C2>(Identity.None).AsSpan(0, table.Count);
-            var s3 = table.GetStorage<C3>(Identity.None).AsSpan(0, table.Count);
-            var s4 = table.GetStorage<C4>(Identity.None).AsSpan(0, table.Count);
-            var s5 = table.GetStorage<C5>(Identity.None).AsSpan(0, table.Count);
+            var s1 = table.GetStorage<C1>(Entity.None).AsSpan(0, table.Count);
+            var s2 = table.GetStorage<C2>(Entity.None).AsSpan(0, table.Count);
+            var s3 = table.GetStorage<C3>(Entity.None).AsSpan(0, table.Count);
+            var s4 = table.GetStorage<C4>(Entity.None).AsSpan(0, table.Count);
+            var s5 = table.GetStorage<C5>(Entity.None).AsSpan(0, table.Count);
 
             for (var i = 0; i < table.Count; i++) action(ref s1[i], ref s2[i], ref s3[i], ref s4[i], ref s5[i]);
         }
@@ -34,11 +34,11 @@ public class Query<C1, C2, C3, C4, C5>(World world, Mask mask, List<Table> table
         foreach (var table in Tables)
         {
             if (table.IsEmpty) continue;
-            var storage1 = table.GetStorage<C1>(Identity.None);
-            var storage2 = table.GetStorage<C2>(Identity.None);
-            var storage3 = table.GetStorage<C3>(Identity.None);
-            var storage4 = table.GetStorage<C4>(Identity.None);
-            var storage5 = table.GetStorage<C5>(Identity.None);
+            var storage1 = table.GetStorage<C1>(Entity.None);
+            var storage2 = table.GetStorage<C2>(Entity.None);
+            var storage3 = table.GetStorage<C3>(Entity.None);
+            var storage4 = table.GetStorage<C4>(Entity.None);
+            var storage5 = table.GetStorage<C5>(Entity.None);
             var length = table.Count;
 
             var partitions = Math.Max(length / chunkSize, 1);
@@ -92,11 +92,11 @@ public class Query<C1, C2, C3, C4, C5>(World world, Mask mask, List<Table> table
         foreach (var table in Tables)
         {
             if (table.IsEmpty) continue;
-            var s1 = table.GetStorage<C1>(Identity.None).AsSpan(0, table.Count);
-            var s2 = table.GetStorage<C2>(Identity.None).AsSpan(0, table.Count);
-            var s3 = table.GetStorage<C3>(Identity.None).AsSpan(0, table.Count);
-            var s4 = table.GetStorage<C4>(Identity.None).AsSpan(0, table.Count);
-            var s5 = table.GetStorage<C5>(Identity.None).AsSpan(0, table.Count);
+            var s1 = table.GetStorage<C1>(Entity.None).AsSpan(0, table.Count);
+            var s2 = table.GetStorage<C2>(Entity.None).AsSpan(0, table.Count);
+            var s3 = table.GetStorage<C3>(Entity.None).AsSpan(0, table.Count);
+            var s4 = table.GetStorage<C4>(Entity.None).AsSpan(0, table.Count);
+            var s5 = table.GetStorage<C5>(Entity.None).AsSpan(0, table.Count);
             for (var i = 0; i < table.Count; i++) action(ref s1[i], ref s2[i], ref s3[i], ref s4[i], ref s5[i], uniform);
         }
 
@@ -112,11 +112,11 @@ public class Query<C1, C2, C3, C4, C5>(World world, Mask mask, List<Table> table
         foreach (var table in Tables)
         {
             if (table.IsEmpty) continue;
-            var storage1 = table.GetStorage<C1>(Identity.None);
-            var storage2 = table.GetStorage<C2>(Identity.None);
-            var storage3 = table.GetStorage<C3>(Identity.None);
-            var storage4 = table.GetStorage<C4>(Identity.None);
-            var storage5 = table.GetStorage<C5>(Identity.None);
+            var storage1 = table.GetStorage<C1>(Entity.None);
+            var storage2 = table.GetStorage<C2>(Entity.None);
+            var storage3 = table.GetStorage<C3>(Entity.None);
+            var storage4 = table.GetStorage<C4>(Entity.None);
+            var storage5 = table.GetStorage<C5>(Entity.None);
             var length = table.Count;
 
             var partitions = Math.Max(length / chunkSize, 1);
@@ -170,11 +170,11 @@ public class Query<C1, C2, C3, C4, C5>(World world, Mask mask, List<Table> table
         foreach (var table in Tables)
         {
             if (table.IsEmpty) continue;
-            var s1 = table.GetStorage<C1>(Identity.None).AsSpan(0, table.Count);
-            var s2 = table.GetStorage<C2>(Identity.None).AsSpan(0, table.Count);
-            var s3 = table.GetStorage<C3>(Identity.None).AsSpan(0, table.Count);
-            var s4 = table.GetStorage<C4>(Identity.None).AsSpan(0, table.Count);
-            var s5 = table.GetStorage<C5>(Identity.None).AsSpan(0, table.Count);
+            var s1 = table.GetStorage<C1>(Entity.None).AsSpan(0, table.Count);
+            var s2 = table.GetStorage<C2>(Entity.None).AsSpan(0, table.Count);
+            var s3 = table.GetStorage<C3>(Entity.None).AsSpan(0, table.Count);
+            var s4 = table.GetStorage<C4>(Entity.None).AsSpan(0, table.Count);
+            var s5 = table.GetStorage<C5>(Entity.None).AsSpan(0, table.Count);
             action(s1, s2, s3, s4, s5);
         }
 
@@ -187,11 +187,11 @@ public class Query<C1, C2, C3, C4, C5>(World world, Mask mask, List<Table> table
         foreach (var table in Tables)
         {
             if (table.IsEmpty) continue;
-            var m1 = table.GetStorage<C1>(Identity.None).AsMemory(0, table.Count);
-            var m2 = table.GetStorage<C2>(Identity.None).AsMemory(0, table.Count);
-            var m3 = table.GetStorage<C3>(Identity.None).AsMemory(0, table.Count);
-            var m4 = table.GetStorage<C4>(Identity.None).AsMemory(0, table.Count);
-            var m5 = table.GetStorage<C5>(Identity.None).AsMemory(0, table.Count);
+            var m1 = table.GetStorage<C1>(Entity.None).AsMemory(0, table.Count);
+            var m2 = table.GetStorage<C2>(Entity.None).AsMemory(0, table.Count);
+            var m3 = table.GetStorage<C3>(Entity.None).AsMemory(0, table.Count);
+            var m4 = table.GetStorage<C4>(Entity.None).AsMemory(0, table.Count);
+            var m5 = table.GetStorage<C5>(Entity.None).AsMemory(0, table.Count);
             action(m1, m2, m3, m4, m5);
         }
 
@@ -205,11 +205,11 @@ public class Query<C1, C2, C3, C4, C5>(World world, Mask mask, List<Table> table
             table =>
             {
                 if (table.IsEmpty) return; //TODO: This wastes a scheduled thread.
-                var m1 = table.GetStorage<C1>(Identity.None).AsMemory(0, table.Count);
-                var m2 = table.GetStorage<C2>(Identity.None).AsMemory(0, table.Count);
-                var m3 = table.GetStorage<C3>(Identity.None).AsMemory(0, table.Count);
-                var m4 = table.GetStorage<C4>(Identity.None).AsMemory(0, table.Count);
-                var m5 = table.GetStorage<C5>(Identity.None).AsMemory(0, table.Count);
+                var m1 = table.GetStorage<C1>(Entity.None).AsMemory(0, table.Count);
+                var m2 = table.GetStorage<C2>(Entity.None).AsMemory(0, table.Count);
+                var m3 = table.GetStorage<C3>(Entity.None).AsMemory(0, table.Count);
+                var m4 = table.GetStorage<C4>(Entity.None).AsMemory(0, table.Count);
+                var m5 = table.GetStorage<C5>(Entity.None).AsMemory(0, table.Count);
                 action(m1, m2, m3, m4, m5);
             });
 
