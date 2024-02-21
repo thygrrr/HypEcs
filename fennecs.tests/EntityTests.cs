@@ -1,11 +1,10 @@
 ﻿// SPDX-License-Identifier: MIT
 
-using System.Data;
 using System.Numerics;
 
 namespace fennecs.tests;
 
-public class EntityTests(ITestOutputHelper output)
+public class EntityTests
 {
     #region Input Data
 
@@ -37,14 +36,16 @@ public class EntityTests(ITestOutputHelper output)
 
     #endregion
 
+    /*
     [Fact]
     private void Entity_ToString_Facades_Identity_ToString()
     {
         var identity = new Identity(123, 456);
-        var entity = new Entity(identity);
-        output.WriteLine(entity.ToString());
-        Assert.Equal(identity.ToString(), entity.ToString());
+        var identity = new Identity(identity);
+        output.WriteLine(identity.ToString());
+        Assert.Equal(identity.ToString(), identity.ToString());
     }
+    */
     
     [Fact]
     private void Entity_HashCode_is_Stable()
@@ -63,15 +64,15 @@ public class EntityTests(ITestOutputHelper output)
     private void Entity_is_Equal_to_Itself()
     {
         using var world = new World();
-        var entity = world.Spawn().Id();
-        Assert.Equal(entity, entity);
+        var identity = world.Spawn().Id();
+        Assert.Equal(identity, identity);
     }
     
     [Fact]
     private void Same_Entity_is_Equal()
     {
-        var entity1 = new Entity(new Identity(123, 999));
-        var entity2 = new Entity(new Identity(123, 999));
+        var entity1 = new Identity(123, 999);
+        var entity2 = new Identity(123, 999);
         Assert.Equal(entity1, entity2);
         Assert.True(entity1 == entity2);
     }
@@ -81,11 +82,11 @@ public class EntityTests(ITestOutputHelper output)
     [Fact]
     private void Different_Entity_is_Not_Equal()
     {
-        var entity1 = new Entity(new Identity(69, 420));
-        var entity2 = new Entity(new Identity(420, 69));
+        var entity1 = new Identity(69, 420);
+        var entity2 = new Identity(420, 69);
 
-        var entity3 = new Entity(new Identity(69, 69));
-        var entity4 = new Entity(new Identity(420, 420));
+        var entity3 = new Identity(69, 69);
+        var entity4 = new Identity(420, 420);
         
         Assert.NotEqual(entity1, entity2);
         Assert.True(entity1 != entity2);
@@ -102,30 +103,30 @@ public class EntityTests(ITestOutputHelper output)
 
 
     [Fact]
-    public Entity Entity_is_Alive_after_Spawn()
+    public Identity Entity_is_Alive_after_Spawn()
     {
         using var world = new World();
-        var entity = world.Spawn().Id();
-        Assert.True(world.IsAlive(entity));
-        return entity;
+        var identity = world.Spawn().Id();
+        Assert.True(world.IsAlive(identity));
+        return identity;
     }
 
     [Fact]
     private void Entity_is_Not_Alive_after_Despawn()
     {
         using var world = new World();
-        var entity = world.Spawn().Id();
-        world.Despawn(entity);
-        Assert.False(world.IsAlive(entity));
+        var identity = world.Spawn().Id();
+        world.Despawn(identity);
+        Assert.False(world.IsAlive(identity));
     }
 
     [Fact]
     private void Entity_has_no_Components_after_Spawn()
     {
         using var world = new World();
-        var entity = world.Spawn().Id();
-        var components = world.GetComponents(entity);
-        Assert.False(world.HasComponent<int>(entity));
+        var identity = world.Spawn().Id();
+        var components = world.GetComponents(identity);
+        Assert.False(world.HasComponent<int>(identity));
         Assert.True(components.Count() == 1);
     }
 
@@ -134,10 +135,10 @@ public class EntityTests(ITestOutputHelper output)
     private void Entity_can_Add_Component<T>(T t1) where T : struct
     {
         using var world = new World();
-        var entity = world.Spawn().Id();
-        world.On(entity).Add(t1);
-        Assert.True(world.HasComponent<T>(entity));
-        var components = world.GetComponents(entity);
+        var identity = world.Spawn().Id();
+        world.On(identity).Add(t1);
+        Assert.True(world.HasComponent<T>(identity));
+        var components = world.GetComponents(identity);
         Assert.True(components.Count() == 2);
     }
 
@@ -146,10 +147,10 @@ public class EntityTests(ITestOutputHelper output)
     private void Entity_cannot_Get_Component_from_Dead<T>(T t1) where T : struct
     {
         using var world = new World();
-        var entity = world.Spawn().Add(t1).Id();
-        world.Despawn(entity);
+        var identity = world.Spawn().Add(t1).Id();
+        world.Despawn(identity);
 
-        Assert.Throws<ObjectDisposedException>(() => world.GetComponent<T>(entity));
+        Assert.Throws<ObjectDisposedException>(() => world.GetComponent<T>(identity));
     }
 
     [Theory]
@@ -161,7 +162,7 @@ public class EntityTests(ITestOutputHelper output)
         world.Despawn(entity1);
         var entity2 = world.Spawn().Add(t1).Id();
 
-        Assert.Equal(entity1.Identity.Id, entity2.Identity.Id);
+        Assert.Equal(entity1.Id, entity2.Id);
         Assert.Throws<ObjectDisposedException>(() => world.GetComponent<T>(entity1));
     }
 
@@ -170,8 +171,8 @@ public class EntityTests(ITestOutputHelper output)
     private void Entity_can_Get_Component<T>(T t1) where T : struct
     {
         using var world = new World();
-        var entity = world.Spawn().Add(t1).Id();
-        var x = world.GetComponent<T>(entity);
+        var identity = world.Spawn().Add(t1).Id();
+        var x = world.GetComponent<T>(identity);
         Assert.Equal(t1, x);
     }
 
@@ -180,10 +181,10 @@ public class EntityTests(ITestOutputHelper output)
     private void Entity_can_Remove_Component<T>(T t1) where T : struct
     {
         using var world = new World();
-        var entity = world.Spawn().Id();
-        world.On(entity).Add(t1);
-        world.On(entity).Remove<T>();
-        Assert.False(world.HasComponent<T>(entity));
+        var identity = world.Spawn().Id();
+        world.On(identity).Add(t1);
+        world.On(identity).Remove<T>();
+        Assert.False(world.HasComponent<T>(identity));
     }
 
     [Theory]
@@ -191,11 +192,11 @@ public class EntityTests(ITestOutputHelper output)
     private void Entity_can_ReAdd_Component<T>(T t1) where T : struct
     {
         using var world = new World();
-        var entity = world.Spawn().Id();
-        world.On(entity).Add(t1);
-        world.On(entity).Remove<T>();
-        world.On(entity).Add(t1);
-        Assert.True(world.HasComponent<T>(entity));
+        var identity = world.Spawn().Id();
+        world.On(identity).Add(t1);
+        world.On(identity).Remove<T>();
+        world.On(identity).Add(t1);
+        Assert.True(world.HasComponent<T>(identity));
     }
 
     [Theory]
@@ -203,9 +204,9 @@ public class EntityTests(ITestOutputHelper output)
     private void Entity_cannot_Add_Component_twice<T>(T t1) where T : struct 
     {
         using var world = new World();
-        var entity = world.Spawn().Id();
-        world.On(entity).Add(t1);
-        Assert.Throws<ArgumentException>(() => world.On(entity).Add(t1));
+        var identity = world.Spawn().Id();
+        world.On(identity).Add(t1);
+        Assert.Throws<ArgumentException>(() => world.On(identity).Add(t1));
     }
 
     [Theory]
@@ -213,10 +214,10 @@ public class EntityTests(ITestOutputHelper output)
     private void Entity_cannot_Remove_Component_twice<T>(T t1) where T : struct
     {
         using var world = new World();
-        var entity = world.Spawn().Id();
-        world.On(entity).Add(t1);
-        world.On(entity).Remove<T>();
-        Assert.Throws<ArgumentException>(() => world.On(entity).Remove<T>());
+        var identity = world.Spawn().Id();
+        world.On(identity).Add(t1);
+        world.On(identity).Remove<T>();
+        Assert.Throws<ArgumentException>(() => world.On(identity).Remove<T>());
     }
 
     [Theory]
@@ -225,8 +226,8 @@ public class EntityTests(ITestOutputHelper output)
     private void Entity_cannot_Remove_Component_without_Adding<T>(T _) where T : struct
     {
         using var world = new World();
-        var entity = world.Spawn().Id();
-        Assert.Throws<ArgumentException>(() => world.On(entity).Remove<T>());
+        var identity = world.Spawn().Id();
+        Assert.Throws<ArgumentException>(() => world.On(identity).Remove<T>());
     }
 #pragma warning restore xUnit1026
 }

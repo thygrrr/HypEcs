@@ -33,7 +33,7 @@ public partial class World : IDisposable
     private readonly List<Table> _tables = [];
     private readonly Dictionary<int, Query> _queries = new();
 
-    // The "Entity" Archetype, which is the root of the Archetype Graph.
+    // The "Identity" Archetype, which is the root of the Archetype Graph.
     private readonly Table _root;
 
 
@@ -46,21 +46,21 @@ public partial class World : IDisposable
 
     private Mode _mode = Mode.Immediate;
 
-    public void CollectTargets<T>(List<Entity> entities)
+    public void CollectTargets<T>(List<Identity> entities)
     {
         var type = TypeExpression.Create<T>(Identity.Any);
 
         // Iterate through tables and get all concrete entities from their Archetype TypeExpressions
         foreach (var candidate in _tablesByType.Keys)
         {
-            if (type.Matches(candidate)) entities.Add(new Entity(candidate.Target));
+            if (type.Matches(candidate)) entities.Add(candidate.Target);
         }
     }
 
     private readonly object _spawnLock = new();
 
     #region CRUD
-    private Entity NewEntity()
+    private Identity NewEntity()
     {
         lock (_spawnLock)
         {
@@ -72,12 +72,10 @@ public partial class World : IDisposable
 
             _meta[identity.Id] = new EntityMeta(identity, _root.Id, row);
 
-            var entity = new Entity(identity);
+            var entityStorage = (Identity[]) _root.Storages.First();
+            entityStorage[row] = identity;
 
-            var entityStorage = (Entity[]) _root.Storages.First();
-            entityStorage[row] = entity;
-
-            return entity;
+            return identity;
         }
     }
 
@@ -102,7 +100,7 @@ public partial class World : IDisposable
 
         if (!oldTable.Types.Contains(typeExpression))
         {
-            throw new ArgumentException($"cannot remove non-existent component {typeExpression} from entity {identity}");
+            throw new ArgumentException($"cannot remove non-existent component {typeExpression} from identity {identity}");
         }
 
         var oldEdge = oldTable.GetTableEdge(typeExpression);
@@ -300,7 +298,7 @@ public partial class World : IDisposable
     {
         if (IsAlive(identity)) return;
 
-        throw new ObjectDisposedException($"Entity {identity} is no longer alive.");
+        throw new ObjectDisposedException($"Identity {identity} is no longer alive.");
     }
 
     #endregion

@@ -2,7 +2,7 @@
 
 namespace fennecs;
 
-public readonly struct EntityBuilder(World world, Entity entity) : IDisposable
+public readonly struct EntityBuilder(World world, Identity identity) : IDisposable
 {
     private readonly PooledList<World.DeferredOperation> _operations = PooledList<World.DeferredOperation>.Rent();
 
@@ -12,58 +12,58 @@ _operations.Add(
     new World.DeferredOperation()
     {
         Operation = World.Operation.Add,
-        Identity = entity,
+        IdIdentity = identity,
         Data = target,
     });
 */
-    public EntityBuilder Link<T>(Entity target) where T : notnull, new()
+    public EntityBuilder Link<T>(Identity target) where T : notnull, new()
     {
-        world.Link(entity, target, new T());
+        world.Link(identity, target, new T());
         return this;
     }
 
-    public EntityBuilder Link<T>(Entity target, T data)
+    public EntityBuilder Link<T>(Identity target, T data)
     {
-        world.Link(entity, target, data);
+        world.Link(identity, target, data);
         return this;
     }
 
     public EntityBuilder Link<T>(T target) where T : class
     {
-        world.Link(entity, target);
+        world.Link(identity, target);
         return this;
     }
 
     public EntityBuilder Add<T>(T data)
     {
-        world.AddComponent(entity, data);
+        world.AddComponent(identity, data);
         return this;
     }
 
 
     public EntityBuilder Add<T>() where T : new()
     {
-        world.AddComponent(entity, new T());
+        world.AddComponent(identity, new T());
         return this;
     }
 
     
     public EntityBuilder Remove<T>() 
     {
-        world.RemoveComponent<T>(entity);
+        world.RemoveComponent<T>(identity);
         return this;
     }
     
-    public EntityBuilder Remove<T>(Entity target) 
+    public EntityBuilder Remove<T>(Identity target) 
     {
-        world.Unlink<T>(entity, target);
+        world.Unlink<T>(identity, target);
         return this;
     }
     
-    public Entity Id()
+    public Identity Id()
     {
         Dispose();
-        return entity;
+        return identity;
     }
 
     public void Dispose()

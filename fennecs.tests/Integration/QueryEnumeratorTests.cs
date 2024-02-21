@@ -4,7 +4,7 @@ public static class QueryEnumeration
 {
     public static class QueryTests
     {
-        private static World SetupWorld(out List<Entity> intEntities, out List<Entity> notIntEntities, out List<Entity> floatEntities, out List<Entity> bothEntities, out List<Entity> anyEntities)
+        private static World SetupWorld(out List<Identity> intEntities, out List<Identity> notIntEntities, out List<Identity> floatEntities, out List<Identity> bothEntities, out List<Identity> anyEntities)
         {
             intEntities = [];
             notIntEntities = [];
@@ -51,15 +51,15 @@ public static class QueryEnumeration
             {
                 foreach (var _ in query)
                 {
-                    world.Spawn().Add<int>(4).Id();
+                    world.Spawn().Add(4).Id();
                 }
             });
 
             Assert.Throws<InvalidOperationException>(() =>
             {
-                foreach (var entity in query)
+                foreach (var identity in query)
                 {
-                    world.On(entity).Add("structural change");
+                    world.On(identity).Add("structural change");
                 }
             });
         }

@@ -10,11 +10,11 @@ public class QueryTests
     {
         using var world = new World();
 
-        var entities = new List<Entity>();
+        var entities = new List<Identity>();
         for (var i = 0; i < 234; i++)
         {
-            var entity = world.Spawn().Add(new object()).Id();
-            entities.Add(entity);
+            var identity = world.Spawn().Add(new object()).Id();
+            entities.Add(identity);
         }
         
         var query = world.Query<object>().Build();
@@ -24,11 +24,11 @@ public class QueryTests
         using var disposable = enumerator as IDisposable;
         while (enumerator.MoveNext())
         {
-            Assert.IsType<Entity>(enumerator.Current);
+            Assert.IsType<Identity>(enumerator.Current);
             
-            var entity = (Entity) enumerator.Current;
-            Assert.Contains(entity, entities);
-            entities.Remove(entity);            
+            var identity = (Identity) enumerator.Current;
+            Assert.Contains(identity, entities);
+            entities.Remove(identity);            
         }
         Assert.Empty(entities);
     }
@@ -39,11 +39,11 @@ public class QueryTests
         using var world = new World();
 
         var random = new Random(1234);
-        var entities = new List<Entity>();
+        var entities = new List<Identity>();
         for (var i = 0; i < 2345; i++)
         {
-            var entity = world.Spawn().Add(i).Id();
-            entities.Add(entity);
+            var identity = world.Spawn().Add(i).Id();
+            entities.Add(identity);
         }
 
         var query = world.Query<int>().Build();
@@ -54,9 +54,9 @@ public class QueryTests
         while (entities.Count > 0)
         {
             var index = random.Next(entities.Count);
-            var entity = entities[index];
-            world.Despawn(entity);
-            Assert.False(query.Contains(entity));
+            var identity = entities[index];
+            world.Despawn(identity);
+            Assert.False(query.Contains(identity));
             entities.RemoveAt(index);
         }
         
@@ -119,7 +119,7 @@ public class QueryTests
         var bob = world.Spawn().Add(p2).Link(alice, 111).Id();
         /*var charlie = */world.Spawn().Add(p3).Link(bob, 222).Id();
 
-        var query = world.Query<Entity, Vector3>()
+        var query = world.Query<Identity, Vector3>()
             .Any<int>(Identity.None)
             .Build();
 
@@ -128,8 +128,8 @@ public class QueryTests
         {
             count++;
             Assert.Equal(1, mp.Length);
-            var entity = me.Span[0];
-            Assert.Equal(alice, entity);
+            var identity = me.Span[0];
+            Assert.Equal(alice, identity);
         });
         Assert.Equal(1, count);
     }
@@ -146,15 +146,15 @@ public class QueryTests
         var eve = world.Spawn().Add(p2).Link(alice, 111).Id();
         var charlie = world.Spawn().Add(p3).Link(eve, 222).Id();
 
-        var query = world.Query<Entity, Vector3>().Any<int>(eve).Build();
+        var query = world.Query<Identity, Vector3>().Any<int>(eve).Build();
 
         var count = 0;
         query.Raw((me, mp) =>
         {
             count++;
             Assert.Equal(1, mp.Length);
-            var entity = me.Span[0];
-            Assert.Equal(charlie, entity);
+            var identity = me.Span[0];
+            Assert.Equal(charlie, identity);
             var pos = mp.Span[0];
             Assert.Equal(pos, p3);
         });
@@ -173,7 +173,7 @@ public class QueryTests
         var eve = world.Spawn().Add(p2).Link(alice, 111).Id();
         var charlie = world.Spawn().Add(p3).Link(eve, 222).Id();
 
-        var query = world.Query<Entity, Vector3>()
+        var query = world.Query<Identity, Vector3>()
             .Any<int>(eve)
             .Any<int>(alice)
             .Build();
@@ -184,21 +184,21 @@ public class QueryTests
             Assert.Equal(1, mp.Length);
             for (var index = 0; index < me.Length; index++)
             {
-                var entity = me.Span[index];
+                var identity = me.Span[index];
                 count++;
-                if (entity == charlie)
+                if (identity == charlie)
                 {
                     var pos = mp.Span[index];
                     Assert.Equal(pos, p3);
                 }
-                else if (entity == eve)
+                else if (identity == eve)
                 {
                     var pos = mp.Span[index];
                     Assert.Equal(pos, p2);
                 }
                 else
                 {
-                    Assert.Fail("Unexpected entity");
+                    Assert.Fail("Unexpected identity");
                 }
             }
         });
@@ -222,7 +222,7 @@ public class QueryTests
         /*var charlie = */
         world.Spawn().Add(p3).Link(eve, 222).Id();
 
-        var query = world.Query<Entity, Vector3>()
+        var query = world.Query<Identity, Vector3>()
             .Not<int>(bob)
             .Any<int>(alice)
             .Build();
@@ -233,16 +233,16 @@ public class QueryTests
             Assert.Equal(1, mp.Length);
             for (var index = 0; index < me.Length; index++)
             {
-                var entity = me.Span[index];
+                var identity = me.Span[index];
                 count++;
-                if (entity == bob)
+                if (identity == bob)
                 {
                     var pos = mp.Span[index];
                     Assert.Equal(pos, p2);
                 }
                 else
                 {
-                    Assert.Fail("Unexpected entity");
+                    Assert.Fail("Unexpected identity");
                 }
             }
         });
@@ -266,7 +266,7 @@ public class QueryTests
         world.Spawn().Add(p3).Link(bob, 555).Id();
         world.Spawn().Add(p3).Link(eve, 666).Id();
 
-        var query = world.Query<Entity, Vector3, int>()
+        var query = world.Query<Identity, Vector3, int>()
             .Not<int>(bob)
             .Build();
 
@@ -276,17 +276,17 @@ public class QueryTests
             Assert.Equal(2, mp.Length);
             for (var index = 0; index < me.Length; index++)
             {
-                var entity = me.Span[index];
+                var identity = me.Span[index];
                 count++;
                 
-                if (entity == alice)
+                if (identity == alice)
                 {
                     var pos = mp.Span[0];
                     Assert.Equal(pos, p1);
                     var integer = mi.Span[index];
                     Assert.Equal(0, integer);
                 }
-                else if (entity == eve)
+                else if (identity == eve)
                 {
                     var pos = mp.Span[index];
                     Assert.Equal(pos, p1);
@@ -295,7 +295,7 @@ public class QueryTests
                 }
                 else
                 {
-                    Assert.Fail($"Unexpected entity {entity}");
+                    Assert.Fail($"Unexpected identity {identity}");
                 }
             }
         });
@@ -312,17 +312,17 @@ public class QueryTests
         var query1A = world.Query().Build();
         var query1B = world.Query().Build();
 
-        var query2A = world.Query<Entity>().Build();
-        var query2B = world.Query<Entity>().Build();
+        var query2A = world.Query<Identity>().Build();
+        var query2B = world.Query<Identity>().Build();
 
         var query3A = world.Query().Has<int>().Build();
         var query3B = world.Query().Has<int>().Build();
 
-        var query4A = world.Query<Entity>().Not<int>().Build();
-        var query4B = world.Query<Entity>().Not<int>().Build();
+        var query4A = world.Query<Identity>().Not<int>().Build();
+        var query4B = world.Query<Identity>().Not<int>().Build();
 
-        var query5A = world.Query<Entity>().Any<int>().Any<float>().Build();
-        var query5B = world.Query<Entity>().Any<int>().Any<float>().Build();
+        var query5A = world.Query<Identity>().Any<int>().Any<float>().Build();
+        var query5B = world.Query<Identity>().Any<int>().Any<float>().Build();
 
         Assert.True(ReferenceEquals(query1A, query1B));
         Assert.True(ReferenceEquals(query2A, query2B));
@@ -354,10 +354,10 @@ public class QueryTests
     private void Ref_disallows_Component_Type_Entity()
     {
         using var world = new World();
-        var entity = world.Spawn().Id();
-        var query = world.Query<Entity>().Build();
+        var identity = world.Spawn().Id();
+        var query = world.Query<Identity>().Build();
 
-        Assert.Throws<TypeAccessException>(() => query.Ref<Entity>(entity));
+        Assert.Throws<TypeAccessException>(() => query.Ref<Identity>(identity));
     }
 
     
@@ -365,36 +365,36 @@ public class QueryTests
     private void Ref_disallows_Dead_Entity()
     {
         using var world = new World();
-        var entity = world.Spawn().Add<int>().Id();
-        world.Despawn(entity);
-        Assert.False(world.IsAlive(entity));
+        var identity = world.Spawn().Add<int>().Id();
+        world.Despawn(identity);
+        Assert.False(world.IsAlive(identity));
 
         var query = world.Query<int>().Build();
-        Assert.Throws<ObjectDisposedException>(() => query.Ref<int>(entity));
+        Assert.Throws<ObjectDisposedException>(() => query.Ref<int>(identity));
     }
 
     [Fact]
     private void Ref_disallows_Nonexistent_Component()
     {
         using var world = new World();
-        var entity = world.Spawn().Add<int>().Id();
+        var identity = world.Spawn().Add<int>().Id();
 
         var query = world.Query<int>().Build();
-        Assert.Throws<KeyNotFoundException>(() => query.Ref<float>(entity));
+        Assert.Throws<KeyNotFoundException>(() => query.Ref<float>(identity));
     }
 
     [Fact]
     private void Ref_gets_Mutable_Component()
     {
         using var world = new World();
-        var entity = world.Spawn().Add(23).Id();
+        var identity = world.Spawn().Add(23).Id();
         var query = world.Query<int>().Build();
 
-        ref var gotten = ref query.Ref<int>(entity);
+        ref var gotten = ref query.Ref<int>(identity);
         Assert.Equal(23, gotten);
 
-        // Entity can't be a ref (is readonly - make sure!)
+        // Identity can't be a ref (is readonly - make sure!)
         gotten = 42;
-        Assert.Equal(42, query.Ref<int>(entity));
+        Assert.Equal(42, query.Ref<int>(identity));
     }
 }

@@ -11,16 +11,16 @@ namespace fennecs;
 [StructLayout(LayoutKind.Explicit)]
 public readonly struct Identity(ulong value) : IEquatable<Identity>, IComparable<Identity>
 {
-    [FieldOffset(0)] public readonly ulong Value = value;
-    [FieldOffset(0)] public readonly int Id;
+    [FieldOffset(0)] internal readonly ulong Value = value;
+    [FieldOffset(0)] internal readonly int Id;
     
-    [FieldOffset(4)] public readonly ushort Generation;
-    [FieldOffset(4)] public readonly TypeID Decoration;
+    [FieldOffset(4)] internal readonly ushort Generation;
+    [FieldOffset(4)] internal readonly TypeID Decoration;
 
-    [FieldOffset(6)] public readonly TypeID RESERVED = 0;
+    [FieldOffset(6)] internal readonly TypeID RESERVED = 0;
 
-    [FieldOffset(0)] public readonly uint DWordLow;
-    [FieldOffset(4)] public readonly uint DWordHigh;
+    [FieldOffset(0)] internal readonly uint DWordLow;
+    [FieldOffset(4)] internal readonly uint DWordHigh;
     
     //public ulong Value => (uint) Id | (ulong) Generation << 32;
 
@@ -33,7 +33,7 @@ public readonly struct Identity(ulong value) : IEquatable<Identity>, IComparable
     // Tracked Object Reference.
     public bool IsObject => Decoration < 0;
 
-    // Special Entities, such as None, Any, and others.
+    // Special Entities, such as None, Any.
     public bool IsVirtual => Decoration >= 0 && Id <= 0;
 
     public static implicit operator Identity(Type type) => new(type);
@@ -76,14 +76,13 @@ public readonly struct Identity(ulong value) : IEquatable<Identity>, IComparable
         }
     }
 
-    public static implicit operator Entity(Identity id) => new(id);
     public static bool operator ==(Identity left, Identity right) => left.Equals(right);
     public static bool operator !=(Identity left, Identity right) => !left.Equals(right);
 
     public Type Type => Id switch
     {
         <= 0 => LanguageType.Resolve(Decoration),
-        _ => typeof(Entity),
+        _ => typeof(Identity),
     };
 
     public Identity Successor

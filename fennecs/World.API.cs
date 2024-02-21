@@ -10,17 +10,17 @@ public partial class World
     public EntityBuilder Spawn() => new(this, NewEntity());
 
     /// <summary>
-    /// Schedule operations on the given entity, via fluid API.
+    /// Schedule operations on the given identity, via fluid API.
     /// </summary>
     /// <example>
-    /// <code>world.On(entity).Add(123).Add("string").Remove&lt;int&gt;();</code>
+    /// <code>world.On(identity).Add(123).Add("string").Remove&lt;int&gt;();</code>
     /// </example>
     /// <remarks>
     /// The operations will be executed when this object is disposed, or the EntityBuilder's Id() method is called.
     /// </remarks>
-    /// <param name="entity"></param>
+    /// <param name="identity"></param>
     /// <returns>an EntityBuilder whose methods return itself, to provide a fluid syntax. </returns>
-    public EntityBuilder On(Entity entity) => new(this, entity);
+    public EntityBuilder On(Identity identity) => new(this, identity);
 
     #region Linked Components
 
@@ -34,27 +34,27 @@ public partial class World
             return new Linked<O>(link);
         }
 
-        public static Linked<Entity> With(Entity link)
+        public static Linked<Identity> With(Identity link)
         {
-            return new Linked<Entity>(link);
+            return new Linked<Identity>(link);
         }
     }
 
-    public void Add<T>(Entity entity, Linked<T> target) where T : class
+    public void Add<T>(Identity identity, Linked<T> target) where T : class
     {
         var linkIdentity = _referenceStore.Request(target.Link);
         var typeExpression = TypeExpression.Create<T>(linkIdentity);
-        AddComponent(entity, typeExpression, target);
+        AddComponent(identity, typeExpression, target);
     }
     */
 
     /// <summary>
-    /// Creates an Archetype relation between this entity and an object (instance of a class).
+    /// Creates an Archetype relation between this identity and an object (instance of a class).
     /// The relation is backed by the object itself, which will be enumerated by queries if desired.
-    /// Whenever the entity is enumerated by a query, it will be batched only with other entities
+    /// Whenever the identity is enumerated by a query, it will be batched only with other entities
     /// that share the exact relation, in addition to conforming with the other clauses of the query.
     /// The object is internally reference-counted, and the reference will be discarded once no other
-    /// entity is linked to it.
+    /// identity is linked to it.
     /// </summary>
     ///<remarks>
     /// Beware of Archetype Fragmentation!
@@ -62,47 +62,47 @@ public partial class World
     /// fragmentation of the Archetype Graph, i.e. Archetypes with very few entities that
     /// are difficult to iterate over efficiently.
     /// </remarks>
-    /// <param name="entity"></param>
+    /// <param name="identity"></param>
     /// <param name="target"></param>
     /// <typeparam name="T"></typeparam>
-    public void Link<T>(Entity entity, [NotNull] T target) where T : class
+    public void Link<T>(Identity identity, [NotNull] T target) where T : class
     {
         var typeExpression = TypeExpression.Create<T>(Identity.Of(target));
-        AddComponent(entity, typeExpression, target);
+        AddComponent(identity, typeExpression, target);
     }
     
     /// <summary>
-    /// Checks if this entity has an object-backed relation (instance of a class).
+    /// Checks if this identity has an object-backed relation (instance of a class).
     /// </summary>
-    /// <param name="entity"></param>
+    /// <param name="identity"></param>
     /// <param name="target"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    public bool HasLink<T>(Entity entity, [NotNull] T target) where T : class
+    public bool HasLink<T>(Identity identity, [NotNull] T target) where T : class
     {
         var typeExpression = TypeExpression.Create<T>(Identity.Of(target));
-        return HasComponent(entity, typeExpression);
+        return HasComponent(identity, typeExpression);
     }
 
     /// <summary>
-    /// Removes the object-backed relation between this entity and the object (instance of a class).
+    /// Removes the object-backed relation between this identity and the object (instance of a class).
     /// The object is internally reference-counted, and the reference will be discarded once no other
-    /// entity is linked to it.
+    /// identity is linked to it.
     /// </summary>
-    /// <param name="entity"></param>
+    /// <param name="identity"></param>
     /// <param name="target"></param>
     /// <typeparam name="T"></typeparam>
-    public void Unlink<T>(Entity entity, [NotNull] T target) where T : class
+    public void Unlink<T>(Identity identity, [NotNull] T target) where T : class
     {
         var typeExpression = TypeExpression.Create<T>(Identity.Of(target));
-        RemoveComponent(entity, typeExpression);
+        RemoveComponent(identity, typeExpression);
     }
 
 
     /// <summary>
-    /// Creates an Archetype relation between this entity and another entity.
+    /// Creates an Archetype relation between this identity and another identity.
     /// The relation is backed by an arbitrary type to provide additional data.
-    /// Whenever the entity is enumerated by a query, it will be batched only with other entities
+    /// Whenever the identity is enumerated by a query, it will be batched only with other entities
     /// that share the exact relation, in addition to conforming with the other clauses of the query.
     /// </summary>
     ///<remarks>
@@ -111,89 +111,89 @@ public partial class World
     /// fragmentation of the Archetype Graph, i.e. Archetypes with very few entities that
     /// are difficult to iterate over efficiently.
     /// </remarks>
-    /// <param name="entity"></param>
+    /// <param name="identity"></param>
     /// <param name="target"></param>
     /// <param name="data"></param>
     /// <typeparam name="T">any component type</typeparam>
-    public void Link<T>(Entity entity, Entity target, T data)
+    public void Link<T>(Identity identity, Identity target, T data)
     {
-        var typeExpression = TypeExpression.Create<T>(target.Identity);
-        AddComponent(entity, typeExpression, data);
+        var typeExpression = TypeExpression.Create<T>(target);
+        AddComponent(identity, typeExpression, data);
     }
     
     /// <summary>
-    /// Checks if this entity has a relation component with another entity.
+    /// Checks if this identity has a relation component with another identity.
     /// </summary>
-    /// <param name="entity"></param>
+    /// <param name="identity"></param>
     /// <param name="target"></param>
     /// <typeparam name="T">any component type</typeparam>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    public bool HasLink<T>(Entity entity, Entity target)
+    public bool HasLink<T>(Identity identity, Identity target)
     {
-        var typeExpression = TypeExpression.Create<T>(target.Identity);
-        return HasComponent(entity, typeExpression);
+        var typeExpression = TypeExpression.Create<T>(target);
+        return HasComponent(identity, typeExpression);
     }
 
     /// <summary>
-    /// Removes the relation component between this entity and another entity.
+    /// Removes the relation component between this identity and another identity.
     /// </summary>
-    /// <param name="entity"></param>
+    /// <param name="identity"></param>
     /// <param name="target"></param>
     /// <typeparam name="T">any component type</typeparam>
-    public void Unlink<T>(Entity entity, Entity target)
+    public void Unlink<T>(Identity identity, Identity target)
     {
-        var typeExpression = TypeExpression.Create<T>(target.Identity);
-        RemoveComponent(entity, typeExpression);
+        var typeExpression = TypeExpression.Create<T>(target);
+        RemoveComponent(identity, typeExpression);
     }
 
     #endregion
     
-    public void AddComponent<T>(Entity entity) where T : new()
+    public void AddComponent<T>(Identity identity) where T : new()
     {
         var type = TypeExpression.Create<T>(Identity.None);
-        AddComponent(entity.Identity, type, new T());
+        AddComponent(identity, type, new T());
     }
 
     
-    public void AddComponent<T>(Entity entity, T data)
+    public void AddComponent<T>(Identity identity, T data)
     {
         if (data == null) throw new ArgumentNullException(nameof(data));
         var type = TypeExpression.Create<T>();
-        AddComponent(entity.Identity, type, data);
+        AddComponent(identity, type, data);
     }
 
     
-    public bool HasComponent<T>(Entity entity, Identity target = default)
+    public bool HasComponent<T>(Identity identity, Identity target = default)
     {
         var type = TypeExpression.Create<T>(target);
-        return HasComponent(entity, type);
+        return HasComponent(identity, type);
     }
 
     
-    public void RemoveComponent<T>(Entity entity)
+    public void RemoveComponent<T>(Identity identity)
     {
         var type = TypeExpression.Create<T>(Identity.None);
-        RemoveComponent(entity.Identity, type);
+        RemoveComponent(identity, type);
     }
     
 
     
     public void DespawnAllWith<T>(Identity target = default)
     {
-        using var query = Query<Entity>().Has<T>(target).Build();
-        query.Run(delegate(Span<Entity> entities)
+        using var query = Query<Identity>().Has<T>(target).Build();
+        query.Run(delegate(Span<Identity> entities)
         {
-            foreach (var entity in entities) Despawn(entity);
+            foreach (var identity in entities) Despawn(identity);
         });
     }
     
-    
-    public IEnumerable<(TypeExpression, object)> GetComponents(Entity entity)
+    /*
+    public IEnumerable<(TypeExpression, object)> GetComponents(Identity identity)
     {
-        return GetComponents(entity.Identity);
+        return GetComponents(identity);
     }
-
+*/
     
     public World(int capacity = 4096)
     {
@@ -202,8 +202,8 @@ public partial class World
         
         _meta = new EntityMeta[capacity];
 
-        //Create the "Entity" Archetype, which is also the root of the Archetype Graph.
-        _root = AddTable([TypeExpression.Create<Entity>(Identity.None)]);
+        //Create the "Identity" Archetype, which is also the root of the Archetype Graph.
+        _root = AddTable([TypeExpression.Create<Identity>(Identity.None)]);
     }
 
     public void Despawn(Identity identity)
@@ -226,7 +226,7 @@ public partial class World
 
             _identityPool.Despawn(identity);
 
-            // Find entity-entity relation reverse lookup (if applicable)
+            // Find identity-identity relation reverse lookup (if applicable)
             if (!_typesByRelationTarget.TryGetValue(identity, out var list)) return;
 
             //Remove components from all entities that had a relation
@@ -255,7 +255,7 @@ public partial class World
 
         if (oldTable.Types.Contains(typeExpression))
         {
-            throw new ArgumentException($"Entity {identity} already has component of type {typeExpression}");
+            throw new ArgumentException($"Identity {identity} already has component of type {typeExpression}");
         }
 
         if (_mode == Mode.Deferred)
@@ -288,16 +288,16 @@ public partial class World
         storage.SetValue(data, newRow);
     }
 
-    public ref T GetComponent<T>(Entity entity, Identity target = default)
+    public ref T GetComponent<T>(Identity identity, Identity target = default)
     {
-        AssertAlive(entity);
+        AssertAlive(identity);
 
-        if (typeof(T) == typeof(Entity))
+        if (typeof(T) == typeof(Identity))
         {
-            throw new TypeAccessException("Not allowed get mutable reference in root table (TypeExpression<Entity>, system integrity).");
+            throw new TypeAccessException("Not allowed get mutable reference in root table (TypeExpression<Identity>, system integrity).");
         }
 
-        var meta = _meta[entity.Identity.Id];
+        var meta = _meta[identity.Id];
         var table = _tables[meta.TableId];
         var storage = table.GetStorage<T>(target);
         return ref storage[meta.Row];

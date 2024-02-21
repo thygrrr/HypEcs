@@ -13,7 +13,7 @@ public class IdentityTests(ITestOutputHelper output)
     }
 
     [Fact]
-    public void Identity_Resolves_Type()
+    public void NonVirtual_Identity_Resolves_as_Type()
     {
         var boolType = new Identity(typeof(bool));
         Assert.Equal(typeof(bool), boolType.Type);
@@ -22,8 +22,8 @@ public class IdentityTests(ITestOutputHelper output)
         Assert.Equal(typeof(LanguageType.None), Identity.None.Type);
 
         using var world = new World();
-        var entity = world.Spawn().Id();
-        Assert.Equal(typeof(Entity), entity.Identity.Type);
+        var identity = world.Spawn().Id();
+        Assert.Equal(typeof(Identity), identity.Type);
     }
     
     [Fact]
