@@ -1,37 +1,51 @@
 ![fennecs logo](./docs/logos/fennecs-logo-darkmode.svg#gh-dark-mode-only) ![fennecs logo](./docs/logos/fennecs-logo-lightmode.svg#gh-light-mode-only)
 
 <table style="width: 90%">
-    <th colspan="10"><h3>... the tiny, tiny, high-energy Entity Component System!</h3></th>
-    <tr>
-        <td colspan="3" style="width: fit-content">
-            <img src="docs/logos/fennecs.png" alt="a box of fennecs, 8-color pixel art" style="min-width: 320px"/>
-        </td>
-        <td colspan="7">
-            <h1>What the fox!? Another ECS?</h1>
-            <p>We know... oh, <em>we know.</em> 😩</p>
-            <p>But in a nutshell, <a href="https://fennecs.tech"><span style="font-size: larger"><em><b>fenn</b>ecs</em></span></a> is...</p>
-            <p>
-                🐾 zero codegen<br/>
-                🐾 minimal boilerplate<br/>
-                🐾 archetype-based<br/>
-                🐾 intuitively relational<br/>
-                🐾 lithe and fast<br/>
-            </p>
-            <p><span style="font-size: larger"><em><b>fenn</b>ecs</em></em></span> is a re-imagining of <a href="https://github.com/Byteron/HypEcs">RelEcs/HypEcs</a> 
-            which <em>feels just right<a href="#quickstart-lets-go">*</a></em> for high performance game development in any modern C# engine. Including, of course, the fantastic <a href="https://godotengine.org">Godot</a>.</p>
-        </td>
-    </tr>
-<tr><td colspan="3"><em>👍9 out of 10 fennecs<br/>recommend: <span style="font-size: larger"><em><b>fenn</b>ecs</em></span>!</em></td>
-<td colspan="7">
-<a href="https://www.nuget.org/packages/fennecs/"><img alt="Nuget" src="https://img.shields.io/nuget/v/fennecs?color=blue"/></a>
-<a href="https://github.com/thygrrr/fennECS/actions"><img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/thygrrr/fennECS/xUnit.yml"/></a>
-<a href="https://github.com/thygrrr/fennECS/issues"><img alt="Open issues" src="https://img.shields.io/github/issues-raw/thygrrr/fennECS?color=green"/></a>
-<img alt="GitHub top language" src="https://img.shields.io/github/languages/top/thygrrr/fennECS"/>
-<a href="https://github.com/thygrrr/fennECS?tab=MIT-1-ov-file#readme"><img alt="License: MIT" src="https://img.shields.io/github/license/thygrrr/fennECS?color=blue"/></a>
-</td></tr>
-<tr>
-<td colspan="1">Code Samples</sup></td><td>MonoGame<br/><sup>(soon)</sup></td><td>Stride<br/><sup>(soon)</sup></td><td><a href="https://github.com/thygrrr/fennecs/tree/main/examples/example-godot">Godot<br/><sup>(WIP)</a></td><td>Flax<br/><sup>(soon)</sup></td><td>Unity<br/><sup>(soon)</sup></td><td>CRYENGINE<br/><sup>(soon)</sup></td><td>Evergine<br/><sup>(soon)</sup></td><td>UNIGINE<br/><sup>(soon)</sup></td><td>NeoAxis<br/><sup>(soon)</sup></td>
-</tr>
+   <th colspan="10">
+      <h3>... the tiny, tiny, high-energy Entity Component System!</h3>
+   </th>
+   <tr>
+      <td colspan="3" style="width: fit-content">
+         <img src="docs/logos/fennecs.png" alt="a box of fennecs, 8-color pixel art" style="min-width: 320px"/>
+      </td>
+      <td colspan="7">
+         <h1>What the fox!? Another ECS?</h1>
+         <p>We know... oh, <em>we know.</em> 😩</p>
+         <p>But in a nutshell, <a href="https://fennecs.tech"><span style="font-size: larger"><em><b>fenn</b>ecs</em></span></a> is...</p>
+         <p>
+            🐾 zero codegen<br/>
+            🐾 minimal boilerplate<br/>
+            🐾 archetype-based<br/>
+            🐾 intuitively relational<br/>
+            🐾 lithe and fast<br/>
+         </p>
+         <p><span style="font-size: larger"><em><b>fenn</b>ecs</em></em></span> is a re-imagining of <a href="https://github.com/Byteron/HypEcs">RelEcs/HypEcs</a> 
+            which <em>feels just right<a href="#quickstart-lets-go">*</a></em> for high performance game development in any modern C# engine. Including, of course, the fantastic <a href="https://godotengine.org">Godot</a>.
+         </p>
+      </td>
+   </tr>
+   <tr>
+      <td colspan="3"><em>👍9 out of 10 fennecs<br/>recommend: <span style="font-size: larger"><em><b>fenn</b>ecs</em></span>!</em></td>
+      <td colspan="7">
+         <a href="https://www.nuget.org/packages/fennecs/"><img alt="Nuget" src="https://img.shields.io/nuget/v/fennecs?color=blue"/></a>
+         <a href="https://github.com/thygrrr/fennECS/actions"><img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/thygrrr/fennECS/xUnit.yml"/></a>
+         <a href="https://github.com/thygrrr/fennECS/issues"><img alt="Open issues" src="https://img.shields.io/github/issues-raw/thygrrr/fennECS?color=green"/></a>
+         <img alt="GitHub top language" src="https://img.shields.io/github/languages/top/thygrrr/fennECS"/>
+         <a href="https://github.com/thygrrr/fennECS?tab=MIT-1-ov-file#readme"><img alt="License: MIT" src="https://img.shields.io/github/license/thygrrr/fennECS?color=blue"/></a>
+      </td>
+   </tr>
+   <tr>
+      <td colspan="1">Code Samples</sup></td>
+      <td>MonoGame<br/><sup>(soon)</sup></td>
+      <td>Stride<br/><sup>(soon)</sup></td>
+      <td><a href="https://github.com/thygrrr/fennecs/tree/main/examples/example-godot">Godot<br/><sup>(WIP)</a></td>
+      <td>Flax<br/><sup>(soon)</sup></td>
+      <td>Unity<br/><sup>(waiting)</sup></td>
+      <td>CRYENGINE<br/><sup>(soon)</sup></td>
+      <td>Evergine<br/><sup>(soon)</sup></td>
+      <td>UNIGINE<br/><sup>(soon)</sup></td>
+      <td>NeoAxis<br/><sup>(soon)</sup></td>
+   </tr>
 </table>
 
 ## Quickstart: Let's go!
