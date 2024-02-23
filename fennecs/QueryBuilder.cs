@@ -82,7 +82,7 @@ public class QueryBuilder : IDisposable
 public sealed class QueryBuilder<C1> : QueryBuilder
 {
     private static readonly Func<World, List<TypeExpression>, Mask, List<Archetype>, Query> CreateQuery =
-        (world, outputs, mask, matchingTables) => new Query<C1>(world, outputs, mask, matchingTables);
+        (world, streamTypes, mask, matchingTables) => new Query<C1>(world, streamTypes, mask, matchingTables);
 
     internal QueryBuilder(World world, Entity match = default) : base(world)
     {
@@ -133,7 +133,7 @@ public sealed class QueryBuilder<C1> : QueryBuilder
 public sealed class QueryBuilder<C1, C2> : QueryBuilder
 {
     private static readonly Func<World, List<TypeExpression>, Mask, List<Archetype>, Query> CreateQuery =
-        (world, outputs, mask, matchingTables) => new Query<C1, C2>(world, outputs, mask, matchingTables);
+        (world, streamTypes, mask, matchingTables) => new Query<C1, C2>(world, streamTypes, mask, matchingTables);
 
 
     internal QueryBuilder(World world, Entity match1, Entity match2) : base(world)
@@ -186,7 +186,7 @@ public sealed class QueryBuilder<C1, C2> : QueryBuilder
 public sealed class QueryBuilder<C1, C2, C3> : QueryBuilder
 {
     private static readonly Func<World, List<TypeExpression>, Mask, List<Archetype>, Query> CreateQuery =
-        (world, outputs, mask, matchingTables) => new Query<C1, C2, C3>(world, outputs, mask, matchingTables);
+        (world, streamTypes, mask, matchingTables) => new Query<C1, C2, C3>(world, streamTypes, mask, matchingTables);
 
 
     internal QueryBuilder(World world, Entity match1, Entity match2, Entity match3) : base(world)
@@ -240,7 +240,7 @@ public sealed class QueryBuilder<C1, C2, C3> : QueryBuilder
 public sealed class QueryBuilder<C1, C2, C3, C4> : QueryBuilder
 {
     private static readonly Func<World, List<TypeExpression>, Mask, List<Archetype>, Query> CreateQuery =
-        (world, outputs, mask, matchingTables) => new Query<C1, C2, C3, C4>(world, outputs, mask, matchingTables);
+        (world, streamTypes, mask, matchingTables) => new Query<C1, C2, C3, C4>(world, streamTypes, mask, matchingTables);
 
 
     internal QueryBuilder(World world, Entity match1, Entity match2, Entity match3, Entity match4) : base(world)
@@ -295,7 +295,7 @@ public sealed class QueryBuilder<C1, C2, C3, C4> : QueryBuilder
 public sealed class QueryBuilder<C1, C2, C3, C4, C5> : QueryBuilder
 {
     private static readonly Func<World, List<TypeExpression>, Mask, List<Archetype>, Query> CreateQuery =
-        (world, outputs, mask, matchingTables) => new Query<C1, C2, C3, C4, C5>(world, outputs, mask, matchingTables);
+        (world, streamTypes, mask, matchingTables) => new Query<C1, C2, C3, C4, C5>(world, streamTypes, mask, matchingTables);
 
 
     internal QueryBuilder(World world, Entity match1, Entity match2, Entity match3, Entity match4, Entity match5) : base(world)

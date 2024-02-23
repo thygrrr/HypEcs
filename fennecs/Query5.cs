@@ -11,7 +11,7 @@ public class Query<C0, C1, C2, C3, C4> : Query<C0, C1, C2, C3>
     private readonly int[] _counter = new int[5];
     private readonly int[] _limiter = new int[5];
 
-    internal Query(World world, List<TypeExpression> outputs, Mask mask, List<Archetype> archetypes) : base(world, outputs, mask, archetypes)
+    internal Query(World world, List<TypeExpression> streamTypes, Mask mask, List<Archetype> archetypes) : base(world, streamTypes, mask, archetypes)
     {
     }
 
