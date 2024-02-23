@@ -21,7 +21,7 @@
             which <em>feels just right<a href="#quickstart-lets-go">*</a></em> for high performance game development in any modern C# engine. Including, of course, the fantastic <a href="https://godotengine.org">Godot</a>.</p>
         </td>
     </tr>
-<tr><td colspan="3"><i>👍9 out of 10 fennecs<br/>recommend: fenn<b>ecs</b>!</i></td>
+<tr><td colspan="3"><em>👍9 out of 10 fennecs<br/>recommend: <span style="font-size: larger"><em><b>fenn</b>ecs</em></span>!</em></td>
 <td colspan="9">
 <a href="https://www.nuget.org/packages/fennecs/"><img alt="Nuget" src="https://img.shields.io/nuget/v/fennecs"/></a>
 <a href="https://github.com/thygrrr/fennECS/actions"><img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/thygrrr/fennECS/xUnit.yml"/></a>
