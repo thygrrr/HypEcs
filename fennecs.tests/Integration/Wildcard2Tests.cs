@@ -3,7 +3,6 @@
 public class Wildcard2Tests
 {
     private readonly World _world;
-
     private readonly Entity _entity;
     
     // string may be interned or not
