@@ -2,9 +2,6 @@
 
 ### ... the tiny, tiny, high-energy Entity Component System!
 
-[View on Github](https://github.com/thygrrr/fennecs)
-
-
 <table style="border: none; border-collapse: collapse; width: 80%">
     <tr>
         <td style="width: fit-content">
@@ -13,7 +10,7 @@
         <td>
             <h1>What the fox!? Another ECS?</h1>
             <p>We know... oh, <em>we know.</em> 😩️</p>  
-            <h3>But in a nutshell, <a href="https://github.com/thygrrr/fennecs"><span style="font-size: larger"><em>fenn<b>ecs</b></em></span></a> is...</h3>
+            <h3>But in a nutshell, <a href="https://fennecs.tech"><span style="font-size: larger"><em><b>fenn</b>ecs</em></span></a> is...</h3>
             <ul style="list-style-type: '🐾 ';">
                 <li>zero codegen</li>
                 <li>minimal boilerplate</li>
@@ -21,7 +18,7 @@
                 <li>intuitively relational</li>
                 <li>lithe and fast</li>
             </ul>
-            <p><em>fenn<b>ecs</b></em> is a re-imagining of <a href="https://github.com/Byteron/HypEcs">RelEcs/HypEcs</a> 
+            <p><span style="font-size: larger"><em><b>fenn</b>ecs</em></em></span> is a re-imagining of <a href="https://github.com/Byteron/HypEcs">RelEcs/HypEcs</a> 
             which <em>feels just right<a href="#quickstart-lets-go">*</a></em> for high performance game development in any modern C# engine. Including, of course, the fantastic <a href="https://godotengine.org">Godot</a>.</p>
         </td>
     </tr>
