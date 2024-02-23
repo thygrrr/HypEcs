@@ -8,7 +8,8 @@
         </td>
         <td colspan="7">
             <h1>What the fox!? Another ECS?</h1>
-            <p>We know... oh, <em>we know.</em> 😩️<br/> But in a nutshell, <a href="https://fennecs.tech"><span style="font-size: larger"><em><b>fenn</b>ecs</em></span></a> is...</p>
+            <p>We know... oh, <em>we know.</em> 😩</p>
+            <p>But in a nutshell, <a href="https://fennecs.tech"><span style="font-size: larger"><em><b>fenn</b>ecs</em></span></a> is...</p>
             <p>
                 🐾 zero codegen<br/>
                 🐾 minimal boilerplate<br/>
