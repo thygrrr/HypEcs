@@ -76,6 +76,7 @@ public class Query<C0, C1, C2, C3> : Query<C0, C1, C2>
             _counter[2] = 0;
             _limiter[2] = storages2.Count;
             _counter[3] = 0;
+            _limiter[3] = storages3.Count;
 
             do
             {
