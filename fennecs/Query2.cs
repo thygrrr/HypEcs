@@ -26,8 +26,8 @@ public class Query<C0, C1> : Query<C0>
             if (table.IsEmpty) continue;
             var count = table.Count;
 
-            using var storages0 = table.Match<C0>(Mask.HasTypes[0]);
-            using var storages1 = table.Match<C1>(Mask.HasTypes[1]);
+            using var storages0 = table.Match<C0>(StreamTypes[0]);
+            using var storages1 = table.Match<C1>(StreamTypes[1]);
 
             _counter[0] = 0;
             _limiter[0] = storages0.Count;
@@ -57,8 +57,8 @@ public class Query<C0, C1> : Query<C0>
             if (table.IsEmpty) continue;
             var count = table.Count;
 
-            using var storages0 = table.Match<C0>(Mask.HasTypes[0]);
-            using var storages1 = table.Match<C1>(Mask.HasTypes[1]);
+            using var storages0 = table.Match<C0>(StreamTypes[0]);
+            using var storages1 = table.Match<C1>(StreamTypes[1]);
 
             _counter[0] = 0;
             _limiter[0] = storages0.Count;
@@ -86,8 +86,8 @@ public class Query<C0, C1> : Query<C0>
         {
             if (table.IsEmpty) continue;
 
-            using var storages0 = table.Match<C0>(Mask.HasTypes[0]);
-            using var storages1 = table.Match<C1>(Mask.HasTypes[1]);
+            using var storages0 = table.Match<C0>(StreamTypes[0]);
+            using var storages1 = table.Match<C1>(StreamTypes[1]);
             
             _counter[0] = 0;
             _limiter[0] = storages0.Count;
@@ -115,8 +115,8 @@ public class Query<C0, C1> : Query<C0>
         {
             if (table.IsEmpty) continue;
 
-            using var storages0 = table.Match<C0>(Mask.HasTypes[0]);
-            using var storages1 = table.Match<C1>(Mask.HasTypes[1]);
+            using var storages0 = table.Match<C0>(StreamTypes[0]);
+            using var storages1 = table.Match<C1>(StreamTypes[1]);
                 
             _counter[0] = 0;
             _limiter[0] = storages0.Count;
@@ -147,8 +147,8 @@ public class Query<C0, C1> : Query<C0>
         {
             if (table.IsEmpty) continue;
 
-            using var storages0 = table.Match<C0>(Mask.HasTypes[0]);
-            using var storages1 = table.Match<C1>(Mask.HasTypes[1]);
+            using var storages0 = table.Match<C0>(StreamTypes[0]);
+            using var storages1 = table.Match<C1>(StreamTypes[1]);
             
             _counter[0] = 0;
             _limiter[0] = storages0.Count;
@@ -199,8 +199,8 @@ public class Query<C0, C1> : Query<C0>
         {
             if (table.IsEmpty) continue;
 
-            using var storages0 = table.Match<C0>(Mask.HasTypes[0]);
-            using var storages1 = table.Match<C1>(Mask.HasTypes[1]);
+            using var storages0 = table.Match<C0>(StreamTypes[0]);
+            using var storages1 = table.Match<C1>(StreamTypes[1]);
 
             _counter[0] = 0;
             _limiter[0] = storages0.Count;
@@ -249,8 +249,8 @@ public class Query<C0, C1> : Query<C0>
         {
             if (table.IsEmpty) continue;
 
-            using var storages0 = table.Match<C0>(Mask.HasTypes[0]);
-            using var storages1 = table.Match<C1>(Mask.HasTypes[1]);
+            using var storages0 = table.Match<C0>(StreamTypes[0]);
+            using var storages1 = table.Match<C1>(StreamTypes[1]);
             
             _counter[0] = 0;
             _limiter[0] = storages0.Count;
@@ -278,8 +278,8 @@ public class Query<C0, C1> : Query<C0>
         {
             if (table.IsEmpty) continue;
 
-            using var storages0 = table.Match<C0>(Mask.HasTypes[0]);
-            using var storages1 = table.Match<C1>(Mask.HasTypes[1]);
+            using var storages0 = table.Match<C0>(StreamTypes[0]);
+            using var storages1 = table.Match<C1>(StreamTypes[1]);
             
             _counter[0] = 0;
             _limiter[0] = storages0.Count;
