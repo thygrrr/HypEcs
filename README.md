@@ -110,18 +110,18 @@ well; and things it may aspire to do but compromised on in order to be able to a
 
 ## 💡Highlights / Design Goals
 
-- ✅ Modern C# 12 codebase, targeting .NET 8.
-- ✅ Full Unit Test coverage.
-- 🟨 Benchmarking suite. (Work in Progress)
+[x] Modern C# 12 codebase, targeting .NET 8.
+[x] Full Unit Test coverage.
+[ ] Benchmarking suite. (Work in Progress)
 
-- ✅ Workloads can be easily parallelized across *and within* Archetypes
+[x] Workloads can be easily parallelized across *and within* Archetypes
 
-- ✅ Expressive, queryable relations between Entities and Objects
-- ✅ Entity Structural Changes with O(1) time complexity (per individual change).
-- ✅ Entity-Component Queries with O(1) runtime lookup time complexity.
+[x] Expressive, queryable relations between Entities and Objects
+[x] Entity Structural Changes with O(1) time complexity (per individual change).
+[x] Entity-Component Queries with O(1) runtime lookup time complexity.
 
-- ✅ No code generation required.
-- ✅ No reflection required.
+[x] No code generation required.
+[x] No reflection required.
 
 
 ------------------------
