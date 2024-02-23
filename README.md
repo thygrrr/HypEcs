@@ -23,14 +23,14 @@
     </tr>
 <tr><td colspan="3"><em>👍9 out of 10 fennecs<br/>recommend: <span style="font-size: larger"><em><b>fenn</b>ecs</em></span>!</em></td>
 <td colspan="9">
-<a href="https://www.nuget.org/packages/fennecs/"><img alt="Nuget" src="https://img.shields.io/nuget/v/fennecs"/></a>
+<a href="https://www.nuget.org/packages/fennecs/"><img alt="Nuget" src="https://img.shields.io/nuget/v/fennecs?color=blue"/></a>
 <a href="https://github.com/thygrrr/fennECS/actions"><img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/thygrrr/fennECS/xUnit.yml"/></a>
-<a href="https://github.com/thygrrr/fennECS/issues"><img alt="Open issues" src="https://img.shields.io/github/issues-raw/thygrrr/fennECS"/></a>
+<a href="https://github.com/thygrrr/fennECS/issues"><img alt="Open issues" src="https://img.shields.io/github/issues-raw/thygrrr/fennECS?color=green"/></a>
 <img alt="GitHub top language" src="https://img.shields.io/github/languages/top/thygrrr/fennECS"/>
 <a href="https://github.com/thygrrr/fennECS?tab=MIT-1-ov-file#readme"><img alt="License: MIT" src="https://img.shields.io/github/license/thygrrr/fennECS?color=blue"/></a>
 </td></tr>
 <tr>
-<td colspan="1">Code Samples</sup></td><td><a href="https://github.com/thygrrr/fennecs/tree/main/examples/example-godot">Godot<br/><sup>(WIP)</a></td><td>MonoGame<br/><sup>(soon)</sup></td><td>Stride<br/><sup>(soon)</sup></td><td>Flax<br/><sup>(soon)</sup></td><td>Unity<br/><sup>(soon)</sup></td><td>CRYENGINE<br/><sup>(soon)</sup></td><td>Evergine<br/><sup>(soon)</sup></td><td>UNIGINE<br/><sup>(soon)</sup></td><td>NeoAxis<br/><sup>(soon)</sup></td>
+<td colspan="1">Code Samples</sup></td><td>MonoGame<br/><sup>(soon)</sup></td><td>Stride<br/><sup>(soon)</sup></td><td><a href="https://github.com/thygrrr/fennecs/tree/main/examples/example-godot">Godot<br/><sup>(WIP)</a></td><td>Flax<br/><sup>(soon)</sup></td><td>Unity<br/><sup>(soon)</sup></td><td>CRYENGINE<br/><sup>(soon)</sup></td><td>Evergine<br/><sup>(soon)</sup></td><td>UNIGINE<br/><sup>(soon)</sup></td><td>NeoAxis<br/><sup>(soon)</sup></td>
 </tr>
 </table>
 
@@ -110,16 +110,19 @@ well; and things it may aspire to do but compromised on in order to be able to a
 
 ## 💡Highlights / Design Goals
 
-- Workloads can be easily parallelized across Archetypes (old) and within Archetypes (new).
-- Entity-Entity-, and Entity-Type-Relations with O(1) runtime lookup time complexity.
-- Entity Structural Changes with O(1) time complexity (per individual change).
-- Entity-Component Queries with O(1) runtime lookup time complexity. 
-- No code generation required.
-- No reflection required.
+- ✅ Modern C# 12 codebase, targeting .NET 8.
+- ✅ Full Unit Test coverage.
+- 🟨 Benchmarking suite. (Work in Progress)
 
-- Full Unit Test coverage. (Work in Progress)
-- Benchmarking suite. (Work in Progress)
-- Modern C# 12 codebase, targeting .NET 8.
+- ✅ Workloads can be easily parallelized across *and within* Archetypes
+
+- ✅ Expressive, queryable relations between Entities and Objects
+- ✅ Entity Structural Changes with O(1) time complexity (per individual change).
+- ✅ Entity-Component Queries with O(1) runtime lookup time complexity.
+
+- ✅ No code generation required.
+- ✅ No reflection required.
+
 
 ------------------------
 
