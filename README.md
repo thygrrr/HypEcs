@@ -7,7 +7,7 @@
             <img src="docs/logos/fennecs.png" alt="a box of fennecs, 8-color pixel art" style="min-width: 320px"/>
         </td>
         <td colspan="7">
-            <h1>What the fox!? Another ECS?</h1>
+            <h2>What the fox!? Another ECS?</h2>
             <p>We know... oh, <em>we know.</em> 😩</p>
             <p>But in a nutshell, <a href="https://fennecs.tech"><span style="font-size: larger"><em><b>fenn</b>ecs</em></span></a> is...</p>
             <p>
