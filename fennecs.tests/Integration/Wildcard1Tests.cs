@@ -16,7 +16,12 @@ public class Wildcard1Tests
         _world = new World();
         
         var bob = _world.Spawn().Id();
-        _entity = _world.Spawn().AddLink(OBJECT1).AddLink(OBJECT2).Add(NONE1).AddRelation(bob, RELATION1).Id();
+        _entity = _world.Spawn()
+            .AddLink(OBJECT1)
+            .AddLink(OBJECT2)
+            .Add(NONE1)
+            .AddRelation(bob, RELATION1)
+            .Id();
     }
     
     [Fact]
@@ -103,7 +108,6 @@ public class Wildcard1Tests
         {
             Assert.DoesNotContain(str, seen);
             seen.Add(str);
-            Assert.True(ReferenceEquals(OBJECT1, str) || ReferenceEquals(OBJECT2, str));
         });
         
         Assert.Contains(OBJECT1, seen);

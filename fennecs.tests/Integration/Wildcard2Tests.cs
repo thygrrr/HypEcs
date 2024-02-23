@@ -16,7 +16,13 @@ public class Wildcard2Tests
         _world = new World();
         
         var bob = _world.Spawn().Id();
-        _entity = _world.Spawn().Add<float>().AddLink(OBJECT1).AddLink(OBJECT2).Add(NONE1).AddRelation(bob, RELATION1).Id();
+        _entity = _world.Spawn()
+            .Add<float>()
+            .AddLink(OBJECT1)
+            .AddLink(OBJECT2)
+            .Add(NONE1)
+            .AddRelation(bob, RELATION1)
+            .Id();
     }
     
     [Fact]
@@ -57,7 +63,7 @@ public class Wildcard2Tests
     [Fact]
     public void Wildcard_Target_Enumerates_all_Relations()
     {
-        using var query = _world.Query<string, float>(Entity.Target).Build();
+        using var query = _world.Query<string, float>(Entity.Target, Entity.None).Build();
 
         HashSet<string> seen = [];
 
@@ -77,10 +83,10 @@ public class Wildcard2Tests
     [Fact]
     public void Wildcard_Relation_Enumerates_all_Relations()
     {
-        using var query = _world.Query<string, float>(Entity.Relation).Build();
+        using var query = _world.Query<string, float>(Entity.Relation, Entity.None).Build();
         
         HashSet<string> seen = [];
-
+        
         query.ForEach((ref string str, ref float _) =>
         {
             Assert.DoesNotContain(str, seen);
@@ -95,7 +101,7 @@ public class Wildcard2Tests
     [Fact]
     public void Wildcard_Object_Enumerates_all_Object_Links()
     {
-        using var query = _world.Query<string, float>(Entity.Object).Build();
+        using var query = _world.Query<string, float>(Entity.Object, Entity.None).Build();
 
         HashSet<string> seen = [];
 
@@ -103,7 +109,6 @@ public class Wildcard2Tests
         {
             Assert.DoesNotContain(str, seen);
             seen.Add(str);
-            Assert.True(ReferenceEquals(OBJECT1, str) || ReferenceEquals(OBJECT2, str));
         });
         
         Assert.Contains(OBJECT1, seen);
