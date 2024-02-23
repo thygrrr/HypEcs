@@ -1,8 +1,7 @@
 ![fennecs logo](./docs/logos/fennecs-logo-darkmode.svg#gh-dark-mode-only) ![fennecs logo](./docs/logos/fennecs-logo-lightmode.svg#gh-light-mode-only)
 
-### ... the tiny, tiny, high-energy Entity Component System!
-
 <table style="width: 90%">
+    <th><td colspan="10"><h3>... the tiny, tiny, high-energy Entity Component System!</h3></td></th>
     <tr>
         <td colspan="3" style="width: fit-content">
             <img src="docs/logos/fennecs.png" alt="a box of fennecs, 8-color pixel art" style="min-width: 320px"/>
