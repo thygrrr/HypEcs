@@ -28,7 +28,7 @@ public class Wildcard2Tests
     [Fact]
     public void Wildcard_Any_Enumerates_all_Components_Once()
     {
-        using var query = _world.Query<string, float>(Entity.Any).Build();
+        using var query = _world.Query<string, float>(Entity.Any, Entity.None).Build();
         
         HashSet<string> seen = [];
         query.ForEach((ref string str, ref float _) =>
@@ -47,7 +47,7 @@ public class Wildcard2Tests
     [Fact]
     public void Wildcard_None_Enumerates_Only_Plain_Components()
     {
-        using var query = _world.Query<string, float>(Entity.None).Build();
+        using var query = _world.Query<string, float>(Entity.None, Entity.None).Build();
 
         HashSet<string> seen = [];
         query.ForEach((ref string str, ref float _) =>
