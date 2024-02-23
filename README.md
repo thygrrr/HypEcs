@@ -30,7 +30,7 @@
 <a href="https://github.com/thygrrr/fennECS?tab=MIT-1-ov-file#readme"><img alt="License: MIT" src="https://img.shields.io/github/license/thygrrr/fennECS?color=blue"/></a>
 </td></tr>
 <tr>
-<td colspan="1">Code Samples</sup></td><td>MonoGame<br/><sup>(soon)</sup></td><td>Stride<br/><sup>(soon)</sup></td><td><a href="https://github.com/thygrrr/fennecs/tree/main/examples/example-godot">Godot<br/><sup>(WIP)</a></td><td>Flax<br/><sup>(soon)</sup></td><td>Unity<br/><sup>(soon)</sup></td><td>CRYENGINE<br/><sup>(soon)</sup></td><td>Evergine<br/><sup>(soon)</sup></td><td>UNIGINE<br/><sup>(soon)</sup></td><td>NeoAxis<br/><sup>(soon)</sup></td>
+<td colspan="1">Code Samples</sup></td><td>MonoGame<br/><sup>(help wanted)</sup></td><td>Stride<br/><sup>(help wanted)</sup></td><td><a href="https://github.com/thygrrr/fennecs/tree/main/examples/example-godot">Godot<br/><sup>(WIP)</a></td><td>Flax<br/><sup>(help wanted)</sup></td><td>Unity<br/><sup>(help wanted)</sup></td><td>CRYENGINE<br/><sup>(help wanted)</sup></td><td>Evergine<br/><sup>(help wanted)</sup></td><td>UNIGINE<br/><sup>(help wanted)</sup></td><td>NeoAxis<br/><sup>(help wanted)</sup></td>
 </tr>
 </table>
 
