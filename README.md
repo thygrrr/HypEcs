@@ -4,13 +4,12 @@
 
 <table style="border: none; border-collapse: collapse; width: 80%">
     <tr>
-        <td style="width: fit-content">
+        <td colspan="3" style="width: fit-content">
             <img src="docs/logos/fennecs.png" alt="a box of fennecs, 8-color pixel art" style="min-width: 320px"/>
         </td>
-        <td>
+        <td colspan="9">
             <h1>What the fox!? Another ECS?</h1>
-            <p>We know... oh, <em>we know.</em> 😩️</p>  
-            <h3>But in a nutshell, <a href="https://fennecs.tech"><span style="font-size: larger"><em><b>fenn</b>ecs</em></span></a> is...</h3>
+            <p>We know... oh, <em>we know.</em> 😩️<br/> But in a nutshell, <a href="https://fennecs.tech"><span style="font-size: larger"><em><b>fenn</b>ecs</em></span></a> is...</p>
             <ul style="list-style-type: '🐾 ';">
                 <li>zero codegen</li>
                 <li>minimal boilerplate</li>
@@ -22,13 +21,17 @@
             which <em>feels just right<a href="#quickstart-lets-go">*</a></em> for high performance game development in any modern C# engine. Including, of course, the fantastic <a href="https://godotengine.org">Godot</a>.</p>
         </td>
     </tr>
-<tr><td><i>👍9 out of 10 fennecs<br/>recommend: fenn<b>ecs</b>!</i></td><td>
+<tr><td colspan="3"><i>👍9 out of 10 fennecs<br/>recommend: fenn<b>ecs</b>!</i></td>
+<td colspan="9">
 <a href="https://www.nuget.org/packages/fennecs/"><img alt="Nuget" src="https://img.shields.io/nuget/v/fennecs"/></a>
 <a href="https://github.com/thygrrr/fennECS/actions"><img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/thygrrr/fennECS/xUnit.yml"/></a>
 <a href="https://github.com/thygrrr/fennECS/issues"><img alt="Open issues" src="https://img.shields.io/github/issues-raw/thygrrr/fennECS"/></a>
 <img alt="GitHub top language" src="https://img.shields.io/github/languages/top/thygrrr/fennECS"/>
 <a href="https://github.com/thygrrr/fennECS?tab=MIT-1-ov-file#readme"><img alt="License: MIT" src="https://img.shields.io/github/license/thygrrr/fennECS?color=blue"/></a>
 </td></tr>
+<tr>
+<td colspan="1">Code Samples</sup></td><td><a href="https://github.com/thygrrr/fennecs/tree/main/examples/example-godot">Godot<br/><sup>(WIP)</a></td><td>MonoGame<br/><sup>(soon)</sup></td><td>Stride<br/><sup>(soon)</sup></td><td>Flax<br/><sup>(soon)</sup></td><td>Unity<br/><sup>(soon)</sup></td><td>CRYENGINE<br/><sup>(soon)</sup></td><td>Evergine<br/><sup>(soon)</sup></td><td>UNIGINE<br/><sup>(soon)</sup></td><td>NeoAxis<br/><sup>(soon)</sup></td>
+</tr>
 </table>
 
 ## Quickstart: Let's go!
@@ -93,8 +96,8 @@ well; and things it may aspire to do but compromised on in order to be able to a
 | Mutable Shared Components                                                 |                    ✅                     |                  ❌                   |    ❌    |                ❌                 |                ✅                 | 
 | Reference Component Types                                                 |                    ✅                     |                  ❌                   |    ❌    |                ❌                 |                ❌                 |
 | Arbitrary Component Types                                                 |                    ✅                     | ✅<br/><sup>(value types only)</sup>  |    ❌    |                ❌                 |                ✅                 |
-| Structural Change Events                                                  |     🟨<br/><sup>(coming soon)</sup>      |                  ❌                   |    ✅    |  ☠️<br/><sup>(unreliable)</sup>  |                ❌                 |
-| Workload Scheduling                                                       |     🟨<br/><sup>(coming soon)</sup>      |                  ❌                   |      ❌  | ✅<br/><sup>(highly static)</sup> |                ✅                 |
+| Structural Change Events                                                  |     🟨<br/><sup>(soon)</sup>      |                  ❌                   |    ✅    |  ☠️<br/><sup>(unreliable)</sup>  |                ❌                 |
+| Workload Scheduling                                                       |     🟨<br/><sup>(soon)</sup>      |                  ❌                   |      ❌  | ✅<br/><sup>(highly static)</sup> |                ✅                 |
 | No Code Generation Required                                               |                    ✅                     |                  ✅                   |    ❌    |                ❌                 | 🟨<br/><sup>(roslyn addon)</sup> |
 | Enqueue Structural Changes at Any Time                                    |                    ✅                     |                  ✅                   |    ✅    | 🟨<br/><sup>(restrictive)</sup>  |                🟨                |
 | Apply Structural Changes at Any Time                                      |                    ❌                     |                  ❌                   |    ✅    |                ❌                 |                ❌                 |
@@ -127,7 +130,7 @@ We worked hard to minimize allocations, though convenience, especially paralleli
 
 _**fenn**ecs_ provides a variety of ways to iterate over and modify components, to offer a good balance of control and elegance without compromising too much. 
 
-Here are some raw results from our benchmark suite, from the Vector3 operations parts, better ones coming soon.
+Here are some raw results from our benchmark suite, from the Vector3 operations parts, better ones soon.
 (don't @ us)
 
 <details>
