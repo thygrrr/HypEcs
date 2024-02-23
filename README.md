@@ -8,12 +8,14 @@
         </td>
         <td colspan="7">
             <h1>What the fox!? Another ECS?</h1>
-            <p>We know... oh, <em>we know.</em> 😩️<br/> But in a nutshell, <a href="https://fennecs.tech"><span style="font-size: larger"><em><b>fenn</b>ecs</em></span></a> is...</p>            
+            <p>We know... oh, <em>we know.</em> 😩️<br/> But in a nutshell, <a href="https://fennecs.tech"><span style="font-size: larger"><em><b>fenn</b>ecs</em></span></a> is...</p>
+            <p>
                 🐾 zero codegen<br/>
                 🐾 minimal boilerplate<br/>
                 🐾 archetype-based<br/>
                 🐾 intuitively relational<br/>
                 🐾 lithe and fast<br/>
+            </p>
             <p><span style="font-size: larger"><em><b>fenn</b>ecs</em></em></span> is a re-imagining of <a href="https://github.com/Byteron/HypEcs">RelEcs/HypEcs</a> 
             which <em>feels just right<a href="#quickstart-lets-go">*</a></em> for high performance game development in any modern C# engine. Including, of course, the fantastic <a href="https://godotengine.org">Godot</a>.</p>
         </td>
