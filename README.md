@@ -2,7 +2,7 @@
 
 ### ... the tiny, tiny, high-energy Entity Component System!
 
-<table style="border: none; border-collapse: collapse; width: 80%">
+<table style="width: 80%">
     <tr>
         <td colspan="3" style="width: fit-content">
             <img src="docs/logos/fennecs.png" alt="a box of fennecs, 8-color pixel art" style="min-width: 320px"/>
